@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ContextPulse Lumina OS — Production Hardened Edition</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        deepvoid: '#030014',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- React & Babel -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #030014;
+            color: #f8fafc;
+        }
+
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Next-Gen Holographic Glass Cards */
+        .glass-card-luxe {
+            background: linear-gradient(135deg, rgba(20, 18, 50, 0.75) 0%, rgba(10, 8, 30, 0.9) 100%);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(236, 72, 153, 0.25);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), inset 0 1px 2px rgba(255, 255, 255, 0.25);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .glass-card-luxe:hover {
+            border-color: rgba(236, 72, 153, 0.7);
+            box-shadow: 0 30px 70px rgba(236, 72, 153, 0.3), inset 0 1px 3px rgba(255, 255, 255, 0.5);
+            transform: translateY(-5px);
+        }
+
+        /* Ambient Dynamic Color Mesh Orbs */
+        @keyframes floatOrb1 {
+            0%, 100% { transform: translate(0px, 0px) scale(1) rotate(0deg); }
+            50% { transform: translate(60px, -80px) scale(1.15) rotate(180deg); }
+        }
+        @keyframes floatOrb2 {
+            0%, 100% { transform: translate(0px, 0px) scale(1) rotate(0deg); }
+            50% { transform: translate(-70px, 60px) scale(1.2) rotate(-180deg); }
+        }
+        @keyframes floatOrb3 {
+            0%, 100% { transform: translate(0px, 0px) scale(1); }
+            50% { transform: translate(50px, 70px) scale(1.1); }
+        }
+
+        .orb-1 {
+            position: fixed;
+            top: -15%;
+            left: 5%;
+            width: 650px;
+            height: 650px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, rgba(99, 102, 241, 0.15) 55%, rgba(0,0,0,0) 80%);
+            z-index: -1;
+            pointer-events: none;
+            filter: blur(80px);
+            animation: floatOrb1 12s ease-in-out infinite;
+        }
+        .orb-2 {
+            position: fixed;
+            top: 25%;
+            right: 2%;
+            width: 750px;
+            height: 750px;
+            background: radial-gradient(circle, rgba(236, 72, 153, 0.35) 0%, rgba(217, 70, 239, 0.12) 55%, rgba(0,0,0,0) 80%);
+            z-index: -1;
+            pointer-events: none;
+            filter: blur(90px);
+            animation: floatOrb2 15s ease-in-out infinite;
+        }
+        .orb-3 {
+            position: fixed;
+            bottom: -15%;
+            left: 20%;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.3) 0%, rgba(59, 130, 246, 0.12) 55%, rgba(0,0,0,0) 80%);
+            z-index: -1;
+            pointer-events: none;
+            filter: blur(100px);
+            animation: floatOrb3 18s ease-in-out infinite;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #030014; }
+        ::-webkit-scrollbar-thumb { background: rgba(236, 72, 153, 0.4); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(236, 72, 153, 0.8); }
+    </style>
+</head>
+<body class="selection:bg-pink-500 selection:text-white relative overflow-x-hidden min-h-screen">
+
+    <!-- Ambient Glowing Orbs -->
+    <div class="orb-1"></div>
+    <div class="orb-2"></div>
+    <div class="orb-3"></div>
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo, useRef } = React;
+
+        const INITIAL_ITEMS = [
+            {
+                id: 'ctx-1',
+                title: 'Stripe Webhook Handler v2',
+                category: 'coders',
+                source: 'GitHub Gist',
+                image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80',
+                snippet: "app.post('/webhook', express.raw({type: 'application/json'}), async (req, res) => {\n  const event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);\n  // Handle secure async checkout fulfillment\n});",
+                description: 'Enterprise-grade async event processor built for handling subscription renewals and edge runtime network failures gracefully.',
+                metadata: 'Repo: saas-core • 12m ago',
+                favorite: true,
+                tags: ['#Backend', '#Stripe', '#NodeJS', '#Security']
+            },
+            {
+                id: 'ctx-2',
+                title: 'Brand Guidelines & 4K B-Roll Pack',
+                category: 'creators',
+                source: 'Google Drive',
+                image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80',
+                snippet: 'Primary Palette: #030014 (DeepVoid), #ec4899 (Neon Pink), #a855f7 (Electric Purple).\nTypography: Plus Jakarta Sans.',
+                description: 'Latest 4K raw assets, typography configurations, and official cinematic color grading lookup tables for global product launch.',
+                metadata: 'Size: 1.4 GB • 1h ago',
+                favorite: false,
+                tags: ['#BrandAssets', '#YouTubeS3', '#ColorGrading']
+            },
+            {
+                id: 'ctx-3',
+                title: 'Q3 Budget Realignment Decision',
+                category: 'leaders',
+                source: 'Executive Sync',
+                image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&auto=format&fit=crop&q=80',
+                snippet: 'Consensus Actions:\n1. Reallocate 40% capital expenditure toward autonomous AI compute clusters.\n2. Execute department lead signoffs by Friday.',
+                description: 'Executive board agreement reached on pivoting quarterly infrastructure investments toward high-speed machine learning nodes.',
+                metadata: 'Meeting: Boardroom Sync • 3h ago',
+                favorite: true,
+                tags: ['#Strategy', '#BudgetQ3', '#ExecBoard', '#AI']
+            },
+            {
+                id: 'ctx-4',
+                title: 'API Rate Limiting Architecture',
+                category: 'coders',
+                source: 'Notion Spec',
+                image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80',
+                snippet: 'MAX_REQUESTS = 150 per window_ms (60000)\nStorage: Distributed Redis Cluster token bucket algorithm.',
+                description: 'High-frequency distributed rate-limiting specification utilizing Redis sorted sets for public developer API keys.',
+                metadata: 'Space: Engineering • Yesterday',
+                favorite: false,
+                tags: ['#Architecture', '#Redis', '#API', '#Scaling']
+            }
+        ];
+
+        function App() {
+            const [items, setItems] = useState(() => {
+                try {
+                    const saved = localStorage.getItem('lumina_v5_items');
+                    if (saved) {
+                        const parsed = JSON.parse(saved);
+                        if (Array.isArray(parsed)) return parsed;
+                    }
+                } catch (e) {
+                    console.error("Failed to parse local storage items", e);
+                }
+                return INITIAL_ITEMS;
+            });
+
+            const [activeTab, setActiveTab] = useState('all');
+            const [searchQuery, setSearchQuery] = useState('');
+            const [isOmniOpen, setIsOmniOpen] = useState(false);
+            const [isAddOpen, setIsAddOpen] = useState(false);
+            const [toast, setToast] = useState(null);
+
+            // New Item Form State with validation errors
+            const [newTitle, setNewTitle] = useState('');
+            const [newCategory, setNewCategory] = useState('coders');
+            const [newSource, setNewSource] = useState('Custom Input');
+            const [newDescription, setNewDescription] = useState('');
+            const [newSnippet, setNewSnippet] = useState('');
+            const [newTags, setNewTags] = useState('');
+            const [newImage, setNewImage] = useState('');
+            const [formError, setFormError] = useState('');
+
+            const searchInputRef = useRef(null);
+
+            useEffect(() => {
+                try {
+                    localStorage.setItem('lumina_v5_items', JSON.stringify(items));
+                } catch (e) {
+                    console.error("Failed to save items to local storage", e);
+                }
+            }, [items]);
+
+            // Re-render Lucide icons safely when dependencies change
+            useEffect(() => {
+                if (window.lucide && typeof window.lucide.createIcons === 'function') {
+                    try {
+                        window.lucide.createIcons();
+                    } catch (e) {
+                        console.error("Lucide icon generation error:", e);
+                    }
+                }
+            }, [items, activeTab, searchQuery, isOmniOpen, isAddOpen]);
+
+            // Global Keyboard Shortcuts (⌘K, Esc)
+            useEffect(() => {
+                const handleKeyDown = (e) => {
+                    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+                        e.preventDefault();
+                        setIsOmniOpen(prev => {
+                            const nextState = !prev;
+                            if (nextState) {
+                                setTimeout(() => {
+                                    if (searchInputRef.current) searchInputRef.current.focus();
+                                }, 50);
+                            }
+                            return nextState;
+                        });
+                    }
+                    if (e.key === 'Escape') {
+                        setIsOmniOpen(false);
+                        setIsAddOpen(false);
+                    }
+                };
+                window.addEventListener('keydown', handleKeyDown);
+                return () => window.removeEventListener('keydown', handleKeyDown);
+            }, []);
+
+            const showToast = (msg) => {
+                setToast(msg);
+                setTimeout(() => setToast(null), 3500);
+            };
+
+            const toggleFavorite = (id) => {
+                setItems(prev => prev.map(item => item.id === id ? { ...item, favorite: !item.favorite } : item));
+                showToast("⭐ Favorite status toggled");
+            };
+
+            const deleteItem = (id) => {
+                setItems(prev => prev.filter(item => item.id !== id));
+                showToast("🗑️ Context artifact deleted");
+            };
+
+            const handleAddItem = (e) => {
+                e.preventDefault();
+                if (!newTitle.trim()) {
+                    setFormError('Artifact Title is required.');
+                    return;
+                }
+                setFormError('');
+
+                const newItem = {
+                    id: 'ctx-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
+                    title: newTitle.trim(),
+                    category: newCategory,
+                    source: newSource.trim() || 'Manual Entry',
+                    image: newImage.trim() || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80',
+                    snippet: newSnippet.trim(),
+                    description: newDescription.trim() || 'No description provided.',
+                    metadata: 'Created: Just now',
+                    favorite: false,
+                    tags: newTags ? newTags.split(',').map(t => {
+                        const clean = t.trim();
+                        return clean.startsWith('#') ? clean : '#' + clean;
+                    }).filter(t => t.length > 1) : ['#Custom']
+                };
+
+                setItems(prev => [newItem, ...prev]);
+                setIsAddOpen(false);
+                setNewTitle('');
+                setNewDescription('');
+                setNewSnippet('');
+                setNewTags('');
+                setNewImage('');
+                showToast("✨ New context artifact indexed successfully!");
+            };
+
+            const filtered = useMemo(() => {
+                return items.filter(item => {
+                    const matchTab = activeTab === 'all' || item.category === activeTab;
+                    const q = searchQuery.trim().toLowerCase();
+                    const matchQuery = !q || 
+                        item.title.toLowerCase().includes(q) ||
+                        item.description.toLowerCase().includes(q) ||
+                        item.source.toLowerCase().includes(q) ||
+                        item.tags.some(t => t.toLowerCase().includes(q)) ||
+                        (item.snippet && item.snippet.toLowerCase().includes(q));
+                    return matchTab && matchQuery;
+                });
+            }, [items, activeTab, searchQuery]);
+
+            return (
+                <div className="min-h-screen flex flex-col relative text-slate-100">
+                    
+                    {/* Toast Notification */}
+                    {toast && (
+                        <div className="fixed bottom-6 right-6 z-50 glass-card-luxe px-5 py-3.5 rounded-2xl border border-pink-500/60 shadow-2xl flex items-center space-x-3 bg-gradient-to-r from-purple-900/95 via-pink-900/95 to-rose-950/95 animate-bounce">
+                            <div className="w-3 h-3 rounded-full bg-pink-400 animate-ping"></div>
+                            <span className="text-xs font-extrabold text-white tracking-wide">{toast}</span>
+                        </div>
+                    )}
+
+                    {/* Omni-Search Modal / Command Palette */}
+                    {isOmniOpen && (
+                        <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 bg-deepvoid/80 backdrop-blur-md px-4" onClick={() => setIsOmniOpen(false)}>
+                            <div className="glass-card-luxe w-full max-w-2xl rounded-3xl p-6 border border-pink-500/60 shadow-2xl animate-in fade-in zoom-in duration-200" onClick={e => e.stopPropagation()}>
+                                <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
+                                    <div className="flex items-center space-x-3">
+                                        <i data-lucide="search" className="w-5 h-5 text-pink-400"></i>
+                                        <span className="font-extrabold text-white tracking-wide text-sm">Omni-Search Engine</span>
+                                    </div>
+                                    <button onClick={() => setIsOmniOpen(false)} className="text-xs font-bold text-slate-400 hover:text-white px-2.5 py-1 rounded-xl bg-white/5">
+                                        ESC
+                                    </button>
+                                </div>
+                                <input 
+                                    ref={searchInputRef}
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    placeholder="Type to search anything across your active streams..."
+                                    className="w-full bg-slate-950 border border-pink-500/50 rounded-2xl px-4 py-3.5 text-sm text-slate-100 outline-none mb-4 shadow-inner"
+                                />
+                                <div className="space-y-2 max-h-72 overflow-y-auto">
+                                    {filtered.length === 0 ? (
+                                        <p className="text-xs text-slate-400 text-center py-6">No matching records found.</p>
+                                    ) : (
+                                        filtered.map(item => (
+                                            <div key={item.id} onClick={() => { setSearchQuery(item.title); setIsOmniOpen(false); }} className="flex items-center justify-between p-3 rounded-2xl hover:bg-white/10 cursor-pointer transition border border-transparent hover:border-pink-500/30">
+                                                <div>
+                                                    <p className="text-xs font-bold text-white">{item.title}</p>
+                                                    <p className="text-[10px] text-slate-400">{item.source} • {item.category}</p>
+                                                </div>
+                                                <span className="text-[10px] font-mono text-pink-400 bg-pink-500/10 px-2 py-0.5 rounded-full border border-pink-500/20">Select</span>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Add Context Modal */}
+                    {isAddOpen && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-deepvoid/80 backdrop-blur-md" onClick={() => setIsAddOpen(false)}>
+                            <div className="glass-card-luxe w-full max-w-lg rounded-3xl p-6 border border-pink-500/60 shadow-2xl overflow-y-auto max-h-[90vh]" onClick={e => e.stopPropagation()}>
+                                <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
+                                    <div className="flex items-center space-x-3">
+                                        <i data-lucide="sparkles" className="w-5 h-5 text-pink-400"></i>
+                                        <span className="font-extrabold text-white tracking-wide text-sm">Add New Context Artifact</span>
+                                    </div>
+                                    <button onClick={() => setIsAddOpen(false)} className="text-xs font-bold text-slate-400 hover:text-white px-2.5 py-1 rounded-xl bg-white/5">
+                                        ✕
+                                    </button>
+                                </div>
+                                {formError && (
+                                    <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-xl text-red-200 text-xs font-bold">
+                                        {formError}
+                                    </div>
+                                )}
+                                <form onSubmit={handleAddItem} className="space-y-4">
+                                    <div>
+                                        <label className="block text-[11px] font-extrabold uppercase tracking-widest text-pink-400 mb-1.5">Artifact Title *</label>
+                                        <input 
+                                            type="text" value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="e.g. JWT Auth Middleware" 
+                                            className="w-full bg-slate-950 border border-white/15 rounded-xl px-4 py-2.5 text-xs text-slate-100 outline-none focus:border-pink-500"
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-[11px] font-extrabold uppercase tracking-widest text-pink-400 mb-1.5">Workspace</label>
+                                            <select value={newCategory} onChange={e => setNewCategory(e.target.value)} className="w-full bg-slate-950 border border-white/15 rounded-xl px-4 py-2.5 text-xs text-slate-100 outline-none focus:border-pink-500">
+                                                <option value="coders">Coders Workspace</option>
+                                                <option value="creators">Creators Vault</option>
+                                                <option value="leaders">Executive Suite</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-[11px] font-extrabold uppercase tracking-widest text-pink-400 mb-1.5">Source Provider</label>
+                                            <input 
+                                                type="text" value={newSource} onChange={e => setNewSource(e.target.value)} placeholder="e.g. GitHub, Notion" 
+                                                className="w-full bg-slate-950 border border-white/15 rounded-xl px-4 py-2.5 text-xs text-slate-100 outline-none focus:border-pink-500"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-[11px] font-extrabold uppercase tracking-widest text-pink-400 mb-1.5">Description</label>
+                                        <textarea 
+                                            rows="2" value={newDescription} onChange={e => setNewDescription(e.target.value)} placeholder="Brief summary of the artifact..." 
+                                            className="w-full bg-slate-950 border border-white/15 rounded-xl px-4 py-2 text-xs text-slate-100 outline-none focus:border-pink-500"
+                                        ></textarea>
+                                    </div>
+                                    <div>
+                                        <label className="block text-[11px] font-extrabold uppercase tracking-widest text-pink-400 mb-1.5">Code Snippet / Raw Data</label>
+                                        <textarea 
+                                            rows="3" value={newSnippet} onChange={e => setNewSnippet(e.target.value)} placeholder="const token = req.headers.authorization;" 
+                                            className="w-full bg-slate-950 border border-white/15 rounded-xl px-4 py-2 text-xs text-pink-200 code-font outline-none focus:border-pink-500"
+                                        ></textarea>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-[11px] font-extrabold uppercase tracking-widest text-pink-400 mb-1.5">Tags (comma separated)</label>
+                                            <input 
+                                                type="text" value={newTags} onChange={e => setNewTags(e.target.value)} placeholder="#Auth, #Security" 
+                                                className="w-full bg-slate-950 border border-white/15 rounded-xl px-4 py-2.5 text-xs text-slate-100 outline-none focus:border-pink-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[11px] font-extrabold uppercase tracking-widest text-pink-400 mb-1.5">Image URL</label>
+                                            <input 
+                                                type="text" value={newImage} onChange={e => setNewImage(e.target.value)} placeholder="https://unsplash.com/..." 
+                                                className="w-full bg-slate-950 border border-white/15 rounded-xl px-4 py-2.5 text-xs text-slate-100 outline-none focus:border-pink-500"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="pt-3 flex justify-end space-x-3">
+                                        <button type="button" onClick={() => setIsAddOpen(false)} className="px-4 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-300 hover:bg-white/10">Cancel</button>
+                                        <button type="submit" className="px-5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-pink-600 to-purple-600 text-white shadow-lg shadow-pink-600/40 hover:from-pink-500 hover:to-purple-500">Index Artifact</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Header */}
+                    <header className="border-b border-white/10 bg-deepvoid/80 backdrop-blur-3xl sticky top-0 z-40">
+                        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+                            <div className="flex items-center space-x-3.5">
+                                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-pink-500 via-purple-600 to-indigo-600 flex items-center justify-center shadow-xl shadow-pink-500/50 ring-2 ring-pink-500/40">
+                                    <i data-lucide="zap" className="w-5 h-5 text-white fill-white/40"></i>
+                                </div>
+                                <div>
+                                    <h1 className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-white via-pink-200 to-purple-300 bg-clip-text text-transparent">ContextPulse</h1>
+                                    <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/40 shadow-sm">Production Hardened v5.0</span>
+                                </div>
+                            </div>
+                            
+                            <div className="flex items-center space-x-4">
+                                <button 
+                                    onClick={() => setIsAddOpen(true)}
+                                    className="hidden sm:flex items-center space-x-2 bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 text-white px-4.5 py-2.5 rounded-xl text-xs font-bold transition shadow-xl shadow-pink-600/40 ring-1 ring-white/20"
+                                >
+                                    <i data-lucide="sparkles" className="w-4 h-4"></i>
+                                    <span>Add Context</span>
+                                </button>
+
+                                <button 
+                                    onClick={() => setIsOmniOpen(true)}
+                                    className="flex items-center space-x-3 bg-slate-900/90 border border-white/15 px-4 py-2.5 rounded-xl text-xs text-slate-300 hover:border-pink-500/70 hover:text-white transition shadow-inner"
+                                >
+                                    <i data-lucide="search" className="w-4 h-4 text-pink-400"></i>
+                                    <span className="hidden md:inline font-semibold">Omni-Search Engine</span>
+                                    <kbd className="bg-white/10 px-2 py-0.5 rounded border border-white/20 text-[10px] font-mono text-pink-300">⌘K</kbd>
+                                </button>
+
+                                <div className="h-6 w-[1px] bg-white/15 hidden md:block"></div>
+
+                                <div className="flex items-center space-x-3 pl-1">
+                                    <div className="relative">
+                                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces" className="w-10 h-10 rounded-2xl border-2 border-pink-500/70 object-cover shadow-lg" alt="Avatar" />
+                                        <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-400 ring-2 ring-deepvoid animate-pulse"></span>
+                                    </div>
+                                    <div className="hidden lg:block text-left">
+                                        <p className="text-xs font-bold leading-tight text-white">Alex Morgan</p>
+                                        <p className="text-[10px] text-pink-400 font-bold tracking-wider">Elite Administrator</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Main Layout */}
+                    <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
+                        
+                        {/* Sidebar */}
+                        <aside className="lg:col-span-1 space-y-6">
+                            <div className="glass-card-luxe rounded-3xl p-5 shadow-2xl">
+                                <h3 className="text-[11px] font-extrabold uppercase tracking-widest text-pink-400 mb-3 px-2 flex items-center space-x-2">
+                                    <i data-lucide="layers" className="w-4 h-4"></i>
+                                    <span>Workspaces</span>
+                                </h3>
+                                <nav className="space-y-2">
+                                    {[
+                                        { id: 'all', label: 'All Streams', icon: 'layout-grid', count: items.length, color: 'text-pink-400', activeBg: 'from-pink-600/35 to-purple-600/35 border-pink-500/60 shadow-pink-500/20' },
+                                        { id: 'coders', label: 'Coders Workspace', icon: 'code', count: items.filter(i => i.category === 'coders').length, color: 'text-cyan-400', activeBg: 'from-cyan-600/35 to-blue-600/35 border-cyan-500/60 shadow-cyan-500/20' },
+                                        { id: 'creators', label: 'Creators Vault', icon: 'video', count: items.filter(i => i.category === 'creators').length, color: 'text-rose-400', activeBg: 'from-rose-600/35 to-pink-600/35 border-rose-500/60 shadow-rose-500/20' },
+                                        { id: 'leaders', label: 'Executive Suite', icon: 'briefcase', count: items.filter(i => i.category === 'leaders').length, color: 'text-amber-400', activeBg: 'from-amber-600/35 to-orange-600/35 border-amber-500/60 shadow-amber-500/20' },
+                                    ].map(tab => (
+                                        <button 
+                                            key={tab.id}
+                                            onClick={() => setActiveTab(tab.id)} 
+                                            className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-semibold transition ${activeTab === tab.id ? `bg-gradient-to-r ${tab.activeBg} text-white border shadow-lg` : 'text-slate-400 hover:bg-white/5 hover:text-slate-200 border border-transparent'}`}
+                                        >
+                                            <div className="flex items-center space-x-3">
+                                                <i data-lucide={tab.icon} className={`w-4 h-4 ${tab.color}`}></i>
+                                                <span>{tab.label}</span>
+                                            </div>
+                                            <span className="text-xs font-mono bg-white/10 px-2.5 py-0.5 rounded-full text-slate-200 font-bold">{tab.count}</span>
+                                        </button>
+                                    ))}
+                                </nav>
+                            </div>
+
+                            {/* Neural Status Box */}
+                            <div className="glass-card-luxe rounded-3xl p-6 border border-pink-500/30 bg-gradient-to-br from-purple-950/50 via-deepvoid to-pink-950/40">
+                                <div className="flex items-center space-x-2 text-pink-400 mb-3">
+                                    <i data-lucide="cpu" className="w-4 h-4 animate-spin text-pink-400"></i>
+                                    <span className="text-[11px] font-black uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-400">Neural Sync Active</span>
+                                </div>
+                                <p className="text-xs text-slate-300 leading-relaxed mb-4 font-medium">
+                                    Live semantic indexing operational across GitHub repositories, Google Drive, Notion docs & Slack channels.
+                                </p>
+                                <div className="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden border border-white/10 p-0.5">
+                                    <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-400 h-full w-full rounded-full animate-pulse"></div>
+                                </div>
+                                <div className="flex justify-between items-center mt-3 text-[10px] text-slate-400 font-mono font-semibold">
+                                    <span>Latency: 6ms</span>
+                                    <span className="text-emerald-400 font-bold flex items-center space-x-1">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                                        <span>256-bit Encrypted</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </aside>
+
+                        {/* Content Area */}
+                        <section className="lg:col-span-3 space-y-6">
+                            
+                            {/* Hero Search Banner */}
+                            <div className="glass-card-luxe rounded-3xl p-8 relative overflow-hidden shadow-2xl border border-pink-500/40">
+                                <div className="absolute -right-20 -top-20 w-64 h-64 bg-gradient-to-br from-pink-600/35 to-purple-600/35 rounded-full blur-3xl pointer-events-none"></div>
+                                <h2 className="text-3xl font-black tracking-tight mb-2 text-transparent bg-clip-text bg-gradient-to-r from-white via-pink-200 to-purple-300">Infinite Context Engine</h2>
+                                <p className="text-slate-300 text-sm mb-6 max-w-xl font-medium">Instantaneous neural retrieval across your complete digital workspace ecosystem.</p>
+                                
+                                <div className="relative">
+                                    <i data-lucide="search" className="absolute left-4 top-4 w-4 h-4 text-pink-400"></i>
+                                    <input 
+                                        type="text"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        placeholder="Search by title, keyword, file tag, or platform..." 
+                                        className="w-full bg-slate-950/90 border border-pink-500/40 focus:border-pink-500 transition rounded-2xl pl-11 pr-4 py-3.5 text-sm text-slate-100 placeholder-slate-500 outline-none shadow-inner"
+                                    />
+                                    {searchQuery && (
+                                        <button onClick={() => setSearchQuery('')} className="absolute right-4 top-4 text-xs font-bold text-pink-400 hover:text-white">
+                                            Clear
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Feed Header */}
+                            <div className="flex items-center justify-between px-1">
+                                <h3 className="text-base font-extrabold tracking-tight text-slate-200 flex items-center space-x-2">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-pink-400 to-purple-400 shadow-sm shadow-pink-400"></span>
+                                    <span>{activeTab === 'all' ? 'All Active Workspace Streams' : `${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Feed`}</span>
+                                </h3>
+                                <span className="text-xs text-pink-300 font-mono font-bold bg-pink-500/10 px-3 py-1 rounded-full border border-pink-500/30">
+                                    {filtered.length} Artifacts Found
+                                </span>
+                            </div>
+
+                            {/* Cards Grid */}
+                            {filtered.length === 0 ? (
+                                <div className="glass-card-luxe rounded-3xl p-12 text-center border border-dashed border-pink-500/30">
+                                    <i data-lucide="folder-open" className="w-12 h-12 text-pink-400/60 mx-auto mb-3 animate-bounce"></i>
+                                    <p className="text-base font-bold text-slate-200">No context artifacts found</p>
+                                    <p className="text-xs text-slate-400 mt-1">Refine your search query or add a new artifact to your workspace.</p>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {filtered.map((item) => {
+                                        const isCoder = item.category === 'coders';
+                                        const isCreator = item.category === 'creators';
+                                        const badgeColor = isCoder 
+                                            ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50 shadow-cyan-500/20' 
+                                            : isCreator 
+                                            ? 'bg-rose-500/20 text-rose-300 border-rose-500/50 shadow-rose-500/20' 
+                                            : 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-amber-500/20';
+                                        const iconName = isCoder ? 'code' : isCreator ? 'video' : 'briefcase';
+
+                                        return (
+                                            <div key={item.id} className="glass-card-luxe rounded-3xl p-6 flex flex-col justify-between relative group overflow-hidden">
+                                                <div>
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        <span className={`text-[10px] font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-xl border flex items-center space-x-1.5 shadow-md ${badgeColor}`}>
+                                                            <i data-lucide={iconName} className="w-3.5 h-3.5"></i>
+                                                            <span>{item.category} • {item.source}</span>
+                                                        </span>
+                                                        <div className="flex items-center space-x-2">
+                                                            <button 
+                                                                onClick={() => toggleFavorite(item.id)} 
+                                                                className={`p-2 rounded-xl border transition ${item.favorite ? 'bg-amber-500/30 border-amber-500/60 text-amber-300 shadow-lg shadow-amber-500/30' : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'}`}
+                                                            >
+                                                                <i data-lucide="star" className={`w-3.5 h-3.5 ${item.favorite ? 'fill-amber-400' : ''}`}></i>
+                                                            </button>
+                                                            <button 
+                                                                onClick={() => deleteItem(item.id)} 
+                                                                className="p-2 rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-pink-400 hover:border-pink-500/50 transition opacity-0 group-hover:opacity-100"
+                                                            >
+                                                                <i data-lucide="trash-2" className="w-3.5 h-3.5"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <h4 className="font-extrabold text-white text-base mb-1.5 tracking-tight">{item.title}</h4>
+                                                    <p className="text-xs text-slate-300 mb-3 line-clamp-2 leading-relaxed font-medium">{item.description}</p>
+                                                    
+                                                    {item.image && (
+                                                        <div className="relative mb-4 rounded-2xl overflow-hidden border border-white/15 h-36 shadow-lg group/img">
+                                                            <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover/img:scale-105 transition duration-500" />
+                                                            <div className="absolute inset-0 bg-gradient-to-t from-deepvoid/80 via-transparent to-transparent"></div>
+                                                            <span className="absolute bottom-2.5 left-3 text-[10px] font-bold text-white bg-black/60 px-2.5 py-1 rounded-lg backdrop-blur-md border border-white/20 flex items-center space-x-1">
+                                                                <i data-lucide="image" className="w-3 h-3 text-pink-400"></i>
+                                                                <span>Live Artifact Preview</span>
+                                                            </span>
+                                                        </div>
+                                                    )}
+
+                                                    {item.snippet && (
+                                                        <div className="bg-slate-950/90 rounded-2xl p-4 border border-white/10 code-font text-xs text-pink-200 overflow-x-auto mb-4 shadow-inner max-h-24">
+                                                            <code>{item.snippet}</code>
+                                                        </div>
+                                                    )}
+
+                                                    {item.tags && item.tags.length > 0 && (
+                                                        <div className="flex flex-wrap gap-1.5 mb-4">
+                                                            {item.tags.map((tag, idx) => (
+                                                                <span key={idx} className="bg-pink-500/15 px-2.5 py-1 rounded-lg text-[10px] border border-pink-500/30 text-pink-300 code-font font-bold">
+                                                                    {tag}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="flex items-center justify-between pt-4 border-t border-white/10 text-xs">
+                                                    <span className="text-slate-400 font-mono text-[11px] font-medium">{item.metadata}</span>
+                                                    <button 
+                                                        onClick={() => {
+                                                            navigator.clipboard.writeText(item.snippet || item.title);
+                                                            showToast(`📋 Copied "${item.title}" to clipboard`);
+                                                        }} 
+                                                        className="text-white font-bold flex items-center space-x-1.5 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 px-3.5 py-2 rounded-xl shadow-lg shadow-pink-600/40 transition"
+                                                    >
+                                                        <span>Copy</span>
+                                                        <i data-lucide="copy" className="w-3 h-3"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </section>
+                    </main>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
