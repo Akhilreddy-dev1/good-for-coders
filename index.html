@@ -75,15 +75,15 @@
 
         @keyframes float1 {
             0%,100% { transform: translate(0,0); }
-            50%     { transform: translate(50px,-70px); }
+            50%      { transform: translate(50px,-70px); }
         }
         @keyframes float2 {
             0%,100% { transform: translate(0,0); }
-            50%     { transform: translate(-60px,50px); }
+            50%      { transform: translate(-60px,50px); }
         }
         @keyframes float3 {
             0%,100% { transform: translate(0,0); }
-            50%     { transform: translate(40px,60px); }
+            50%      { transform: translate(40px,60px); }
         }
         @keyframes slideUp {
             from { opacity:0; transform: translateY(14px); }
@@ -95,7 +95,7 @@
         }
         @keyframes pulse-bar {
             0%,100% { opacity:1; }
-            50%     { opacity:0.5; }
+            50%      { opacity:0.5; }
         }
 
         .anim-slide-up { animation: slideUp 0.3s ease both; }
@@ -154,7 +154,8 @@
 <script type="text/babel">
 const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
-// ── SVG Icons ─────────────────────────────────────────────────────────────
+
+// ── SVG Icons — NO React fragments, each icon is a single <svg> ─────────────
 const icons = {
     zap: (c) => (
         <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
@@ -211,9 +212,19 @@ const icons = {
             <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
         </svg>
     ),
+    cpu: (c) => (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="4" width="16" height="16" rx="2" /><rect x="9" y="9" width="6" height="6" /><line x1="9" y1="1" x2="9" y2="4" /><line x1="15" y1="1" x2="15" y2="4" /><line x1="9" y1="20" x2="9" y2="23" /><line x1="15" y1="20" x2="15" y2="23" /><line x1="20" y1="9" x2="23" y2="9" /><line x1="20" y1="14" x2="23" y2="14" /><line x1="1" y1="9" x2="4" y2="9" /><line x1="1" y1="14" x2="4" y2="14" />
+        </svg>
+    ),
     layers: (c) => (
         <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
             <polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 17 12 22 22 17" /><polyline points="2 12 12 17 22 12" />
+        </svg>
+    ),
+    empty: (c) => (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /><line x1="12" y1="11" x2="12" y2="17" /><line x1="9" y1="14" x2="15" y2="14" />
         </svg>
     ),
     sparkle: (c) => (
@@ -221,11 +232,26 @@ const icons = {
             <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
         </svg>
     ),
-    message: (c) => (
+    download: (c) => (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+    ),
+    expand: (c) => (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+        </svg>
+    ),
+    chat: (c) => (
         <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         </svg>
-    )
+    ),
+    send: (c) => (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
+        </svg>
+    ),
 };
 
 // ── Seed data ────────────────────────────────────────────────────────────────
@@ -280,7 +306,7 @@ const SEED = [
     }
 ];
 
-// ── Toast Component ──────────────────────────────────────────────────────────
+// ── Toast ────────────────────────────────────────────────────────────────────
 function Toast({ msg }) {
     return (
         <div className="anim-slide-up" style={{
@@ -301,98 +327,7 @@ function Toast({ msg }) {
     );
 }
 
-// ── Chatbot Drawer Component ─────────────────────────────────────────────────
-function ChatbotDrawer({ isOpen, onClose, items }) {
-    const [messages, setMessages] = useState([
-        { sender: 'bot', text: 'Hello! I am your Lumina AI assistant. Ask me anything about your loaded artifacts or workspace.' }
-    ]);
-    const [input, setInput] = useState('');
-    const chatEndRef = useRef(null);
-
-    useEffect(() => {
-        if (isOpen) {
-            chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-        }
-    }, [messages, isOpen]);
-
-    if (!isOpen) return null;
-
-    const handleSend = (e) => {
-        e.preventDefault();
-        if (!input.trim()) return;
-        const userText = input.trim();
-        const newMessages = [...messages, { sender: 'user', text: userText }];
-        setMessages(newMessages);
-        setInput('');
-
-        // Simple local intelligent context response simulation
-        setTimeout(() => {
-            let botReply = "I've searched your current workspace streams. ";
-            const lower = userText.toLowerCase();
-            const matched = items.filter(item => 
-                item.title.toLowerCase().includes(lower) || 
-                item.description.toLowerCase().includes(lower) ||
-                (item.snippet && item.snippet.toLowerCase().includes(lower))
-            );
-
-            if (matched.length > 0) {
-                botReply += `Found relevant artifact: "${matched[0].title}" — ${matched[0].description}`;
-            } else {
-                botReply += "No exact snippet matched your query directly, but all systems are indexed and active.";
-            }
-            setMessages(prev => [...prev, { sender: 'bot', text: botReply }]);
-        }, 500);
-    };
-
-    return (
-        <div className="overlay" onClick={onClose} style={{justifyContent:'flex-end', padding:0}}>
-            <div className="glass anim-slide-up" onClick={(e) => e.stopPropagation()} style={{
-                width:'100%', maxWidth:'400px', height:'100%', display:'flex', flexDirection:'column',
-                borderLeft:'1px solid rgba(236,72,153,0.3)', borderTop:'none', borderBottom:'none', borderRight:'none'
-            }}>
-                <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'20px', borderBottom:'1px solid rgba(255,255,255,0.08)'}}>
-                    <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
-                        <div style={{width:'32px', height:'32px', borderRadius:'10px', background:'linear-gradient(135deg,#ec4899,#7c3aed)', display:'flex', alignItems:'center', justifyContent:'center'}}>
-                            {icons.sparkle('w-4 h-4 text-white')}
-                        </div>
-                        <span style={{fontWeight:800, fontSize:'14px', color:'#fff'}}>Neural Assistant</span>
-                    </div>
-                    <button onClick={onClose} style={{padding:'6px', borderRadius:'10px', background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.08)', cursor:'pointer', color:'#94a3b8', display:'flex'}}>
-                        {icons.x('w-4 h-4')}
-                    </button>
-                </div>
-                
-                <div style={{flex:1, overflowY:'auto', padding:'20px', display:'flex', flexDirection:'column', gap:'12px'}}>
-                    {messages.map((m, idx) => (
-                        <div key={idx} style={{
-                            alignSelf: m.sender === 'user' ? 'flex-end' : 'flex-start',
-                            maxWidth:'85%', padding:'10px 14px', borderRadius:'14px',
-                            background: m.sender === 'user' ? 'linear-gradient(135deg,#db2777,#7c3aed)' : 'rgba(255,255,255,0.06)',
-                            color:'#fff', fontSize:'13px', lineHeight:1.4,
-                            border: m.sender === 'bot' ? '1px solid rgba(255,255,255,0.1)' : 'none'
-                        }}>
-                            {m.text}
-                        </div>
-                    ))}
-                    <div ref={chatEndRef} />
-                </div>
-
-                <form onSubmit={handleSend} style={{padding:'16px', borderTop:'1px solid rgba(255,255,255,0.08)', display:'flex', gap:'8px'}}>
-                    <input 
-                        type="text" 
-                        value={input} 
-                        onChange={(e) => setInput(e.target.value)} 
-                        placeholder="Ask chatbot anything..." 
-                        className="field" 
-                    />
-                    <button type="submit" style={{padding:'0 16px', borderRadius:'10px', background:'linear-gradient(135deg,#db2777,#7c3aed)', color:'#fff', border:'none', cursor:'pointer', fontWeight:700, fontSize:'12px'}}>Send</button>
-                </form>
-            </div>
-        </div>
-    );
-}
-
-// ── OmniSearch Modal ─────────────────────────────────────────────────────────
+// ── OmniSearch modal ─────────────────────────────────────────────────────────
 function OmniSearch({ items, query, setQuery, onClose }) {
     const ref = useRef(null);
     useEffect(() => { setTimeout(() => ref.current && ref.current.focus(), 40); }, []);
@@ -401,11 +336,11 @@ function OmniSearch({ items, query, setQuery, onClose }) {
         const q = query.trim().toLowerCase();
         if (!q) return items.slice(0, 6);
         return items.filter(function(i) {
-            return i.title.toLowerCase().includes(q)
-                || i.description.toLowerCase().includes(q)
-                || i.source.toLowerCase().includes(q)
-                || i.tags.some(function(t) { return t.toLowerCase().includes(q); })
-                || (i.snippet && i.snippet.toLowerCase().includes(q));
+            return i.title.toLowerCase().indexOf(q) > -1
+                || i.description.toLowerCase().indexOf(q) > -1
+                || i.source.toLowerCase().indexOf(q) > -1
+                || i.tags.some(function(t) { return t.toLowerCase().indexOf(q) > -1; })
+                || (i.snippet && i.snippet.toLowerCase().indexOf(q) > -1);
         });
     }, [items, query]);
 
@@ -453,16 +388,17 @@ function OmniSearch({ items, query, setQuery, onClose }) {
     );
 }
 
+
 // ── AddItemModal ─────────────────────────────────────────────────────────────
 function AddItemModal({ onClose, onAdd }) {
-    const [title,    setTitle]    = useState('');
-    const [category, setCat]      = useState('coders');
-    const [source,   setSource]   = useState('');
-    const [desc,     setDesc]     = useState('');
+    const [title,    setTitle]   = useState('');
+    const [category, setCat]     = useState('coders');
+    const [source,   setSource]  = useState('');
+    const [desc,     setDesc]    = useState('');
     const [snippet,  setSnippet] = useState('');
-    const [tags,     setTags]     = useState('');
-    const [image,    setImage]    = useState('');
-    const [err,      setErr]      = useState('');
+    const [tags,     setTags]    = useState('');
+    const [image,    setImage]   = useState('');
+    const [err,      setErr]     = useState('');
 
     function submit(e) {
         e.preventDefault();
@@ -564,8 +500,8 @@ function AddItemModal({ onClose, onAdd }) {
     );
 }
 
-// ── Header Component ─────────────────────────────────────────────────────────
-function Header({ onAdd, onSearch, onOpenChat }) {
+// ── Header ───────────────────────────────────────────────────────────────────
+function Header({ onAdd, onSearch }) {
     return (
         <header style={{
             position:'sticky', top:0, zIndex:40,
@@ -591,10 +527,6 @@ function Header({ onAdd, onSearch, onOpenChat }) {
 
                 {/* Actions */}
                 <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
-                    <button onClick={onOpenChat} style={{display:'flex',alignItems:'center',gap:'6px',padding:'8px 14px',borderRadius:'12px',fontSize:'12px',fontWeight:700,color:'#f9a8d4',background:'rgba(236,72,153,0.1)',border:'1px solid rgba(236,72,153,0.3)',cursor:'pointer'}}>
-                        {icons.message('w-4 h-4')}
-                        AI Chatbot
-                    </button>
                     <button onClick={onAdd} style={{display:'flex',alignItems:'center',gap:'6px',padding:'8px 16px',borderRadius:'12px',fontSize:'12px',fontWeight:700,color:'#fff',background:'linear-gradient(135deg,#db2777,#7c3aed)',border:'none',cursor:'pointer',boxShadow:'0 4px 16px rgba(219,39,119,0.35)'}}>
                         {icons.sparkle('w-3.5 h-3.5')}
                         Add Context
@@ -604,13 +536,26 @@ function Header({ onAdd, onSearch, onOpenChat }) {
                         <span>Search</span>
                         <kbd style={{fontSize:'10px',fontFamily:'monospace',padding:'1px 6px',borderRadius:'5px',background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.12)',color:'#f472b6'}}>⌘K</kbd>
                     </button>
+                    <div style={{width:'1px',height:'24px',background:'rgba(255,255,255,0.1)'}}></div>
+                    <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                        <div style={{position:'relative'}}>
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces"
+                                style={{width:'36px',height:'36px',borderRadius:'10px',objectFit:'cover',border:'2px solid rgba(236,72,153,0.55)'}} alt="avatar" />
+                            <span style={{position:'absolute',bottom:0,right:0,width:'10px',height:'10px',borderRadius:'50%',background:'#34d399',border:'2px solid #030014'}}></span>
+                        </div>
+                        <div style={{display:'none'}}>
+                            <div style={{fontSize:'12px',fontWeight:700,color:'#fff'}}>Alex Morgan</div>
+                            <div style={{fontSize:'10px',fontWeight:700,color:'#f472b6'}}>Elite Admin</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </header>
     );
 }
 
-// ── Sidebar Component ────────────────────────────────────────────────────────
+
+// ── Sidebar ──────────────────────────────────────────────────────────────────
 function Sidebar({ items, active, setActive }) {
     var tabs = [
         { id:'all',      label:'All Streams',      icon:icons.grid,      color:'#f472b6' },
@@ -633,30 +578,30 @@ function Sidebar({ items, active, setActive }) {
 
     return (
         <aside style={{gridColumn:'span 1'}}>
+            {/* Nav */}
             <div className="glass" style={{borderRadius:'22px',padding:'16px',marginBottom:'16px'}}>
                 <div style={{display:'flex',alignItems:'center',gap:'6px',padding:'0 4px',marginBottom:'12px'}}>
                     {icons.layers('w-3.5 h-3.5 text-pink-400')}
                     <span style={{fontSize:'10px',fontWeight:900,textTransform:'uppercase',letterSpacing:'0.08em',color:'#f472b6'}}>Workspaces</span>
                 </div>
-                <nav style={{display:'flex', flexDirection:'column', gap:'6px'}}>
+                <nav>
                     {tabs.map(function(tab) {
                         var isActive = active === tab.id;
                         return (
                             <button key={tab.id} onClick={function(){ setActive(tab.id); }}
                                 style={{
                                     width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between',
-                                    padding:'10px 12px', borderRadius:'14px', cursor:'pointer', border:'1px solid',
+                                    padding:'10px 12px', borderRadius:'14px', marginBottom:'6px',
                                     background: isActive ? activeBgs[tab.id] : 'transparent',
-                                    borderColor: isActive ? activeBorders[tab.id] : 'transparent',
-                                    transition:'all 0.2s'
+                                    border: isActive ? '1px solid ' + activeBorders[tab.id] : '1px solid transparent',
+                                    color: isActive ? '#fff' : '#94a3b8',
+                                    cursor:'pointer', transition:'all 0.15s', fontFamily:'inherit'
                                 }}>
-                                <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
-                                    <div style={{color: tab.color}}>
-                                        {tab.icon('w-4 h-4')}
-                                    </div>
-                                    <span style={{fontSize:'13px', fontWeight:isActive ? 700 : 500, color: isActive ? '#fff' : '#94a3b8'}}>{tab.label}</span>
+                                <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                                    {tab.icon('w-4 h-4')}
+                                    <span style={{fontSize:'13px',fontWeight:600}}>{tab.label}</span>
                                 </div>
-                                <span style={{fontSize:'10px', fontWeight:700, padding:'2px 8px', borderRadius:'10px', background:'rgba(255,255,255,0.06)', color:'#cbd5e1'}}>
+                                <span style={{fontSize:'11px',fontFamily:'monospace',fontWeight:700,padding:'1px 8px',borderRadius:'20px',background:'rgba(255,255,255,0.07)',color:'#e2e8f0'}}>
                                     {count(tab.id)}
                                 </span>
                             </button>
@@ -665,172 +610,604 @@ function Sidebar({ items, active, setActive }) {
                 </nav>
             </div>
 
-            <div className="glass" style={{borderRadius:'22px', padding:'18px'}}>
-                <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'10px'}}>
-                    <span style={{fontSize:'10px', fontWeight:900, textTransform:'uppercase', letterSpacing:'0.08em', color:'#f472b6'}}>Neural Sync Active</span>
-                    <span style={{fontSize:'9px', color:'#34d399', fontWeight:700}}>LIVE</span>
+            {/* Neural status */}
+            <div style={{borderRadius:'22px',padding:'18px',background:'linear-gradient(135deg,rgba(49,8,99,0.5),rgba(3,0,20,0.75),rgba(80,7,36,0.4))',border:'1px solid rgba(236,72,153,0.18)'}}>
+                <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'10px'}}>
+                    <div style={{animation:'float1 2s linear infinite'}}>
+                        {icons.cpu('w-3.5 h-3.5 text-pink-400')}
+                    </div>
+                    <span style={{fontSize:'10px',fontWeight:900,textTransform:'uppercase',letterSpacing:'0.08em',background:'linear-gradient(to right,#f9a8d4,#d8b4fe)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>
+                        Neural Sync Active
+                    </span>
                 </div>
-                <p style={{fontSize:'11px', color:'#94a3b8', lineHeight:1.4, marginBottom:'12px'}}>Live semantic indexing across GitHub, Drive, Notion & Slack.</p>
-                <div style={{width:'100%', height:'6px', background:'rgba(255,255,255,0.1)', borderRadius:'3px', overflow:'hidden'}}>
-                    <div style={{width:'78%', height:'100%', background:'linear-gradient(90deg,#ec4899,#06b6d4)', borderRadius:'3px'}}></div>
+                <p style={{fontSize:'11px',color:'#64748b',lineHeight:1.6,marginBottom:'12px'}}>
+                    Live indexing across GitHub, Drive, Notion and Slack.
+                </p>
+                <div style={{width:'100%',height:'6px',borderRadius:'3px',background:'rgba(15,10,40,0.8)',overflow:'hidden'}}>
+                    <div style={{height:'100%',width:'100%',borderRadius:'3px',background:'linear-gradient(to right,#ec4899,#a855f7,#22d3ee)',animation:'pulse-bar 2s ease infinite'}}></div>
                 </div>
-                <div style={{display:'flex', justifyContent:'space-between', marginTop:'8px', fontSize:'9px', color:'#64748b', fontFamily:'monospace'}}>
+                <div style={{display:'flex',justifyContent:'space-between',marginTop:'8px',fontSize:'10px',fontFamily:'monospace',fontWeight:600,color:'#475569'}}>
                     <span>Latency: 6ms</span>
-                    <span>256-bit Encrypted</span>
+                    <span style={{color:'#34d399',display:'flex',alignItems:'center',gap:'4px'}}>
+                        <span style={{width:'6px',height:'6px',borderRadius:'50%',background:'#34d399',display:'inline-block',animation:'pulse-bar 1s ease infinite'}}></span>
+                        256-bit Encrypted
+                    </span>
                 </div>
             </div>
         </aside>
     );
 }
 
-// ── Main Dashboard App Component ─────────────────────────────────────────────
-function App() {
-    const [items, setItems]       = useState(SEED);
-    const [active, setActive]     = useState('all');
-    const [searchQuery, setSearchQuery] = useState('');
-    const [isSearchOpen, setSearchOpen] = useState(false);
-    const [isAddOpen, setAddOpen] = useState(false);
-    const [isChatOpen, setChatOpen] = useState(false);
-    const [toastMsg, setToastMsg] = useState(null);
+// ── ArtifactCard ─────────────────────────────────────────────────────────────
+var CAT = {
+    coders:   { icon: icons.code,      badgeBg:'rgba(6,182,212,0.12)',   badgeBorder:'rgba(6,182,212,0.35)',   badgeColor:'#67e8f9' },
+    creators: { icon: icons.video,     badgeBg:'rgba(244,63,94,0.12)',   badgeBorder:'rgba(244,63,94,0.35)',   badgeColor:'#fda4af' },
+    leaders:  { icon: icons.briefcase, badgeBg:'rgba(245,158,11,0.12)',  badgeBorder:'rgba(245,158,11,0.35)',  badgeColor:'#fcd34d' },
+};
 
-    const triggerToast = (msg) => {
-        setToastMsg(msg);
-        setTimeout(() => setToastMsg(null), 3000);
-    };
-
-    const handleCopy = (text) => {
-        if (!text) {
-            triggerToast('No content available to copy.');
-            return;
-        }
-        navigator.clipboard.writeText(text).then(() => {
-            triggerToast('Snippet copied to clipboard successfully!');
-        }).catch(() => {
-            triggerToast('Failed to copy to clipboard.');
-        });
-    };
-
-    const toggleFavorite = (id) => {
-        setItems(prev => prev.map(i => i.id === id ? {...i, favorite: !i.favorite} : i));
-        triggerToast('Artifact bookmark updated.');
-    };
-
-    const deleteItem = (id) => {
-        setItems(prev => prev.filter(i => i.id !== id));
-        triggerToast('Artifact removed from stream.');
-    };
-
-    const filteredItems = useMemo(() => {
-        let list = items;
-        if (active !== 'all') {
-            list = list.filter(i => i.category === active);
-        }
-        if (searchQuery.trim()) {
-            const q = searchQuery.toLowerCase();
-            list = list.filter(i => i.title.toLowerCase().includes(q) || i.description.toLowerCase().includes(q) || i.source.toLowerCase().includes(q));
-        }
-        return list;
-    }, [items, active, searchQuery]);
+function ArtifactCard({ item, onFav, onDelete, onCopy, onDownload, onExpand }) {
+    var m = CAT[item.category] || CAT.coders;
+    var [hovered, setHovered] = useState(false);
 
     return (
-        <div style={{minHeight:'100vh', display:'flex', flexDirection:'column'}}>
-            <Header 
-                onAdd={() => setAddOpen(true)} 
-                onSearch={() => setSearchOpen(true)} 
-                onOpenChat={() => setChatOpen(true)} 
-            />
+        <div className="glass-hover" onMouseEnter={function(){setHovered(true);}} onMouseLeave={function(){setHovered(false);}}
+            style={{borderRadius:'22px',padding:'20px',display:'flex',flexDirection:'column',gap:'12px',position:'relative'}}>
 
-            <main style={{maxWidth:'1280px', width:'100%', margin:'0 auto', padding:'24px 20px', flex:1}}>
-                <div style={{display:'grid', gridTemplateColumns:'260px 1fr', gap:'24px', alignItems:'start'}}>
-                    
-                    <Sidebar items={items} active={active} setActive={setActive} />
-
-                    <section style={{display:'flex', flexDirection:'column', gap:'20px'}}>
-                        {/* Stream Controls Header */}
-                        <div style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
-                            <h2 style={{fontSize:'16px', fontWeight:800, color:'#fff', textTransform:'uppercase', letterSpacing:'0.05em'}}>
-                                {active === 'all' ? 'All Workspace Streams' : `${active.toUpperCase()} Stream`}
-                            </h2>
-                            <div style={{fontSize:'12px', color:'#94a3b8'}}>
-                                Showing <b>{filteredItems.length}</b> artifacts
-                            </div>
-                        </div>
-
-                        {/* Artifact Grid */}
-                        <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(320px, 1fr))', gap:'20px'}}>
-                            {filteredItems.length === 0 ? (
-                                <div className="glass" style={{gridColumn:'1 / -1', padding:'48px', textAlign:'center', borderRadius:'20px'}}>
-                                    <p style={{color:'#94a3b8', fontSize:'14px', marginBottom:'12px'}}>No context artifacts found in this stream.</p>
-                                    <button onClick={() => setAddOpen(true)} style={{padding:'8px 16px', borderRadius:'10px', background:'linear-gradient(135deg,#db2777,#7c3aed)', color:'#fff', border:'none', cursor:'pointer', fontWeight:700, fontSize:'12px'}}>Add First Artifact</button>
-                                </div>
-                            ) : filteredItems.map(item => (
-                                <div key={item.id} className="glass glass-hover" style={{borderRadius:'20px', overflow:'hidden', display:'flex', flexDirection:'column'}}>
-                                    <div style={{position:'relative', height:'140px', background:'#0b0820'}}>
-                                        <img src={item.image} alt={item.title} style={{width:'100%', height:'100%', objectFit:'cover', opacity:0.85}} />
-                                        <div style={{position:'absolute', inset:0, background:'linear-gradient(to top, rgba(10,8,30,0.95), transparent)'}}></div>
-                                        <span style={{position:'absolute', top:'10px', left:'10px', fontSize:'9px', fontWeight:800, textTransform:'uppercase', padding:'3px 8px', borderRadius:'20px', background:'rgba(3,0,20,0.8)', color:'#f472b6', border:'1px solid rgba(236,72,153,0.3)'}}>
-                                            {item.source}
-                                        </span>
-                                        <button onClick={() => toggleFavorite(item.id)} style={{position:'absolute', top:'10px', right:'10px', background:'rgba(3,0,20,0.8)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'50%', width:'28px', height:'28px', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color: item.favorite ? '#fbbf24' : '#94a3b8'}}>
-                                            {icons.star('w-3.5 h-3.5', item.favorite)}
-                                        </button>
-                                    </div>
-                                    <div style={{padding:'16px', flex:1, display:'flex', flexDirection:'column', justifyContent:'space-between'}}>
-                                        <div>
-                                            <h3 style={{fontSize:'14px', fontWeight:800, color:'#f8fafc', marginBottom:'6px'}}>{item.title}</h3>
-                                            <p className="clamp2" style={{fontSize:'12px', color:'#94a3b8', lineHeight:1.4, marginBottom:'12px'}}>{item.description}</p>
-                                            
-                                            {item.snippet && (
-                                                <div className="mono" style={{background:'rgba(2,6,23,0.9)', padding:'10px', borderRadius:'10px', fontSize:'11px', color:'#f9a8d4', border:'1px solid rgba(255,255,255,0.06)', marginBottom:'12px', overflowX:'auto', whiteSpace:'pre-wrap'}}>
-                                                    {item.snippet}
-                                                </div>
-                                            )}
-
-                                            <div style={{display:'flex', flexWrap:'wrap', gap:'4px', marginBottom:'14px'}}>
-                                                {item.tags.map((t, idx) => (
-                                                    <span key={idx} style={{fontSize:'9px', fontFamily:'monospace', color:'#f472b6', background:'rgba(236,72,153,0.1)', padding:'2px 6px', borderRadius:'6px', border:'1px solid rgba(236,72,153,0.2)'}}>{t}</span>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        <div style={{display:'flex', alignItems:'center', justifyContent:'between', paddingTop:'12px', borderTop:'1px solid rgba(255,255,255,0.06)'}}>
-                                            <span style={{fontSize:'10px', color:'#64748b', flex:1}}>{item.metadata}</span>
-                                            <div style={{display:'flex', gap:'6px'}}>
-                                                <button onClick={() => handleCopy(item.snippet || item.description)} style={{display:'flex', alignItems:'center', gap:'4px', padding:'6px 12px', borderRadius:'8px', background:'linear-gradient(135deg,#db2777,#7c3aed)', color:'#fff', border:'none', cursor:'pointer', fontSize:'11px', fontWeight:700}}>
-                                                    {icons.copy('w-3.5 h-3.5')}
-                                                    Copy
-                                                </button>
-                                                <button onClick={() => deleteItem(item.id)} style={{padding:'6px', borderRadius:'8px', background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', color:'#fca5a5', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center'}}>
-                                                    {icons.trash('w-3.5 h-3.5')}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
+            {/* Top row: badge + actions */}
+            <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:'8px'}}>
+                <div style={{display:'flex',alignItems:'center',gap:'6px',padding:'5px 10px',borderRadius:'10px',background:m.badgeBg,border:'1px solid '+m.badgeBorder,fontSize:'10px',fontWeight:800,textTransform:'uppercase',letterSpacing:'0.06em',color:m.badgeColor}}>
+                    {m.icon('w-3 h-3')}
+                    <span>{item.category} · {item.source}</span>
                 </div>
-            </main>
+                <div style={{display:'flex',gap:'6px',flexShrink:0}}>
+                    <button onClick={function(){ onFav(item.id); }} title="Favourite"
+                        style={{padding:'6px',borderRadius:'10px',cursor:'pointer',display:'flex',
+                            background: item.favorite ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.05)',
+                            border: item.favorite ? '1px solid rgba(245,158,11,0.5)' : '1px solid rgba(255,255,255,0.08)',
+                            color: item.favorite ? '#fcd34d' : '#64748b'}}>
+                        {icons.star('w-3.5 h-3.5', item.favorite)}
+                    </button>
+                    <button onClick={function(){ onDelete(item.id); }} title="Delete"
+                        style={{padding:'6px',borderRadius:'10px',cursor:'pointer',display:'flex',
+                            background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',
+                            color:'#64748b',opacity: hovered ? 1 : 0, transition:'opacity 0.2s'}}>
+                        {icons.trash('w-3.5 h-3.5')}
+                    </button>
+                </div>
+            </div>
 
-            {/* Modals & Overlays */}
-            {isSearchOpen && (
-                <OmniSearch items={items} query={searchQuery} setQuery={setSearchQuery} onClose={() => setSearchOpen(false)} />
+            {/* Title + desc */}
+            <div>
+                <h4 style={{fontWeight:800,fontSize:'15px',color:'#f1f5f9',marginBottom:'6px',lineHeight:1.3}}>{item.title}</h4>
+                <p className="clamp2" style={{fontSize:'12px',color:'#64748b',lineHeight:1.6}}>{item.description}</p>
+            </div>
+
+            {/* Image */}
+            {item.image && (
+                <div style={{borderRadius:'14px',overflow:'hidden',height:'120px',border:'1px solid rgba(255,255,255,0.08)',position:'relative'}}>
+                    <img src={item.image} alt={item.title} style={{width:'100%',height:'100%',objectFit:'cover',transition:'transform 0.4s',transform: hovered ? 'scale(1.04)' : 'scale(1)'}} />
+                    <div style={{position:'absolute',inset:0,background:'linear-gradient(to top,rgba(3,0,20,0.7),transparent)',pointerEvents:'none'}}></div>
+                </div>
             )}
 
-            {isAddOpen && (
-                <AddItemModal onClose={() => setAddOpen(false)} onAdd={(newItem) => { setItems(prev => [newItem, ...prev]); setAddOpen(false); triggerToast('Context artifact added successfully.'); }} />
+            {/* Snippet */}
+            {item.snippet && (
+                <div className="mono" style={{background:'rgba(2,6,23,0.9)',borderRadius:'12px',padding:'12px',fontSize:'11px',color:'#f9a8d4',border:'1px solid rgba(255,255,255,0.07)',maxHeight:'80px',overflowY:'auto',lineHeight:1.6}}>
+                    <pre style={{margin:0,whiteSpace:'pre-wrap',wordBreak:'break-word'}}>{item.snippet}</pre>
+                </div>
             )}
 
-            <ChatbotDrawer isOpen={isChatOpen} onClose={() => setChatOpen(false)} items={items} />
+            {/* Tags */}
+            {item.tags && item.tags.length > 0 && (
+                <div style={{display:'flex',flexWrap:'wrap',gap:'6px'}}>
+                    {item.tags.map(function(tag, i) {
+                        return (
+                            <span key={i} className="mono" style={{fontSize:'10px',fontWeight:700,padding:'2px 8px',borderRadius:'6px',background:'rgba(236,72,153,0.1)',border:'1px solid rgba(236,72,153,0.22)',color:'#f472b6'}}>
+                                {tag}
+                            </span>
+                        );
+                    })}
+                </div>
+            )}
 
-            {toastMsg && <Toast msg={toastMsg} />}
+            {/* Footer */}
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',paddingTop:'12px',borderTop:'1px solid rgba(255,255,255,0.07)',marginTop:'auto'}}>
+                <span className="mono" style={{fontSize:'11px',color:'#475569'}}>{item.metadata}</span>
+                <div style={{display:'flex',gap:'6px'}}>
+                    <button onClick={function(){ onDownload(item); }} title="Download snippet"
+                        style={{display:'flex',alignItems:'center',gap:'4px',padding:'6px 10px',borderRadius:'10px',fontSize:'11px',fontWeight:700,color:'#67e8f9',background:'rgba(6,182,212,0.12)',border:'1px solid rgba(6,182,212,0.3)',cursor:'pointer'}}>
+                        {icons.download('w-3 h-3')}
+                        <span>Save</span>
+                    </button>
+                    <button onClick={function(){ onExpand(item); }} title="View full artifact"
+                        style={{display:'flex',alignItems:'center',gap:'4px',padding:'6px 10px',borderRadius:'10px',fontSize:'11px',fontWeight:700,color:'#d8b4fe',background:'rgba(124,58,237,0.12)',border:'1px solid rgba(124,58,237,0.3)',cursor:'pointer'}}>
+                        {icons.expand('w-3 h-3')}
+                        <span>View</span>
+                    </button>
+                    <button onClick={function(){ onCopy(item); }} title="Copy snippet"
+                        style={{display:'flex',alignItems:'center',gap:'6px',padding:'6px 14px',borderRadius:'10px',fontSize:'11px',fontWeight:700,color:'#fff',background:'linear-gradient(135deg,#db2777,#7c3aed)',border:'none',cursor:'pointer',boxShadow:'0 3px 12px rgba(219,39,119,0.3)'}}>
+                        Copy
+                        {icons.copy('w-3 h-3')}
+                    </button>
+                </div>
+            </div>
         </div>
     );
 }
 
-ReactDOM.render(<App />, document.getElementById('root'));
-</script>
+// ── ChatPanel — AI assistant sidebar ────────────────────────────────────────
+var CHAT_KNOWLEDGE = {
+    greet:    ['hi','hello','hey','sup','yo','howdy','good morning','good evening'],
+    help:     ['help','what can you do','commands','features','guide','tutorial','how does'],
+    copy:     ['copy','clipboard','how to copy','copy button','copied'],
+    tools:    ['tools','tool','features list','what tools','app tools','toolbar','what does this do','capabilities'],
+    search:   ['search','find','filter','query','look for','discover'],
+    add:      ['add','create','new artifact','index','upload','submit','new context'],
+    fav:      ['favourite','favorite','star','starred','bookmarked'],
+    delete:   ['delete','remove','trash','clear'],
+    tag:      ['tag','tags','#'],
+    download: ['download','save','export','get file'],
+    view:     ['view','expand','open','full','detail','preview'],
+    workspace:['workspace','coders','creators','leaders','category','section'],
+};
 
+function smartReply(msg, items) {
+    var m = msg.toLowerCase().trim();
+
+    // Greet
+    if (CHAT_KNOWLEDGE.greet.some(function(w){ return m.indexOf(w) > -1; }))
+        return "Hey! 👋 I'm your ContextPulse AI assistant.\n\nHere's what I can help with:\n• 🛠️ Explain any tool or feature\n• 🔍 Search artifacts by title or tag\n• ⭐ Show your favourites\n• 📋 Help you copy, save, or view snippets\n• 📊 Workspace stats\n\nJust ask naturally — or type a title to find it!";
+
+    // Help / guide
+    if (CHAT_KNOWLEDGE.help.some(function(w){ return m.indexOf(w) > -1; }))
+        return "Here's everything I can help you with:\n\n🛠️ Tools & Features:\n• Copy — copies a snippet to clipboard\n• Save — downloads snippet as a file\n• View — opens full artifact details\n• Add Context — creates a new artifact\n• Search / ⌘K — searches everything\n• ⭐ Star — marks as favourite\n• 🗑️ Delete — removes an artifact\n\n📊 Data:\n• \"show favourites\" — lists starred items\n• \"list tags\" — all tags in workspace\n• \"workspace stats\" — counts per category\n\nJust type naturally — I'll figure it out!";
+
+    // Tools / features overview  ← NEW
+    if (CHAT_KNOWLEDGE.tools.some(function(w){ return m.indexOf(w) > -1; }))
+        return "Here are all the tools available in ContextPulse:\n\n📋 Copy — Click the pink \"Copy\" button on any card to copy the code snippet to your clipboard instantly.\n\n⬇️ Save — Click the cyan \"Save\" button to download the snippet as a .txt file.\n\n🔍 View — Click the purple \"View\" button to open the full artifact in a detailed modal.\n\n➕ Add Context — Use the button in the top-right header to add a new artifact with title, snippet, tags and more.\n\n🔎 Search — Type in the main search bar or press Ctrl+K / ⌘K for Omni-Search overlay.\n\n⭐ Favourite — Click the star icon on any card to bookmark it.\n\n🗑️ Delete — Hover over a card and click the trash icon to remove it.\n\n💬 Chat — That's me! Ask me anything.";
+
+    // Copy
+    if (CHAT_KNOWLEDGE.copy.some(function(w){ return m.indexOf(w) > -1; }))
+        return "To copy a snippet:\n1️⃣ Find the artifact card\n2️⃣ Click the pink \"Copy\" button at the bottom right of the card\n3️⃣ The snippet is instantly copied to your clipboard ✅\n\nWorks on both local (file://) and hosted pages. If your browser blocks clipboard access, the app uses a safe fallback method automatically.";
+
+    // Download
+    if (CHAT_KNOWLEDGE.download.some(function(w){ return m.indexOf(w) > -1; }))
+        return "To download a snippet:\n1️⃣ Find the artifact card\n2️⃣ Click the cyan \"Save\" button at the bottom of the card\n3️⃣ A .txt file with the snippet downloads to your computer ✅\n\nYou can also download from the expanded View modal.";
+
+    // View / expand
+    if (CHAT_KNOWLEDGE.view.some(function(w){ return m.indexOf(w) > -1; }))
+        return "To view full artifact details:\n1️⃣ Click the purple \"View\" button at the bottom of any card\n2️⃣ A full-screen modal opens with the complete snippet, description, image, and tags\n3️⃣ You can Copy or Download directly from the modal too ✅";
+
+    // Search
+    if (CHAT_KNOWLEDGE.search.some(function(w){ return m.indexOf(w) > -1; }))
+        return "To search your workspace:\n• Type in the search bar in the main panel — it filters cards live\n• Press Ctrl+K or ⌘K to open the Omni-Search overlay for quick results\n• Search works on title, description, tags, source, and snippet content ✅";
+
+    // Add
+    if (CHAT_KNOWLEDGE.add.some(function(w){ return m.indexOf(w) > -1; }))
+        return "To add a new artifact:\n1️⃣ Click \"Add Context\" in the top-right header\n2️⃣ Fill in: title, workspace, source, description, code snippet, and tags\n3️⃣ Click \"Index Artifact\" to save it ✅\n\nArtifacts are saved to your browser's local storage automatically.";
+
+    // Favourites
+    if (CHAT_KNOWLEDGE.fav.some(function(w){ return m.indexOf(w) > -1; })) {
+        var favs = items.filter(function(i){ return i.favorite; });
+        if (favs.length === 0) return "You have no starred artifacts yet.\nClick the ⭐ icon on the top-right of any card to favourite it.";
+        return "Your starred artifacts (" + favs.length + "):\n" + favs.map(function(i){ return "• " + i.title + " [" + i.category + "]"; }).join('\n');
+    }
+
+    // Delete
+    if (CHAT_KNOWLEDGE.delete.some(function(w){ return m.indexOf(w) > -1; }))
+        return "To delete an artifact:\n1️⃣ Hover your mouse over the card\n2️⃣ The 🗑️ trash icon appears in the top-right corner of the card\n3️⃣ Click it to permanently remove the artifact ✅";
+
+    // Tags
+    if (CHAT_KNOWLEDGE.tag.some(function(w){ return m.indexOf(w) > -1; })) {
+        var allTags = [];
+        items.forEach(function(i){ i.tags && i.tags.forEach(function(t){ if (allTags.indexOf(t) < 0) allTags.push(t); }); });
+        return "All tags in your workspace:\n" + (allTags.length > 0 ? allTags.join('  ') : 'No tags found yet.');
+    }
+
+    // Workspace stats
+    if (CHAT_KNOWLEDGE.workspace.some(function(w){ return m.indexOf(w) > -1; })) {
+        var c  = items.filter(function(i){ return i.category==='coders'; }).length;
+        var cr = items.filter(function(i){ return i.category==='creators'; }).length;
+        var l  = items.filter(function(i){ return i.category==='leaders'; }).length;
+        return "Workspace breakdown:\n• 💻 Coders Workspace: " + c + " artifact" + (c!==1?'s':'') + "\n• 🎬 Creators Vault: " + cr + " artifact" + (cr!==1?'s':'') + "\n• 💼 Executive Suite: " + l + " artifact" + (l!==1?'s':'') + "\n• 📦 Total: " + items.length + " artifacts";
+    }
+
+    // Search for a specific artifact by name
+    var found = items.filter(function(i){ return i.title.toLowerCase().indexOf(m) > -1; });
+    if (found.length > 0)
+        return "Found " + found.length + " artifact" + (found.length!==1?'s':'') + " matching \"" + msg + "\":\n" + found.map(function(i){ return "• " + i.title + " [" + i.category + "]"; }).join('\n');
+
+    // Count / total
+    if (m.indexOf('how many') > -1 || m.indexOf('count') > -1 || m.indexOf('total') > -1)
+        return "You have " + items.length + " artifact" + (items.length!==1?'s':'') + " indexed across all workspaces.";
+
+    // Fallback
+    return "I didn't quite catch that 🤔\n\nTry asking about:\n• \"tools\" — see all features\n• \"copy\" — how to copy snippets\n• \"search\" — find artifacts\n• \"add\" — create new artifact\n• \"favourites\" — your starred items\n• \"tags\" — list all tags\n• \"workspace stats\" — item counts\n\nOr just type a title to search for it!";
+}
+
+function ChatPanel({ onClose, items }) {
+    var [msgs, setMsgs] = useState([
+        { from:'ai', text:"Hi! I'm your ContextPulse AI 🤖\n\nI can help you use every feature of this app:\n🛠️ Ask \"tools\" — see all features\n📋 Ask \"copy\" — copy a snippet\n⬇️ Ask \"save\" — download a snippet\n🔍 Ask \"search\" — find artifacts\n⭐ Ask \"favourites\" — your starred items\n\nOr just type any artifact title to find it instantly!" }
+    ]);
+    var [input, setInput] = useState('');
+    var [typing, setTyping] = useState(false);
+    var bottomRef = useRef(null);
+
+    useEffect(function() {
+        if (bottomRef.current) bottomRef.current.scrollIntoView({ behavior:'smooth' });
+    }, [msgs]);
+
+    function send() {
+        var text = input.trim();
+        if (!text) return;
+        var userMsg = { from:'user', text: text };
+        setMsgs(function(p){ return p.concat(userMsg); });
+        setInput('');
+        setTyping(true);
+        setTimeout(function() {
+            var reply = smartReply(text, items);
+            setMsgs(function(p){ return p.concat({ from:'ai', text: reply }); });
+            setTyping(false);
+        }, 600);
+    }
+
+    function onKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }
+
+    return (
+        <div className="glass anim-slide-up" style={{
+            position:'fixed', bottom:'96px', left:'28px', zIndex:89,
+            width:'340px', maxHeight:'480px', borderRadius:'22px',
+            border:'1px solid rgba(236,72,153,0.4)',
+            display:'flex', flexDirection:'column', overflow:'hidden',
+            boxShadow:'0 24px 60px rgba(0,0,0,0.7)'
+        }}>
+            {/* Header */}
+            <div style={{padding:'14px 16px',borderBottom:'1px solid rgba(255,255,255,0.08)',display:'flex',alignItems:'center',justifyContent:'space-between',background:'rgba(15,10,40,0.8)'}}>
+                <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                    <div style={{width:'30px',height:'30px',borderRadius:'50%',background:'linear-gradient(135deg,#ec4899,#7c3aed)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                        {icons.sparkle('w-3.5 h-3.5 text-white')}
+                    </div>
+                    <div>
+                        <div style={{fontSize:'12px',fontWeight:800,color:'#fff'}}>ContextPulse AI</div>
+                        <div style={{fontSize:'10px',color:'#34d399',display:'flex',alignItems:'center',gap:'4px'}}>
+                            <span style={{width:'5px',height:'5px',borderRadius:'50%',background:'#34d399',display:'inline-block'}}></span>
+                            Online
+                        </div>
+                    </div>
+                </div>
+                <button onClick={onClose} style={{padding:'5px',borderRadius:'8px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',cursor:'pointer',color:'#64748b',display:'flex'}}>
+                    {icons.x('w-3.5 h-3.5')}
+                </button>
+            </div>
+
+            {/* Messages */}
+            <div style={{flex:1,overflowY:'auto',padding:'14px',display:'flex',flexDirection:'column',gap:'10px'}}>
+                {msgs.map(function(msg, i) {
+                    var isAI = msg.from === 'ai';
+                    return (
+                        <div key={i}>
+                            <div style={{display:'flex',justifyContent: isAI ? 'flex-start' : 'flex-end'}}>
+                                <div style={{
+                                    maxWidth:'82%', padding:'9px 12px', borderRadius: isAI ? '4px 14px 14px 14px' : '14px 4px 14px 14px',
+                                    fontSize:'12px', lineHeight:1.6, whiteSpace:'pre-wrap', wordBreak:'break-word',
+                                    background: isAI ? 'rgba(124,58,237,0.2)' : 'linear-gradient(135deg,rgba(219,39,119,0.4),rgba(124,58,237,0.4))',
+                                    border: isAI ? '1px solid rgba(124,58,237,0.3)' : '1px solid rgba(236,72,153,0.3)',
+                                    color: '#f1f5f9'
+                                }}>
+                                    {msg.text}
+                                </div>
+                            </div>
+                            {/* Quick-reply chips only after the first AI message */}
+                            {isAI && i === 0 && (
+                                <div style={{display:'flex',flexWrap:'wrap',gap:'6px',marginTop:'8px',paddingLeft:'2px'}}>
+                                    {['🛠️ tools','📋 copy','⬇️ save','🔍 search','⭐ favourites','📊 workspace stats'].map(function(chip) {
+                                        var chipText = chip.replace(/^\S+\s/,'');
+                                        return (
+                                            <button key={chip} onClick={function(){
+                                                    var userMsg = { from:'user', text: chipText };
+                                                    setMsgs(function(p){ return p.concat(userMsg); });
+                                                    setTyping(true);
+                                                    setTimeout(function() {
+                                                        var reply = smartReply(chipText, items);
+                                                        setMsgs(function(p){ return p.concat({ from:'ai', text: reply }); });
+                                                        setTyping(false);
+                                                    }, 400);
+                                                }}
+                                                style={{fontSize:'11px',fontWeight:700,padding:'4px 10px',borderRadius:'20px',
+                                                    background:'rgba(124,58,237,0.15)',border:'1px solid rgba(124,58,237,0.35)',
+                                                    color:'#c4b5fd',cursor:'pointer',fontFamily:'inherit',transition:'all 0.15s'}}
+                                                onMouseEnter={function(e){ e.currentTarget.style.background='rgba(124,58,237,0.35)'; }}
+                                                onMouseLeave={function(e){ e.currentTarget.style.background='rgba(124,58,237,0.15)'; }}>
+                                                {chip}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
+                {typing && (
+                    <div style={{display:'flex',justifyContent:'flex-start'}}>
+                        <div style={{padding:'9px 14px',borderRadius:'4px 14px 14px 14px',background:'rgba(124,58,237,0.2)',border:'1px solid rgba(124,58,237,0.3)',display:'flex',gap:'4px',alignItems:'center'}}>
+                            {[0,1,2].map(function(d){
+                                return <span key={d} style={{width:'5px',height:'5px',borderRadius:'50%',background:'#a78bfa',animation:'pulse-bar 1s ease '+(d*0.2)+'s infinite',display:'inline-block'}}></span>;
+                            })}
+                        </div>
+                    </div>
+                )}
+                <div ref={bottomRef}></div>
+            </div>
+
+            {/* Input */}
+            <div style={{padding:'12px',borderTop:'1px solid rgba(255,255,255,0.07)',display:'flex',gap:'8px',background:'rgba(15,10,40,0.8)'}}>
+                <input
+                    type="text" value={input} onChange={function(e){ setInput(e.target.value); }} onKeyDown={onKey}
+                    placeholder="Ask anything..."
+                    style={{flex:1,background:'rgba(2,6,23,0.9)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'10px',padding:'8px 12px',fontSize:'12px',color:'#f1f5f9',outline:'none',fontFamily:'inherit'}}
+                />
+                <button onClick={send}
+                    style={{padding:'8px 12px',borderRadius:'10px',background:'linear-gradient(135deg,#db2777,#7c3aed)',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff'}}>
+                    {icons.send('w-4 h-4')}
+                </button>
+            </div>
+        </div>
+    );
+}
+
+
+// ── App ───────────────────────────────────────────────────────────────────────
+function App() {
+    var [items,   setItems]   = useState(function() {
+        try {
+            var s = localStorage.getItem('cp_v5');
+            if (s) { var p = JSON.parse(s); if (Array.isArray(p)) return p; }
+        } catch(e) {}
+        return SEED;
+    });
+    var [tab,      setTab]     = useState('all');
+    var [query,    setQuery]   = useState('');
+    var [omni,     setOmni]    = useState(false);
+    var [addOpen,  setAddOpen] = useState(false);
+    var [toast,    setToast]   = useState(null);
+    var [expanded, setExpanded]= useState(null);   // artifact being viewed full-screen
+    var [chatOpen, setChatOpen]= useState(false);  // AI chatbot panel
+
+    useEffect(function() {
+        try { localStorage.setItem('cp_v5', JSON.stringify(items)); } catch(e) {}
+    }, [items]);
+
+    useEffect(function() {
+        function handler(e) {
+            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault(); setOmni(function(p){ return !p; });
+            }
+            if (e.key === 'Escape') { setOmni(false); setAddOpen(false); setExpanded(null); setChatOpen(false); }
+        }
+        window.addEventListener('keydown', handler);
+        return function() { window.removeEventListener('keydown', handler); };
+    }, []);
+
+    function showToast(msg) { setToast(msg); setTimeout(function(){ setToast(null); }, 3000); }
+
+    function handleFav(id) {
+        setItems(function(prev){ return prev.map(function(i){ return i.id === id ? Object.assign({}, i, {favorite: !i.favorite}) : i; }); });
+        showToast('⭐ Favourite updated');
+    }
+    function handleDelete(id) {
+        setItems(function(prev){ return prev.filter(function(i){ return i.id !== id; }); });
+        showToast('🗑️ Artifact deleted');
+    }
+    function handleAdd(item) {
+        setItems(function(prev){ return [item].concat(prev); });
+        setAddOpen(false);
+        showToast('✨ Artifact added!');
+    }
+
+    function handleDownload(item) {
+        var text = item.snippet || item.title;
+        var ext = item.category === 'coders' ? '.txt' : '.txt';
+        var blob = new Blob([text], { type: 'text/plain' });
+        var url  = URL.createObjectURL(blob);
+        var a    = document.createElement('a');
+        a.href     = url;
+        a.download = item.title.replace(/[^a-z0-9]/gi,'_').toLowerCase() + ext;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('⬇️ Snippet downloaded!');
+    }
+
+    function handleExpand(item) {
+        setExpanded(item);
+    }
+    function handleCopy(item) {
+        var text = item.snippet || item.title;
+        // Modern async clipboard API (works on HTTPS / localhost)
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function() {
+                showToast('📋 Copied to clipboard!');
+            }).catch(function() {
+                fallbackCopy(text);
+            });
+        } else {
+            fallbackCopy(text);
+        }
+    }
+
+    function fallbackCopy(text) {
+        // Works on file:// and older browsers via hidden textarea
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        try {
+            var ok = document.execCommand('copy');
+            showToast(ok ? '📋 Copied to clipboard!' : '⚠️ Copy failed — select manually');
+        } catch(e) {
+            showToast('⚠️ Copy not supported in this browser');
+        }
+        document.body.removeChild(ta);
+    }
+
+    var filtered = useMemo(function() {
+        var q = query.trim().toLowerCase();
+        return items.filter(function(item) {
+            var matchTab = tab === 'all' || item.category === tab;
+            var matchQ = !q
+                || item.title.toLowerCase().indexOf(q) > -1
+                || item.description.toLowerCase().indexOf(q) > -1
+                || item.source.toLowerCase().indexOf(q) > -1
+                || item.tags.some(function(t){ return t.toLowerCase().indexOf(q) > -1; })
+                || (item.snippet && item.snippet.toLowerCase().indexOf(q) > -1);
+            return matchTab && matchQ;
+        });
+    }, [items, tab, query]);
+
+    var feedLabel = tab === 'all' ? 'All Workspace Streams' : {coders:'Coders Workspace', creators:'Creators Vault', leaders:'Executive Suite'}[tab];
+
+    return (
+        <div style={{minHeight:'100vh',display:'flex',flexDirection:'column'}}>
+            {toast && <Toast msg={toast} />}
+            {omni && <OmniSearch items={items} query={query} setQuery={setQuery} onClose={function(){ setOmni(false); }} />}
+            {addOpen && <AddItemModal onClose={function(){ setAddOpen(false); }} onAdd={handleAdd} />}
+
+            {/* Expanded artifact modal */}
+            {expanded && (
+                <div className="overlay" onClick={function(){ setExpanded(null); }}>
+                    <div className="glass anim-pop-in" onClick={function(e){ e.stopPropagation(); }} style={{
+                        width:'100%', maxWidth:'680px', borderRadius:'24px', padding:'28px',
+                        border:'1px solid rgba(236,72,153,0.45)', maxHeight:'90vh', overflowY:'auto'
+                    }}>
+                        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'20px'}}>
+                            <div>
+                                <h2 style={{fontWeight:900,fontSize:'18px',color:'#fff',marginBottom:'4px'}}>{expanded.title}</h2>
+                                <span style={{fontSize:'11px',color:'#f472b6',fontFamily:'monospace'}}>{expanded.category} · {expanded.source}</span>
+                            </div>
+                            <button onClick={function(){ setExpanded(null); }}
+                                style={{padding:'7px',borderRadius:'10px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.1)',cursor:'pointer',color:'#94a3b8',display:'flex'}}>
+                                {icons.x('w-4 h-4')}
+                            </button>
+                        </div>
+                        {expanded.image && (
+                            <div style={{borderRadius:'16px',overflow:'hidden',height:'200px',marginBottom:'20px',border:'1px solid rgba(255,255,255,0.1)'}}>
+                                <img src={expanded.image} alt={expanded.title} style={{width:'100%',height:'100%',objectFit:'cover'}} />
+                            </div>
+                        )}
+                        <p style={{fontSize:'13px',color:'#94a3b8',lineHeight:1.7,marginBottom:'20px'}}>{expanded.description}</p>
+                        {expanded.snippet && (
+                            <div>
+                                <div style={{fontSize:'10px',fontWeight:800,textTransform:'uppercase',letterSpacing:'0.08em',color:'#f472b6',marginBottom:'8px'}}>Snippet</div>
+                                <div className="mono" style={{background:'rgba(2,6,23,0.95)',borderRadius:'14px',padding:'16px',fontSize:'12px',color:'#f9a8d4',border:'1px solid rgba(255,255,255,0.08)',lineHeight:1.7,overflowX:'auto'}}>
+                                    <pre style={{margin:0,whiteSpace:'pre-wrap',wordBreak:'break-word'}}>{expanded.snippet}</pre>
+                                </div>
+                            </div>
+                        )}
+                        {expanded.tags && expanded.tags.length > 0 && (
+                            <div style={{display:'flex',flexWrap:'wrap',gap:'6px',marginTop:'16px'}}>
+                                {expanded.tags.map(function(tag,i){
+                                    return <span key={i} className="mono" style={{fontSize:'10px',fontWeight:700,padding:'3px 10px',borderRadius:'6px',background:'rgba(236,72,153,0.1)',border:'1px solid rgba(236,72,153,0.22)',color:'#f472b6'}}>{tag}</span>;
+                                })}
+                            </div>
+                        )}
+                        <div style={{display:'flex',gap:'10px',marginTop:'20px',paddingTop:'16px',borderTop:'1px solid rgba(255,255,255,0.07)'}}>
+                            <button onClick={function(){ handleCopy(expanded); }}
+                                style={{flex:1,padding:'10px',borderRadius:'12px',fontSize:'12px',fontWeight:700,color:'#fff',background:'linear-gradient(135deg,#db2777,#7c3aed)',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'6px'}}>
+                                {icons.copy('w-3.5 h-3.5')} Copy Snippet
+                            </button>
+                            <button onClick={function(){ handleDownload(expanded); }}
+                                style={{flex:1,padding:'10px',borderRadius:'12px',fontSize:'12px',fontWeight:700,color:'#67e8f9',background:'rgba(6,182,212,0.12)',border:'1px solid rgba(6,182,212,0.3)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'6px'}}>
+                                {icons.download('w-3.5 h-3.5')} Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* AI Chatbot floating button */}
+            <button onClick={function(){ setChatOpen(function(p){ return !p; }); }}
+                style={{position:'fixed',bottom:'28px',left:'28px',zIndex:90,width:'54px',height:'54px',borderRadius:'50%',
+                    background:'linear-gradient(135deg,#ec4899,#7c3aed)',border:'none',cursor:'pointer',
+                    display:'flex',alignItems:'center',justifyContent:'center',
+                    boxShadow:'0 6px 24px rgba(236,72,153,0.5)',transition:'transform 0.2s'}}>
+                {icons.chat('w-6 h-6 text-white')}
+            </button>
+
+            {/* AI Chatbot panel */}
+            {chatOpen && <ChatPanel onClose={function(){ setChatOpen(false); }} items={items} />}
+
+            <Header onAdd={function(){ setAddOpen(true); }} onSearch={function(){ setOmni(true); }} />
+
+            <main style={{flex:1,maxWidth:'1280px',width:'100%',margin:'0 auto',padding:'28px 20px',display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'24px'}}>
+
+                <Sidebar items={items} active={tab} setActive={setTab} />
+
+                <section style={{gridColumn:'span 3',display:'flex',flexDirection:'column',gap:'20px'}}>
+
+                    {/* Search banner */}
+                    <div className="glass" style={{borderRadius:'22px',padding:'28px',position:'relative',overflow:'hidden',border:'1px solid rgba(236,72,153,0.25)'}}>
+                        <div style={{position:'absolute',right:'-40px',top:'-40px',width:'200px',height:'200px',borderRadius:'50%',background:'radial-gradient(circle,rgba(236,72,153,0.22),transparent)',filter:'blur(40px)',pointerEvents:'none'}}></div>
+                        <h2 style={{fontWeight:900,fontSize:'24px',marginBottom:'6px',background:'linear-gradient(to right,#fff,#f9a8d4,#d8b4fe)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>
+                            Infinite Context Engine
+                        </h2>
+                        <p style={{fontSize:'13px',color:'#64748b',marginBottom:'18px',fontWeight:500}}>
+                            Instant retrieval across your entire digital workspace.
+                        </p>
+                        <div style={{position:'relative'}}>
+                            <div style={{position:'absolute',left:'14px',top:'50%',transform:'translateY(-50%)',pointerEvents:'none'}}>
+                                {icons.search('w-4 h-4 text-pink-400')}
+                            </div>
+                            <input type="text" value={query} onChange={function(e){ setQuery(e.target.value); }}
+                                placeholder="Search by title, tag, keyword or platform..."
+                                className="field" style={{paddingLeft:'40px',paddingRight: query ? '60px' : '14px',fontSize:'14px',borderRadius:'14px',padding:'13px 14px 13px 40px'}} />
+                            {query && (
+                                <button onClick={function(){ setQuery(''); }}
+                                    style={{position:'absolute',right:'12px',top:'50%',transform:'translateY(-50%)',fontSize:'11px',fontWeight:700,color:'#f472b6',background:'none',border:'none',cursor:'pointer'}}>
+                                    Clear
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Feed header */}
+                    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 4px'}}>
+                        <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                            <span style={{width:'8px',height:'8px',borderRadius:'50%',background:'linear-gradient(to right,#f472b6,#a78bfa)',display:'inline-block'}}></span>
+                            <span style={{fontSize:'13px',fontWeight:800,color:'#e2e8f0'}}>{feedLabel}</span>
+                        </div>
+                        <span style={{fontSize:'11px',fontFamily:'monospace',fontWeight:700,padding:'3px 12px',borderRadius:'20px',background:'rgba(236,72,153,0.08)',border:'1px solid rgba(236,72,153,0.22)',color:'#f472b6'}}>
+                            {filtered.length} artifact{filtered.length !== 1 ? 's' : ''}
+                        </span>
+                    </div>
+
+                    {/* Cards or empty */}
+                    {filtered.length === 0 ? (
+                        <div className="glass" style={{borderRadius:'22px',padding:'60px 20px',textAlign:'center',border:'1px dashed rgba(236,72,153,0.22)'}}>
+                            {icons.empty('w-12 h-12 text-pink-400 mx-auto mb-3')}
+                            <p style={{fontWeight:700,color:'#cbd5e1',fontSize:'14px'}}>No artifacts found</p>
+                            <p style={{fontSize:'12px',color:'#475569',marginTop:'4px'}}>Try a different search or add a new artifact.</p>
+                        </div>
+                    ) : (
+                        <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:'16px'}}>
+                            {filtered.map(function(item) {
+                                return (
+                                    <ArtifactCard key={item.id} item={item}
+                                        onFav={handleFav} onDelete={handleDelete} onCopy={handleCopy}
+                                        onDownload={handleDownload} onExpand={handleExpand} />
+                                );
+                            })}
+                        </div>
+                    )}
+                </section>
+            </main>
+        </div>
+    );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+</script>
 </body>
 </html>
