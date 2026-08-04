@@ -1,170 +1,249 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ContextPulse — Lumina OS</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: { deepvoid: '#030014' },
-                    keyframes: {
-                        floatOrb1: {
-                            '0%,100%': { transform: 'translate(0,0) scale(1)' },
-                            '50%':     { transform: 'translate(60px,-80px) scale(1.15)' }
-                        },
-                        floatOrb2: {
-                            '0%,100%': { transform: 'translate(0,0) scale(1)' },
-                            '50%':     { transform: 'translate(-70px,60px) scale(1.2)' }
-                        },
-                        floatOrb3: {
-                            '0%,100%': { transform: 'translate(0,0) scale(1)' },
-                            '50%':     { transform: 'translate(50px,70px) scale(1.1)' }
-                        },
-                        slideUp: {
-                            '0%':   { opacity: '0', transform: 'translateY(16px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' }
-                        },
-                        fadeIn: {
-                            '0%':   { opacity: '0' },
-                            '100%': { opacity: '1' }
-                        },
-                        zoomIn: {
-                            '0%':   { opacity: '0', transform: 'scale(0.94)' },
-                            '100%': { opacity: '1', transform: 'scale(1)' }
-                        }
-                    },
-                    animation: {
-                        floatOrb1: 'floatOrb1 12s ease-in-out infinite',
-                        floatOrb2: 'floatOrb2 15s ease-in-out infinite',
-                        floatOrb3: 'floatOrb3 18s ease-in-out infinite',
-                        slideUp:   'slideUp 0.35s cubic-bezier(0.16,1,0.3,1) both',
-                        fadeIn:    'fadeIn 0.25s ease both',
-                        zoomIn:    'zoomIn 0.25s cubic-bezier(0.16,1,0.3,1) both'
-                    }
-                }
-            }
-        }
-    </script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
         * { box-sizing: border-box; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #030014; color: #f8fafc; }
-        .code-font { font-family: 'JetBrains Mono', monospace; }
 
-        .glass-card {
-            background: linear-gradient(135deg, rgba(20,18,50,0.78) 0%, rgba(10,8,30,0.92) 100%);
-            backdrop-filter: blur(28px);
-            -webkit-backdrop-filter: blur(28px);
-            border: 1px solid rgba(236,72,153,0.22);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.65), inset 0 1px 1px rgba(255,255,255,0.18);
-            transition: all 0.35s cubic-bezier(0.16,1,0.3,1);
-        }
-        .glass-card:hover {
-            border-color: rgba(236,72,153,0.55);
-            box-shadow: 0 28px 65px rgba(236,72,153,0.22), inset 0 1px 2px rgba(255,255,255,0.35);
-            transform: translateY(-4px);
-        }
-        .glass-flat {
-            background: linear-gradient(135deg, rgba(20,18,50,0.78) 0%, rgba(10,8,30,0.92) 100%);
-            backdrop-filter: blur(28px);
-            -webkit-backdrop-filter: blur(28px);
-            border: 1px solid rgba(236,72,153,0.22);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #030014;
+            color: #f8fafc;
+            overflow-x: hidden;
         }
 
-        .orb { position: fixed; pointer-events: none; z-index: -1; border-radius: 9999px; }
-        .orb-1 { top:-15%; left:5%; width:650px; height:650px;
-            background: radial-gradient(circle, rgba(168,85,247,0.38) 0%, rgba(99,102,241,0.12) 55%, transparent 80%);
-            filter:blur(80px); animation: floatOrb1 12s ease-in-out infinite; }
-        .orb-2 { top:25%; right:2%; width:750px; height:750px;
-            background: radial-gradient(circle, rgba(236,72,153,0.32) 0%, rgba(217,70,239,0.1) 55%, transparent 80%);
-            filter:blur(90px); animation: floatOrb2 15s ease-in-out infinite; }
-        .orb-3 { bottom:-15%; left:20%; width:700px; height:700px;
-            background: radial-gradient(circle, rgba(6,182,212,0.28) 0%, rgba(59,130,246,0.1) 55%, transparent 80%);
-            filter:blur(100px); animation: floatOrb3 18s ease-in-out infinite; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
 
-        ::-webkit-scrollbar { width: 7px; height: 7px; }
-        ::-webkit-scrollbar-track { background: #030014; }
-        ::-webkit-scrollbar-thumb { background: rgba(236,72,153,0.35); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(236,72,153,0.7); }
-        ::selection { background: #ec4899; color: #fff; }
+        /* Glass cards */
+        .glass {
+            background: linear-gradient(135deg, rgba(20,18,50,0.82) 0%, rgba(10,8,30,0.94) 100%);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(236,72,153,0.2);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+        }
+        .glass-hover {
+            background: linear-gradient(135deg, rgba(20,18,50,0.82) 0%, rgba(10,8,30,0.94) 100%);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(236,72,153,0.2);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+            transition: all 0.3s ease;
+        }
+        .glass-hover:hover {
+            border-color: rgba(236,72,153,0.5);
+            box-shadow: 0 24px 60px rgba(236,72,153,0.18);
+            transform: translateY(-3px);
+        }
 
-        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        /* Ambient orbs */
+        .orb {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+            border-radius: 9999px;
+        }
+        .orb1 {
+            top: -10%; left: 5%;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(168,85,247,0.35) 0%, transparent 70%);
+            filter: blur(80px);
+            animation: float1 12s ease-in-out infinite;
+        }
+        .orb2 {
+            top: 30%; right: 0%;
+            width: 700px; height: 700px;
+            background: radial-gradient(circle, rgba(236,72,153,0.28) 0%, transparent 70%);
+            filter: blur(90px);
+            animation: float2 16s ease-in-out infinite;
+        }
+        .orb3 {
+            bottom: -10%; left: 25%;
+            width: 650px; height: 650px;
+            background: radial-gradient(circle, rgba(6,182,212,0.22) 0%, transparent 70%);
+            filter: blur(100px);
+            animation: float3 20s ease-in-out infinite;
+        }
 
-        /* Input focus ring */
-        .input-field {
+        @keyframes float1 {
+            0%,100% { transform: translate(0,0); }
+            50%      { transform: translate(50px,-70px); }
+        }
+        @keyframes float2 {
+            0%,100% { transform: translate(0,0); }
+            50%      { transform: translate(-60px,50px); }
+        }
+        @keyframes float3 {
+            0%,100% { transform: translate(0,0); }
+            50%      { transform: translate(40px,60px); }
+        }
+        @keyframes slideUp {
+            from { opacity:0; transform: translateY(14px); }
+            to   { opacity:1; transform: translateY(0); }
+        }
+        @keyframes popIn {
+            from { opacity:0; transform: scale(0.95); }
+            to   { opacity:1; transform: scale(1); }
+        }
+        @keyframes pulse-bar {
+            0%,100% { opacity:1; }
+            50%      { opacity:0.5; }
+        }
+
+        .anim-slide-up { animation: slideUp 0.3s ease both; }
+        .anim-pop-in   { animation: popIn  0.25s cubic-bezier(0.16,1,0.3,1) both; }
+
+        /* Inputs */
+        .field {
             width: 100%;
-            background: rgba(2,6,23,0.9);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 12px;
-            padding: 10px 16px;
+            background: rgba(2,6,23,0.92);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 9px 14px;
             font-size: 13px;
             color: #f1f5f9;
             outline: none;
             transition: border-color 0.2s;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
-        .input-field:focus { border-color: rgba(236,72,153,0.7); }
-        textarea.input-field { resize: vertical; }
+        .field:focus { border-color: rgba(236,72,153,0.65); }
+        select.field { cursor: pointer; }
+        textarea.field { resize: vertical; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #030014; }
+        ::-webkit-scrollbar-thumb { background: rgba(236,72,153,0.3); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(236,72,153,0.6); }
+
+        /* Line clamp */
+        .clamp2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+
+        /* Overlay backdrop */
+        .overlay {
+            position: fixed; inset: 0; z-index: 50;
+            background: rgba(0,0,0,0.72);
+            backdrop-filter: blur(10px);
+            display: flex; align-items: center; justify-content: center;
+            padding: 16px;
+            animation: fadeOverlay 0.2s ease both;
+        }
+        .overlay-top { align-items: flex-start; padding-top: 80px; }
+        @keyframes fadeOverlay {
+            from { opacity:0; }
+            to   { opacity:1; }
+        }
     </style>
 </head>
-<body class="relative overflow-x-hidden min-h-screen">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-    <div id="root"></div>
+<body style="position:relative; min-height:100vh;">
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<div id="root" style="position:relative; z-index:1;"></div>
 
 <script type="text/babel">
 const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
 
-// ── Inline SVG Icons (no external icon lib needed) ──────────────────────────
-const Icon = ({ name, cls = "w-4 h-4" }) => {
-    const paths = {
-        zap:         <><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></>,
-        search:      <><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></>,
-        sparkles:    <><path d="M12 3L13.5 8.5H19L14.5 12L16 17.5L12 14L8 17.5L9.5 12L5 8.5H10.5L12 3Z"/></>,
-        layers:      <><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></>,
-        'layout-grid':<><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></>,
-        code:        <><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></>,
-        video:       <><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></>,
-        briefcase:   <><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></>,
-        cpu:         <><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></>,
-        star:        <><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></>,
-        'trash-2':   <><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></>,
-        copy:        <><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></>,
-        image:       <><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></>,
-        'folder-open':<><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></>,
-        x:           <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>,
-        plus:        <><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></>,
-    };
-    return (
-        <svg xmlns="http://www.w3.org/2000/svg" className={cls} viewBox="0 0 24 24"
-            fill="none" stroke="currentColor" strokeWidth="2"
-            strokeLinecap="round" strokeLinejoin="round">
-            {paths[name]}
+// ── SVG Icons — NO React fragments, each icon is a single <svg> ─────────────
+const icons = {
+    zap: (c) => (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
         </svg>
-    );
+    ),
+    search: (c) => (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+    ),
+    plus: (c) => (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+    ),
+    x: (c) => (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+    ),
+    star: (c, filled) => (
+        <svg className={c} viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+    ),
+    trash: (c) => (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M9 6V4h6v2" />
+        </svg>
+    ),
+    copy: (c) => (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+        </svg>
+    ),
+    code: (c) => (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" />
+        </svg>
+    ),
+    video: (c) => (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="23 7 16 12 23 17 23 7" /><rect x="1" y="5" width="15" height="14" rx="2" />
+        </svg>
+    ),
+    briefcase: (c) => (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+        </svg>
+    ),
+    grid: (c) => (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
+        </svg>
+    ),
+    cpu: (c) => (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="4" width="16" height="16" rx="2" /><rect x="9" y="9" width="6" height="6" /><line x1="9" y1="1" x2="9" y2="4" /><line x1="15" y1="1" x2="15" y2="4" /><line x1="9" y1="20" x2="9" y2="23" /><line x1="15" y1="20" x2="15" y2="23" /><line x1="20" y1="9" x2="23" y2="9" /><line x1="20" y1="14" x2="23" y2="14" /><line x1="1" y1="9" x2="4" y2="9" /><line x1="1" y1="14" x2="4" y2="14" />
+        </svg>
+    ),
+    layers: (c) => (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 17 12 22 22 17" /><polyline points="2 12 12 17 22 12" />
+        </svg>
+    ),
+    empty: (c) => (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /><line x1="12" y1="11" x2="12" y2="17" /><line x1="9" y1="14" x2="15" y2="14" />
+        </svg>
+    ),
+    sparkle: (c) => (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
+        </svg>
+    ),
 };
 
-// ── Initial seed data ────────────────────────────────────────────────────────
-const INITIAL_ITEMS = [
+// ── Seed data ────────────────────────────────────────────────────────────────
+const SEED = [
     {
         id: 'ctx-1',
         title: 'Stripe Webhook Handler v2',
         category: 'coders',
         source: 'GitHub Gist',
         image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80',
-        snippet: "app.post('/webhook', express.raw({type: 'application/json'}), async (req, res) => {\n  const event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);\n  // Handle secure async checkout fulfillment\n});",
-        description: 'Enterprise-grade async event processor for subscription renewals and edge runtime network failures.',
+        snippet: "app.post('/webhook', express.raw({type: 'application/json'}), async (req, res) => {\n  const event = stripe.webhooks.constructEvent(req.body, sig, secret);\n  // Handle fulfillment\n});",
+        description: 'Enterprise-grade async event processor for subscription renewals and edge runtime failures.',
         metadata: 'Repo: saas-core • 12m ago',
         favorite: true,
         tags: ['#Backend', '#Stripe', '#NodeJS', '#Security']
@@ -175,11 +254,11 @@ const INITIAL_ITEMS = [
         category: 'creators',
         source: 'Google Drive',
         image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80',
-        snippet: 'Primary Palette: #030014 (DeepVoid), #ec4899 (Neon Pink), #a855f7 (Electric Purple).\nTypography: Plus Jakarta Sans.',
-        description: 'Latest 4K raw assets, typography configs, and cinematic color grading LUTs for global product launch.',
+        snippet: 'Primary: #030014 (DeepVoid), #ec4899 (Neon Pink), #a855f7 (Purple).\nFont: Plus Jakarta Sans.',
+        description: '4K raw assets, typography configs, and cinematic color grading LUTs for global launch.',
         metadata: 'Size: 1.4 GB • 1h ago',
         favorite: false,
-        tags: ['#BrandAssets', '#YouTubeS3', '#ColorGrading']
+        tags: ['#BrandAssets', '#ColorGrading', '#YouTube']
     },
     {
         id: 'ctx-3',
@@ -187,11 +266,11 @@ const INITIAL_ITEMS = [
         category: 'leaders',
         source: 'Executive Sync',
         image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&auto=format&fit=crop&q=80',
-        snippet: 'Consensus Actions:\n1. Reallocate 40% capex toward autonomous AI compute clusters.\n2. Execute department lead signoffs by Friday.',
-        description: 'Board agreement reached on pivoting quarterly infrastructure investments toward ML compute nodes.',
-        metadata: 'Meeting: Boardroom Sync • 3h ago',
+        snippet: '1. Reallocate 40% capex to AI compute clusters.\n2. Department signoffs due Friday.',
+        description: 'Board agreement on pivoting quarterly infrastructure investments toward ML compute nodes.',
+        metadata: 'Meeting: Boardroom • 3h ago',
         favorite: true,
-        tags: ['#Strategy', '#BudgetQ3', '#ExecBoard', '#AI']
+        tags: ['#Strategy', '#BudgetQ3', '#AI']
     },
     {
         id: 'ctx-4',
@@ -199,314 +278,310 @@ const INITIAL_ITEMS = [
         category: 'coders',
         source: 'Notion Spec',
         image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80',
-        snippet: 'MAX_REQUESTS = 150 per window_ms (60000)\nStorage: Distributed Redis Cluster token bucket algorithm.',
-        description: 'High-frequency distributed rate-limiting spec using Redis sorted sets for public developer API keys.',
+        snippet: 'MAX_REQUESTS = 150 per 60s window\nBackend: Redis token bucket algorithm.',
+        description: 'Distributed rate-limiting spec using Redis sorted sets for public developer API keys.',
         metadata: 'Space: Engineering • Yesterday',
         favorite: false,
-        tags: ['#Architecture', '#Redis', '#API', '#Scaling']
+        tags: ['#Architecture', '#Redis', '#API']
     }
 ];
 
-
-// ── Toast component ──────────────────────────────────────────────────────────
-const Toast = ({ msg }) => (
-    <div className="fixed bottom-6 right-6 z-50 animate-slideUp flex items-center space-x-3 px-5 py-3.5 rounded-2xl border border-pink-500/60 shadow-2xl"
-        style={{background:'linear-gradient(135deg,rgba(88,28,135,0.97),rgba(157,23,77,0.97))'}}>
-        <span className="w-2.5 h-2.5 rounded-full bg-pink-400 animate-ping flex-shrink-0"></span>
-        <span className="text-xs font-bold text-white tracking-wide">{msg}</span>
-    </div>
-);
+// ── Toast ────────────────────────────────────────────────────────────────────
+function Toast({ msg }) {
+    return (
+        <div className="anim-slide-up" style={{
+            position:'fixed', bottom:'24px', right:'24px', zIndex:100,
+            display:'flex', alignItems:'center', gap:'10px',
+            padding:'12px 20px', borderRadius:'16px',
+            background:'linear-gradient(135deg,rgba(88,28,135,0.97),rgba(157,23,77,0.97))',
+            border:'1px solid rgba(236,72,153,0.5)',
+            boxShadow:'0 8px 32px rgba(0,0,0,0.5)'
+        }}>
+            <span style={{
+                width:'8px', height:'8px', borderRadius:'50%',
+                background:'#f472b6', flexShrink:0,
+                animation:'pulse-bar 1s ease infinite'
+            }}></span>
+            <span style={{fontSize:'12px', fontWeight:700, color:'#fff'}}>{msg}</span>
+        </div>
+    );
+}
 
 // ── OmniSearch modal ─────────────────────────────────────────────────────────
-const OmniSearch = ({ items, query, setQuery, onClose }) => {
-    const inputRef = useRef(null);
-    useEffect(() => { setTimeout(() => inputRef.current?.focus(), 40); }, []);
+function OmniSearch({ items, query, setQuery, onClose }) {
+    const ref = useRef(null);
+    useEffect(() => { setTimeout(() => ref.current && ref.current.focus(), 40); }, []);
 
     const results = useMemo(() => {
         const q = query.trim().toLowerCase();
         if (!q) return items.slice(0, 6);
-        return items.filter(i =>
-            i.title.toLowerCase().includes(q) ||
-            i.description.toLowerCase().includes(q) ||
-            i.source.toLowerCase().includes(q) ||
-            i.tags.some(t => t.toLowerCase().includes(q)) ||
-            (i.snippet && i.snippet.toLowerCase().includes(q))
-        );
+        return items.filter(function(i) {
+            return i.title.toLowerCase().indexOf(q) > -1
+                || i.description.toLowerCase().indexOf(q) > -1
+                || i.source.toLowerCase().indexOf(q) > -1
+                || i.tags.some(function(t) { return t.toLowerCase().indexOf(q) > -1; })
+                || (i.snippet && i.snippet.toLowerCase().indexOf(q) > -1);
+        });
     }, [items, query]);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 bg-black/70 backdrop-blur-md px-4 animate-fadeIn"
-            onClick={onClose}>
-            <div className="glass-flat w-full max-w-xl rounded-3xl p-6 border border-pink-500/50 shadow-2xl animate-zoomIn"
-                onClick={e => e.stopPropagation()}>
-                <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
-                    <div className="flex items-center space-x-2 text-pink-400">
-                        <Icon name="search" cls="w-4 h-4" />
-                        <span className="text-sm font-extrabold text-white">Omni-Search</span>
+        <div className="overlay overlay-top" onClick={onClose}>
+            <div className="glass anim-pop-in" onClick={function(e){ e.stopPropagation(); }} style={{
+                width:'100%', maxWidth:'560px', borderRadius:'24px', padding:'24px',
+                border:'1px solid rgba(236,72,153,0.45)'
+            }}>
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',paddingBottom:'16px',borderBottom:'1px solid rgba(255,255,255,0.08)',marginBottom:'16px'}}>
+                    <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                        {icons.search('w-4 h-4 text-pink-400')}
+                        <span style={{fontWeight:800,fontSize:'14px',color:'#fff'}}>Omni-Search</span>
                     </div>
-                    <button onClick={onClose}
-                        className="text-xs font-bold text-slate-400 hover:text-white px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 transition">
-                        ESC
-                    </button>
+                    <button onClick={onClose} style={{fontSize:'11px',fontWeight:700,color:'#94a3b8',padding:'4px 10px',borderRadius:'8px',background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',cursor:'pointer'}}>ESC</button>
                 </div>
-                <div className="relative mb-4">
-                    <Icon name="search" cls="w-4 h-4 absolute left-3.5 top-3.5 text-pink-400 pointer-events-none" />
-                    <input ref={inputRef} type="text" value={query} onChange={e => setQuery(e.target.value)}
-                        placeholder="Search across all workspaces…"
-                        className="input-field pl-10 pr-4 py-3" />
-                    {query && (
-                        <button onClick={() => setQuery('')}
-                            className="absolute right-3.5 top-3 text-pink-400 hover:text-white transition">
-                            <Icon name="x" cls="w-4 h-4" />
-                        </button>
-                    )}
+                <div style={{position:'relative',marginBottom:'14px'}}>
+                    <div style={{position:'absolute',left:'12px',top:'50%',transform:'translateY(-50%)',pointerEvents:'none'}}>
+                        {icons.search('w-4 h-4 text-pink-400')}
+                    </div>
+                    <input ref={ref} type="text" value={query} onChange={function(e){ setQuery(e.target.value); }}
+                        placeholder="Search across all workspaces..."
+                        className="field" style={{paddingLeft:'38px'}} />
                 </div>
-                <div className="space-y-1.5 max-h-72 overflow-y-auto pr-1">
+                <div style={{maxHeight:'260px',overflowY:'auto'}}>
                     {results.length === 0 ? (
-                        <p className="text-xs text-slate-400 text-center py-8">No matching artifacts found.</p>
-                    ) : results.map(item => (
-                        <div key={item.id}
-                            onClick={() => { setQuery(item.title); onClose(); }}
-                            className="flex items-center justify-between p-3 rounded-2xl hover:bg-white/8 cursor-pointer transition border border-transparent hover:border-pink-500/25 group">
-                            <div>
-                                <p className="text-xs font-bold text-white group-hover:text-pink-200 transition">{item.title}</p>
-                                <p className="text-[10px] text-slate-400 mt-0.5">{item.source} · {item.category}</p>
+                        <p style={{textAlign:'center',color:'#64748b',fontSize:'12px',padding:'24px 0'}}>No results found.</p>
+                    ) : results.map(function(item) {
+                        return (
+                            <div key={item.id} onClick={function(){ setQuery(item.title); onClose(); }}
+                                style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'10px 12px',borderRadius:'12px',cursor:'pointer',border:'1px solid transparent',marginBottom:'4px',transition:'all 0.15s'}}
+                                onMouseEnter={function(e){ e.currentTarget.style.background='rgba(255,255,255,0.05)'; e.currentTarget.style.borderColor='rgba(236,72,153,0.2)'; }}
+                                onMouseLeave={function(e){ e.currentTarget.style.background='transparent'; e.currentTarget.style.borderColor='transparent'; }}>
+                                <div>
+                                    <p style={{fontWeight:700,fontSize:'12px',color:'#f1f5f9'}}>{item.title}</p>
+                                    <p style={{fontSize:'10px',color:'#64748b',marginTop:'2px'}}>{item.source} · {item.category}</p>
+                                </div>
+                                <span style={{fontSize:'10px',fontFamily:'monospace',color:'#f472b6',background:'rgba(236,72,153,0.1)',padding:'2px 8px',borderRadius:'20px',border:'1px solid rgba(236,72,153,0.2)',flexShrink:0}}>Open</span>
                             </div>
-                            <span className="text-[10px] font-mono text-pink-400 bg-pink-500/10 px-2 py-0.5 rounded-full border border-pink-500/20 flex-shrink-0">Open</span>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
         </div>
     );
-};
+}
 
-// ── AddItem modal ────────────────────────────────────────────────────────────
-const AddItemModal = ({ onClose, onAdd }) => {
-    const [title, setTitle]       = useState('');
-    const [category, setCategory] = useState('coders');
-    const [source, setSource]     = useState('');
-    const [description, setDesc]  = useState('');
-    const [snippet, setSnippet]   = useState('');
-    const [tags, setTags]         = useState('');
-    const [image, setImage]       = useState('');
-    const [error, setError]       = useState('');
 
-    const handleSubmit = (e) => {
+// ── AddItemModal ─────────────────────────────────────────────────────────────
+function AddItemModal({ onClose, onAdd }) {
+    const [title,    setTitle]   = useState('');
+    const [category, setCat]     = useState('coders');
+    const [source,   setSource]  = useState('');
+    const [desc,     setDesc]    = useState('');
+    const [snippet,  setSnippet] = useState('');
+    const [tags,     setTags]    = useState('');
+    const [image,    setImage]   = useState('');
+    const [err,      setErr]     = useState('');
+
+    function submit(e) {
         e.preventDefault();
-        if (!title.trim()) { setError('Artifact title is required.'); return; }
-        setError('');
-        const newItem = {
-            id: 'ctx-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
+        if (!title.trim()) { setErr('Title is required.'); return; }
+        setErr('');
+        var parsedTags = tags
+            ? tags.split(',').map(function(t) {
+                var c = t.trim();
+                return c.startsWith('#') ? c : '#' + c;
+              }).filter(function(t){ return t.length > 1; })
+            : ['#Custom'];
+        onAdd({
+            id: 'ctx-' + Date.now(),
             title: title.trim(),
-            category,
+            category: category,
             source: source.trim() || 'Manual Entry',
             image: image.trim() || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80',
             snippet: snippet.trim(),
-            description: description.trim() || 'No description provided.',
+            description: desc.trim() || 'No description provided.',
             metadata: 'Created: Just now',
             favorite: false,
-            tags: tags ? tags.split(',').map(t => {
-                const c = t.trim();
-                return c.startsWith('#') ? c : '#' + c;
-            }).filter(t => t.length > 1) : ['#Custom']
-        };
-        onAdd(newItem);
-    };
+            tags: parsedTags
+        });
+    }
 
-    const labelCls = "block text-[11px] font-extrabold uppercase tracking-widest text-pink-400 mb-1.5";
-    const catOptions = [
-        { value: 'coders',   label: 'Coders Workspace' },
-        { value: 'creators', label: 'Creators Vault' },
-        { value: 'leaders',  label: 'Executive Suite' },
-    ];
+    var lbl = { display:'block', fontSize:'10px', fontWeight:800, textTransform:'uppercase', letterSpacing:'0.08em', color:'#f472b6', marginBottom:'6px' };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fadeIn"
-            onClick={onClose}>
-            <div className="glass-flat w-full max-w-lg rounded-3xl p-6 border border-pink-500/50 shadow-2xl overflow-y-auto max-h-[92vh] animate-zoomIn"
-                onClick={e => e.stopPropagation()}>
-                <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
-                    <div className="flex items-center space-x-2.5">
-                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center shadow-lg">
-                            <Icon name="sparkles" cls="w-4 h-4 text-white" />
+        <div className="overlay" onClick={onClose}>
+            <div className="glass anim-pop-in" onClick={function(e){ e.stopPropagation(); }} style={{
+                width:'100%', maxWidth:'500px', borderRadius:'24px', padding:'24px',
+                border:'1px solid rgba(236,72,153,0.4)', maxHeight:'92vh', overflowY:'auto'
+            }}>
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',paddingBottom:'16px',borderBottom:'1px solid rgba(255,255,255,0.08)',marginBottom:'20px'}}>
+                    <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                        <div style={{width:'32px',height:'32px',borderRadius:'10px',background:'linear-gradient(135deg,#ec4899,#7c3aed)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                            {icons.sparkle('w-4 h-4 text-white')}
                         </div>
-                        <span className="text-sm font-extrabold text-white">Add Context Artifact</span>
+                        <span style={{fontWeight:800,fontSize:'14px',color:'#fff'}}>Add Context Artifact</span>
                     </div>
-                    <button onClick={onClose}
-                        className="p-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition">
-                        <Icon name="x" cls="w-4 h-4" />
+                    <button onClick={onClose} style={{padding:'6px',borderRadius:'10px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',cursor:'pointer',color:'#94a3b8',display:'flex'}}>
+                        {icons.x('w-4 h-4')}
                     </button>
                 </div>
 
-                {error && (
-                    <div className="mb-4 px-4 py-3 bg-red-500/15 border border-red-500/40 rounded-xl text-red-300 text-xs font-semibold">
-                        {error}
+                {err && (
+                    <div style={{marginBottom:'14px',padding:'10px 14px',background:'rgba(239,68,68,0.12)',border:'1px solid rgba(239,68,68,0.35)',borderRadius:'10px',color:'#fca5a5',fontSize:'12px',fontWeight:600}}>
+                        {err}
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className={labelCls}>Title *</label>
-                        <input type="text" value={title} onChange={e => setTitle(e.target.value)}
-                            placeholder="e.g. JWT Auth Middleware" className="input-field" />
+                <form onSubmit={submit}>
+                    <div style={{marginBottom:'14px'}}>
+                        <label style={lbl}>Title *</label>
+                        <input type="text" value={title} onChange={function(e){setTitle(e.target.value);}} placeholder="e.g. JWT Auth Middleware" className="field" />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px',marginBottom:'14px'}}>
                         <div>
-                            <label className={labelCls}>Workspace</label>
-                            <select value={category} onChange={e => setCategory(e.target.value)}
-                                className="input-field" style={{cursor:'pointer'}}>
-                                {catOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                            <label style={lbl}>Workspace</label>
+                            <select value={category} onChange={function(e){setCat(e.target.value);}} className="field">
+                                <option value="coders">Coders</option>
+                                <option value="creators">Creators</option>
+                                <option value="leaders">Leaders</option>
                             </select>
                         </div>
                         <div>
-                            <label className={labelCls}>Source</label>
-                            <input type="text" value={source} onChange={e => setSource(e.target.value)}
-                                placeholder="GitHub, Notion…" className="input-field" />
+                            <label style={lbl}>Source</label>
+                            <input type="text" value={source} onChange={function(e){setSource(e.target.value);}} placeholder="GitHub, Notion..." className="field" />
                         </div>
                     </div>
-                    <div>
-                        <label className={labelCls}>Description</label>
-                        <textarea rows="2" value={description} onChange={e => setDesc(e.target.value)}
-                            placeholder="Brief summary…" className="input-field" />
+                    <div style={{marginBottom:'14px'}}>
+                        <label style={lbl}>Description</label>
+                        <textarea rows="2" value={desc} onChange={function(e){setDesc(e.target.value);}} placeholder="Brief summary..." className="field" />
                     </div>
-                    <div>
-                        <label className={labelCls}>Code / Snippet</label>
-                        <textarea rows="3" value={snippet} onChange={e => setSnippet(e.target.value)}
-                            placeholder="const token = req.headers.authorization;"
-                            className="input-field code-font text-pink-200" style={{fontSize:'12px'}} />
+                    <div style={{marginBottom:'14px'}}>
+                        <label style={lbl}>Code / Snippet</label>
+                        <textarea rows="3" value={snippet} onChange={function(e){setSnippet(e.target.value);}} placeholder="const token = req.headers.authorization;" className="field mono" style={{fontSize:'12px',color:'#f9a8d4'}} />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px',marginBottom:'20px'}}>
                         <div>
-                            <label className={labelCls}>Tags (comma-separated)</label>
-                            <input type="text" value={tags} onChange={e => setTags(e.target.value)}
-                                placeholder="#Auth, #Security" className="input-field" />
+                            <label style={lbl}>Tags (comma-separated)</label>
+                            <input type="text" value={tags} onChange={function(e){setTags(e.target.value);}} placeholder="#Auth, #Security" className="field" />
                         </div>
                         <div>
-                            <label className={labelCls}>Image URL</label>
-                            <input type="text" value={image} onChange={e => setImage(e.target.value)}
-                                placeholder="https://…" className="input-field" />
+                            <label style={lbl}>Image URL</label>
+                            <input type="text" value={image} onChange={function(e){setImage(e.target.value);}} placeholder="https://..." className="field" />
                         </div>
                     </div>
-                    <div className="flex justify-end space-x-3 pt-2">
-                        <button type="button" onClick={onClose}
-                            className="px-4 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-300 hover:bg-white/10 transition">
-                            Cancel
-                        </button>
-                        <button type="submit"
-                            className="px-5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white shadow-lg shadow-pink-600/35 transition flex items-center space-x-1.5">
-                            <Icon name="plus" cls="w-3.5 h-3.5" />
-                            <span>Index Artifact</span>
+                    <div style={{display:'flex',justifyContent:'flex-end',gap:'10px'}}>
+                        <button type="button" onClick={onClose} style={{padding:'8px 16px',borderRadius:'10px',fontSize:'12px',fontWeight:700,background:'rgba(255,255,255,0.05)',color:'#94a3b8',border:'1px solid rgba(255,255,255,0.08)',cursor:'pointer'}}>Cancel</button>
+                        <button type="submit" style={{padding:'8px 18px',borderRadius:'10px',fontSize:'12px',fontWeight:700,background:'linear-gradient(135deg,#db2777,#7c3aed)',color:'#fff',border:'none',cursor:'pointer',display:'flex',alignItems:'center',gap:'6px',boxShadow:'0 4px 16px rgba(219,39,119,0.35)'}}>
+                            {icons.plus('w-3.5 h-3.5')}
+                            Index Artifact
                         </button>
                     </div>
                 </form>
             </div>
         </div>
     );
-};
+}
 
+// ── Header ───────────────────────────────────────────────────────────────────
+function Header({ onAdd, onSearch }) {
+    return (
+        <header style={{
+            position:'sticky', top:0, zIndex:40,
+            background:'rgba(3,0,20,0.88)', backdropFilter:'blur(28px)',
+            borderBottom:'1px solid rgba(255,255,255,0.07)'
+        }}>
+            <div style={{maxWidth:'1280px',margin:'0 auto',padding:'0 20px',height:'66px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
 
-// ── Header component ─────────────────────────────────────────────────────────
-const Header = ({ onAddClick, onSearchClick }) => (
-    <header className="sticky top-0 z-40 border-b border-white/8"
-        style={{background:'rgba(3,0,20,0.85)', backdropFilter:'blur(32px)'}}>
-        <div className="max-w-7xl mx-auto px-5 h-[68px] flex items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-pink-500 via-purple-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-pink-500/40 ring-2 ring-pink-500/30">
-                    <Icon name="zap" cls="w-5 h-5 text-white" />
-                </div>
-                <div>
-                    <h1 className="font-extrabold text-lg leading-tight tracking-tight"
-                        style={{background:'linear-gradient(to right,#fff,#f9a8d4,#d8b4fe)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>
-                        ContextPulse
-                    </h1>
-                    <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border"
-                        style={{background:'rgba(236,72,153,0.12)',color:'#f9a8d4',borderColor:'rgba(236,72,153,0.35)'}}>
-                        Lumina OS v5
-                    </span>
-                </div>
-            </div>
-
-            {/* Right controls */}
-            <div className="flex items-center space-x-3">
-                <button onClick={onAddClick}
-                    className="hidden sm:flex items-center space-x-2 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-lg shadow-pink-600/35 hover:shadow-pink-500/50"
-                    style={{background:'linear-gradient(135deg,#db2777,#7c3aed)'}}>
-                    <Icon name="sparkles" cls="w-3.5 h-3.5" />
-                    <span>Add Context</span>
-                </button>
-
-                <button onClick={onSearchClick}
-                    className="flex items-center space-x-2.5 text-xs text-slate-300 hover:text-white px-3.5 py-2.5 rounded-xl border border-white/12 hover:border-pink-500/50 transition"
-                    style={{background:'rgba(15,10,40,0.8)'}}>
-                    <Icon name="search" cls="w-4 h-4 text-pink-400" />
-                    <span className="hidden md:inline font-semibold">Search</span>
-                    <kbd className="hidden md:inline-block text-[10px] font-mono px-1.5 py-0.5 rounded border border-white/15 text-pink-300"
-                        style={{background:'rgba(255,255,255,0.06)'}}>
-                        ⌘K
-                    </kbd>
-                </button>
-
-                <div className="w-px h-6 bg-white/12 hidden md:block"></div>
-
-                {/* Avatar */}
-                <div className="flex items-center space-x-2.5">
-                    <div className="relative">
-                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces"
-                            className="w-9 h-9 rounded-xl border-2 object-cover"
-                            style={{borderColor:'rgba(236,72,153,0.6)'}}
-                            alt="User avatar" />
-                        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2"
-                            style={{ringColor:'#030014'}}></span>
+                {/* Logo */}
+                <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
+                    <div style={{width:'40px',height:'40px',borderRadius:'14px',background:'linear-gradient(135deg,#ec4899,#7c3aed,#6366f1)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 4px 20px rgba(236,72,153,0.4)'}}>
+                        {icons.zap('w-5 h-5 text-white')}
                     </div>
-                    <div className="hidden lg:block text-left">
-                        <p className="text-xs font-bold leading-tight text-white">Alex Morgan</p>
-                        <p className="text-[10px] font-bold tracking-wide text-pink-400">Elite Admin</p>
+                    <div>
+                        <div style={{fontWeight:800,fontSize:'18px',lineHeight:1.2,background:'linear-gradient(to right,#fff,#f9a8d4,#d8b4fe)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>
+                            ContextPulse
+                        </div>
+                        <div style={{fontSize:'9px',fontWeight:900,textTransform:'uppercase',letterSpacing:'0.1em',padding:'1px 8px',borderRadius:'20px',background:'rgba(236,72,153,0.12)',color:'#f9a8d4',border:'1px solid rgba(236,72,153,0.3)',display:'inline-block'}}>
+                            Lumina OS v5
+                        </div>
+                    </div>
+                </div>
+
+                {/* Actions */}
+                <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                    <button onClick={onAdd} style={{display:'flex',alignItems:'center',gap:'6px',padding:'8px 16px',borderRadius:'12px',fontSize:'12px',fontWeight:700,color:'#fff',background:'linear-gradient(135deg,#db2777,#7c3aed)',border:'none',cursor:'pointer',boxShadow:'0 4px 16px rgba(219,39,119,0.35)'}}>
+                        {icons.sparkle('w-3.5 h-3.5')}
+                        Add Context
+                    </button>
+                    <button onClick={onSearch} style={{display:'flex',alignItems:'center',gap:'8px',padding:'8px 14px',borderRadius:'12px',fontSize:'12px',fontWeight:600,color:'#cbd5e1',background:'rgba(15,10,40,0.8)',border:'1px solid rgba(255,255,255,0.1)',cursor:'pointer'}}>
+                        {icons.search('w-4 h-4 text-pink-400')}
+                        <span>Search</span>
+                        <kbd style={{fontSize:'10px',fontFamily:'monospace',padding:'1px 6px',borderRadius:'5px',background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.12)',color:'#f472b6'}}>⌘K</kbd>
+                    </button>
+                    <div style={{width:'1px',height:'24px',background:'rgba(255,255,255,0.1)'}}></div>
+                    <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                        <div style={{position:'relative'}}>
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces"
+                                style={{width:'36px',height:'36px',borderRadius:'10px',objectFit:'cover',border:'2px solid rgba(236,72,153,0.55)'}} alt="avatar" />
+                            <span style={{position:'absolute',bottom:0,right:0,width:'10px',height:'10px',borderRadius:'50%',background:'#34d399',border:'2px solid #030014'}}></span>
+                        </div>
+                        <div style={{display:'none'}}>
+                            <div style={{fontSize:'12px',fontWeight:700,color:'#fff'}}>Alex Morgan</div>
+                            <div style={{fontSize:'10px',fontWeight:700,color:'#f472b6'}}>Elite Admin</div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </header>
-);
+        </header>
+    );
+}
 
-// ── Sidebar component ─────────────────────────────────────────────────────────
-const Sidebar = ({ items, activeTab, setActiveTab }) => {
-    const tabs = [
-        { id:'all',      label:'All Streams',       icon:'layout-grid', color:'text-pink-400',
-          activeBg:'linear-gradient(135deg,rgba(219,39,119,0.28),rgba(124,58,237,0.28))', activeBorder:'rgba(236,72,153,0.5)' },
-        { id:'coders',   label:'Coders Workspace',  icon:'code',        color:'text-cyan-400',
-          activeBg:'linear-gradient(135deg,rgba(8,145,178,0.28),rgba(37,99,235,0.28))',   activeBorder:'rgba(6,182,212,0.5)' },
-        { id:'creators', label:'Creators Vault',    icon:'video',       color:'text-rose-400',
-          activeBg:'linear-gradient(135deg,rgba(225,29,72,0.28),rgba(219,39,119,0.28))',  activeBorder:'rgba(244,63,94,0.5)' },
-        { id:'leaders',  label:'Executive Suite',   icon:'briefcase',   color:'text-amber-400',
-          activeBg:'linear-gradient(135deg,rgba(217,119,6,0.28),rgba(234,88,12,0.28))',   activeBorder:'rgba(245,158,11,0.5)' },
+
+// ── Sidebar ──────────────────────────────────────────────────────────────────
+function Sidebar({ items, active, setActive }) {
+    var tabs = [
+        { id:'all',      label:'All Streams',      icon:icons.grid,      color:'#f472b6' },
+        { id:'coders',   label:'Coders Workspace', icon:icons.code,      color:'#22d3ee' },
+        { id:'creators', label:'Creators Vault',   icon:icons.video,     color:'#fb7185' },
+        { id:'leaders',  label:'Executive Suite',  icon:icons.briefcase, color:'#fbbf24' },
     ];
-    const count = (id) => id === 'all' ? items.length : items.filter(i => i.category === id).length;
+
+    function count(id) {
+        return id === 'all' ? items.length : items.filter(function(i){ return i.category === id; }).length;
+    }
+
+    var activeBgs = {
+        all:      'linear-gradient(135deg,rgba(219,39,119,0.22),rgba(124,58,237,0.22))',
+        coders:   'linear-gradient(135deg,rgba(8,145,178,0.22),rgba(37,99,235,0.22))',
+        creators: 'linear-gradient(135deg,rgba(225,29,72,0.22),rgba(219,39,119,0.22))',
+        leaders:  'linear-gradient(135deg,rgba(217,119,6,0.22),rgba(234,88,12,0.22))',
+    };
+    var activeBorders = { all:'rgba(236,72,153,0.45)', coders:'rgba(6,182,212,0.45)', creators:'rgba(244,63,94,0.45)', leaders:'rgba(245,158,11,0.45)' };
 
     return (
-        <aside className="lg:col-span-1 space-y-5">
-            {/* Workspace nav */}
-            <div className="glass-flat rounded-3xl p-4 shadow-xl">
-                <div className="flex items-center space-x-2 px-2 mb-3">
-                    <Icon name="layers" cls="w-3.5 h-3.5 text-pink-400" />
-                    <span className="text-[10px] font-extrabold uppercase tracking-widest text-pink-400">Workspaces</span>
+        <aside style={{gridColumn:'span 1'}}>
+            {/* Nav */}
+            <div className="glass" style={{borderRadius:'22px',padding:'16px',marginBottom:'16px'}}>
+                <div style={{display:'flex',alignItems:'center',gap:'6px',padding:'0 4px',marginBottom:'12px'}}>
+                    {icons.layers('w-3.5 h-3.5 text-pink-400')}
+                    <span style={{fontSize:'10px',fontWeight:900,textTransform:'uppercase',letterSpacing:'0.08em',color:'#f472b6'}}>Workspaces</span>
                 </div>
-                <nav className="space-y-1.5">
-                    {tabs.map(tab => {
-                        const active = activeTab === tab.id;
+                <nav>
+                    {tabs.map(function(tab) {
+                        var isActive = active === tab.id;
                         return (
-                            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                                className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-sm font-semibold transition"
-                                style={active
-                                    ? { background: tab.activeBg, border: `1px solid ${tab.activeBorder}`, color: '#fff' }
-                                    : { border: '1px solid transparent', color: '#94a3b8' }}>
-                                <div className="flex items-center space-x-3">
-                                    <Icon name={tab.icon} cls={`w-4 h-4 ${tab.color}`} />
-                                    <span className="text-left leading-tight text-[13px]">{tab.label}</span>
+                            <button key={tab.id} onClick={function(){ setActive(tab.id); }}
+                                style={{
+                                    width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between',
+                                    padding:'10px 12px', borderRadius:'14px', marginBottom:'6px',
+                                    background: isActive ? activeBgs[tab.id] : 'transparent',
+                                    border: isActive ? '1px solid ' + activeBorders[tab.id] : '1px solid transparent',
+                                    color: isActive ? '#fff' : '#94a3b8',
+                                    cursor:'pointer', transition:'all 0.15s', fontFamily:'inherit'
+                                }}>
+                                <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                                    {tab.icon('w-4 h-4')}
+                                    <span style={{fontSize:'13px',fontWeight:600}}>{tab.label}</span>
                                 </div>
-                                <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-full"
-                                    style={{background:'rgba(255,255,255,0.08)', color:'#e2e8f0'}}>
+                                <span style={{fontSize:'11px',fontFamily:'monospace',fontWeight:700,padding:'1px 8px',borderRadius:'20px',background:'rgba(255,255,255,0.07)',color:'#e2e8f0'}}>
                                     {count(tab.id)}
                                 </span>
                             </button>
@@ -515,277 +590,254 @@ const Sidebar = ({ items, activeTab, setActiveTab }) => {
                 </nav>
             </div>
 
-            {/* Neural sync status */}
-            <div className="glass-flat rounded-3xl p-5 border border-pink-500/20"
-                style={{background:'linear-gradient(135deg,rgba(49,8,99,0.45),rgba(3,0,20,0.7),rgba(80,7,36,0.35))'}}>
-                <div className="flex items-center space-x-2 mb-3">
-                    <Icon name="cpu" cls="w-3.5 h-3.5 text-pink-400 animate-spin" />
-                    <span className="text-[10px] font-black uppercase tracking-widest"
-                        style={{background:'linear-gradient(to right,#f9a8d4,#d8b4fe)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>
+            {/* Neural status */}
+            <div style={{borderRadius:'22px',padding:'18px',background:'linear-gradient(135deg,rgba(49,8,99,0.5),rgba(3,0,20,0.75),rgba(80,7,36,0.4))',border:'1px solid rgba(236,72,153,0.18)'}}>
+                <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'10px'}}>
+                    <div style={{animation:'float1 2s linear infinite'}}>
+                        {icons.cpu('w-3.5 h-3.5 text-pink-400')}
+                    </div>
+                    <span style={{fontSize:'10px',fontWeight:900,textTransform:'uppercase',letterSpacing:'0.08em',background:'linear-gradient(to right,#f9a8d4,#d8b4fe)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>
                         Neural Sync Active
                     </span>
                 </div>
-                <p className="text-xs text-slate-400 leading-relaxed mb-4">
-                    Live semantic indexing across GitHub, Drive, Notion &amp; Slack.
+                <p style={{fontSize:'11px',color:'#64748b',lineHeight:1.6,marginBottom:'12px'}}>
+                    Live indexing across GitHub, Drive, Notion and Slack.
                 </p>
-                <div className="w-full rounded-full h-2 overflow-hidden" style={{background:'rgba(15,10,40,0.8)'}}>
-                    <div className="h-full w-full rounded-full animate-pulse"
-                        style={{background:'linear-gradient(to right,#ec4899,#a855f7,#22d3ee)'}}></div>
+                <div style={{width:'100%',height:'6px',borderRadius:'3px',background:'rgba(15,10,40,0.8)',overflow:'hidden'}}>
+                    <div style={{height:'100%',width:'100%',borderRadius:'3px',background:'linear-gradient(to right,#ec4899,#a855f7,#22d3ee)',animation:'pulse-bar 2s ease infinite'}}></div>
                 </div>
-                <div className="flex justify-between mt-2.5 text-[10px] font-mono font-semibold text-slate-500">
+                <div style={{display:'flex',justifyContent:'space-between',marginTop:'8px',fontSize:'10px',fontFamily:'monospace',fontWeight:600,color:'#475569'}}>
                     <span>Latency: 6ms</span>
-                    <span className="text-emerald-400 flex items-center space-x-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-                        <span>256-bit Encrypted</span>
+                    <span style={{color:'#34d399',display:'flex',alignItems:'center',gap:'4px'}}>
+                        <span style={{width:'6px',height:'6px',borderRadius:'50%',background:'#34d399',display:'inline-block',animation:'pulse-bar 1s ease infinite'}}></span>
+                        256-bit Encrypted
                     </span>
                 </div>
             </div>
         </aside>
     );
+}
+
+// ── ArtifactCard ─────────────────────────────────────────────────────────────
+var CAT = {
+    coders:   { icon: icons.code,      badgeBg:'rgba(6,182,212,0.12)',   badgeBorder:'rgba(6,182,212,0.35)',   badgeColor:'#67e8f9' },
+    creators: { icon: icons.video,     badgeBg:'rgba(244,63,94,0.12)',   badgeBorder:'rgba(244,63,94,0.35)',   badgeColor:'#fda4af' },
+    leaders:  { icon: icons.briefcase, badgeBg:'rgba(245,158,11,0.12)',  badgeBorder:'rgba(245,158,11,0.35)',  badgeColor:'#fcd34d' },
 };
 
-
-// ── ArtifactCard component ───────────────────────────────────────────────────
-const CATEGORY_META = {
-    coders:   { icon:'code',      badge:'bg-cyan-500/15 text-cyan-300 border-cyan-500/40' },
-    creators: { icon:'video',     badge:'bg-rose-500/15 text-rose-300 border-rose-500/40' },
-    leaders:  { icon:'briefcase', badge:'bg-amber-500/15 text-amber-300 border-amber-500/40' },
-};
-
-const ArtifactCard = ({ item, onToggleFav, onDelete, onCopy }) => {
-    const meta = CATEGORY_META[item.category] || CATEGORY_META.coders;
+function ArtifactCard({ item, onFav, onDelete, onCopy }) {
+    var m = CAT[item.category] || CAT.coders;
+    var [hovered, setHovered] = useState(false);
 
     return (
-        <div className="glass-card rounded-3xl p-5 flex flex-col justify-between relative group overflow-hidden animate-slideUp">
-            {/* Card header row */}
-            <div className="flex items-start justify-between mb-3 gap-2">
-                <span className={`inline-flex items-center space-x-1.5 text-[10px] font-extrabold uppercase tracking-wide px-2.5 py-1.5 rounded-xl border ${meta.badge}`}>
-                    <Icon name={meta.icon} cls="w-3 h-3" />
+        <div className="glass-hover" onMouseEnter={function(){setHovered(true);}} onMouseLeave={function(){setHovered(false);}}
+            style={{borderRadius:'22px',padding:'20px',display:'flex',flexDirection:'column',gap:'12px',position:'relative'}}>
+
+            {/* Top row: badge + actions */}
+            <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:'8px'}}>
+                <div style={{display:'flex',alignItems:'center',gap:'6px',padding:'5px 10px',borderRadius:'10px',background:m.badgeBg,border:'1px solid '+m.badgeBorder,fontSize:'10px',fontWeight:800,textTransform:'uppercase',letterSpacing:'0.06em',color:m.badgeColor}}>
+                    {m.icon('w-3 h-3')}
                     <span>{item.category} · {item.source}</span>
-                </span>
-                <div className="flex items-center space-x-1.5 flex-shrink-0">
-                    <button onClick={() => onToggleFav(item.id)}
-                        title="Toggle favourite"
-                        className={`p-1.5 rounded-xl border transition ${item.favorite
-                            ? 'bg-amber-500/25 border-amber-500/55 text-amber-300 shadow shadow-amber-500/20'
-                            : 'bg-white/5 border-white/10 text-slate-500 hover:text-amber-300'}`}>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24"
-                            fill={item.favorite ? 'currentColor' : 'none'}
-                            stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                        </svg>
+                </div>
+                <div style={{display:'flex',gap:'6px',flexShrink:0}}>
+                    <button onClick={function(){ onFav(item.id); }} title="Favourite"
+                        style={{padding:'6px',borderRadius:'10px',cursor:'pointer',display:'flex',
+                            background: item.favorite ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.05)',
+                            border: item.favorite ? '1px solid rgba(245,158,11,0.5)' : '1px solid rgba(255,255,255,0.08)',
+                            color: item.favorite ? '#fcd34d' : '#64748b'}}>
+                        {icons.star('w-3.5 h-3.5', item.favorite)}
                     </button>
-                    <button onClick={() => onDelete(item.id)}
-                        title="Delete artifact"
-                        className="p-1.5 rounded-xl bg-white/5 border border-white/10 text-slate-500 hover:text-pink-400 hover:border-pink-500/40 transition opacity-0 group-hover:opacity-100">
-                        <Icon name="trash-2" cls="w-3.5 h-3.5" />
+                    <button onClick={function(){ onDelete(item.id); }} title="Delete"
+                        style={{padding:'6px',borderRadius:'10px',cursor:'pointer',display:'flex',
+                            background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',
+                            color:'#64748b',opacity: hovered ? 1 : 0, transition:'opacity 0.2s'}}>
+                        {icons.trash('w-3.5 h-3.5')}
                     </button>
                 </div>
             </div>
 
-            {/* Title + description */}
-            <h4 className="font-extrabold text-white text-[15px] leading-tight mb-1.5 tracking-tight">{item.title}</h4>
-            <p className="text-xs text-slate-400 mb-3 line-clamp-2 leading-relaxed">{item.description}</p>
+            {/* Title + desc */}
+            <div>
+                <h4 style={{fontWeight:800,fontSize:'15px',color:'#f1f5f9',marginBottom:'6px',lineHeight:1.3}}>{item.title}</h4>
+                <p className="clamp2" style={{fontSize:'12px',color:'#64748b',lineHeight:1.6}}>{item.description}</p>
+            </div>
 
-            {/* Image preview */}
+            {/* Image */}
             {item.image && (
-                <div className="relative mb-3 rounded-2xl overflow-hidden border border-white/12 h-32 group/img">
-                    <img src={item.image} alt={item.title}
-                        className="w-full h-full object-cover group-hover/img:scale-105 transition duration-500" />
-                    <div className="absolute inset-0 pointer-events-none"
-                        style={{background:'linear-gradient(to top,rgba(3,0,20,0.75),transparent)'}}></div>
-                    <span className="absolute bottom-2 left-2.5 text-[9px] font-bold text-white flex items-center space-x-1 px-2 py-0.5 rounded-lg"
-                        style={{background:'rgba(0,0,0,0.55)', backdropFilter:'blur(6px)', border:'1px solid rgba(255,255,255,0.15)'}}>
-                        <Icon name="image" cls="w-2.5 h-2.5 text-pink-400" />
-                        <span>Preview</span>
-                    </span>
+                <div style={{borderRadius:'14px',overflow:'hidden',height:'120px',border:'1px solid rgba(255,255,255,0.08)',position:'relative'}}>
+                    <img src={item.image} alt={item.title} style={{width:'100%',height:'100%',objectFit:'cover',transition:'transform 0.4s',transform: hovered ? 'scale(1.04)' : 'scale(1)'}} />
+                    <div style={{position:'absolute',inset:0,background:'linear-gradient(to top,rgba(3,0,20,0.7),transparent)',pointerEvents:'none'}}></div>
                 </div>
             )}
 
-            {/* Code snippet */}
+            {/* Snippet */}
             {item.snippet && (
-                <div className="rounded-2xl p-3.5 mb-3 overflow-x-auto max-h-24 code-font text-xs text-pink-200 border border-white/8"
-                    style={{background:'rgba(2,6,23,0.85)'}}>
-                    <pre className="whitespace-pre-wrap break-words leading-relaxed">{item.snippet}</pre>
+                <div className="mono" style={{background:'rgba(2,6,23,0.9)',borderRadius:'12px',padding:'12px',fontSize:'11px',color:'#f9a8d4',border:'1px solid rgba(255,255,255,0.07)',maxHeight:'80px',overflowY:'auto',lineHeight:1.6}}>
+                    <pre style={{margin:0,whiteSpace:'pre-wrap',wordBreak:'break-word'}}>{item.snippet}</pre>
                 </div>
             )}
 
             {/* Tags */}
             {item.tags && item.tags.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                    {item.tags.map((tag, i) => (
-                        <span key={i} className="code-font text-[10px] font-bold px-2 py-0.5 rounded-lg border text-pink-300"
-                            style={{background:'rgba(236,72,153,0.1)', borderColor:'rgba(236,72,153,0.25)'}}>
-                            {tag}
-                        </span>
-                    ))}
+                <div style={{display:'flex',flexWrap:'wrap',gap:'6px'}}>
+                    {item.tags.map(function(tag, i) {
+                        return (
+                            <span key={i} className="mono" style={{fontSize:'10px',fontWeight:700,padding:'2px 8px',borderRadius:'6px',background:'rgba(236,72,153,0.1)',border:'1px solid rgba(236,72,153,0.22)',color:'#f472b6'}}>
+                                {tag}
+                            </span>
+                        );
+                    })}
                 </div>
             )}
 
             {/* Footer */}
-            <div className="flex items-center justify-between pt-3.5 border-t border-white/8 mt-auto">
-                <span className="text-[11px] text-slate-500 font-mono">{item.metadata}</span>
-                <button onClick={() => onCopy(item)}
-                    className="flex items-center space-x-1.5 text-white text-[11px] font-bold px-3.5 py-1.5 rounded-xl transition shadow shadow-pink-600/30 hover:shadow-pink-500/50"
-                    style={{background:'linear-gradient(135deg,#db2777,#7c3aed)'}}>
-                    <span>Copy</span>
-                    <Icon name="copy" cls="w-3 h-3" />
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',paddingTop:'12px',borderTop:'1px solid rgba(255,255,255,0.07)',marginTop:'auto'}}>
+                <span className="mono" style={{fontSize:'11px',color:'#475569'}}>{item.metadata}</span>
+                <button onClick={function(){ onCopy(item); }}
+                    style={{display:'flex',alignItems:'center',gap:'6px',padding:'6px 14px',borderRadius:'10px',fontSize:'11px',fontWeight:700,color:'#fff',background:'linear-gradient(135deg,#db2777,#7c3aed)',border:'none',cursor:'pointer',boxShadow:'0 3px 12px rgba(219,39,119,0.3)'}}>
+                    Copy
+                    {icons.copy('w-3 h-3')}
                 </button>
             </div>
         </div>
     );
-};
+}
 
-// ── App root ─────────────────────────────────────────────────────────────────
+// ── App ───────────────────────────────────────────────────────────────────────
 function App() {
-    const [items, setItems] = useState(() => {
+    var [items,   setItems]   = useState(function() {
         try {
-            const s = localStorage.getItem('contextpulse_v5_items');
-            if (s) { const p = JSON.parse(s); if (Array.isArray(p)) return p; }
-        } catch {}
-        return INITIAL_ITEMS;
+            var s = localStorage.getItem('cp_v5');
+            if (s) { var p = JSON.parse(s); if (Array.isArray(p)) return p; }
+        } catch(e) {}
+        return SEED;
     });
+    var [tab,     setTab]     = useState('all');
+    var [query,   setQuery]   = useState('');
+    var [omni,    setOmni]    = useState(false);
+    var [addOpen, setAddOpen] = useState(false);
+    var [toast,   setToast]   = useState(null);
 
-    const [activeTab,   setActiveTab]   = useState('all');
-    const [searchQuery, setSearchQuery] = useState('');
-    const [omniOpen,    setOmniOpen]    = useState(false);
-    const [addOpen,     setAddOpen]     = useState(false);
-    const [toast,       setToast]       = useState(null);
-
-    // Persist to localStorage
-    useEffect(() => {
-        try { localStorage.setItem('contextpulse_v5_items', JSON.stringify(items)); } catch {}
+    useEffect(function() {
+        try { localStorage.setItem('cp_v5', JSON.stringify(items)); } catch(e) {}
     }, [items]);
 
-    // Keyboard shortcuts
-    useEffect(() => {
-        const handler = (e) => {
+    useEffect(function() {
+        function handler(e) {
             if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-                e.preventDefault();
-                setOmniOpen(p => !p);
+                e.preventDefault(); setOmni(function(p){ return !p; });
             }
-            if (e.key === 'Escape') { setOmniOpen(false); setAddOpen(false); }
-        };
+            if (e.key === 'Escape') { setOmni(false); setAddOpen(false); }
+        }
         window.addEventListener('keydown', handler);
-        return () => window.removeEventListener('keydown', handler);
+        return function() { window.removeEventListener('keydown', handler); };
     }, []);
 
-    const showToast = useCallback((msg) => {
-        setToast(msg);
-        setTimeout(() => setToast(null), 3200);
-    }, []);
+    function showToast(msg) { setToast(msg); setTimeout(function(){ setToast(null); }, 3000); }
 
-    const toggleFav = useCallback((id) => {
-        setItems(prev => prev.map(i => i.id === id ? { ...i, favorite: !i.favorite } : i));
-        showToast('⭐ Favourite toggled');
-    }, [showToast]);
-
-    const deleteItem = useCallback((id) => {
-        setItems(prev => prev.filter(i => i.id !== id));
+    function handleFav(id) {
+        setItems(function(prev){ return prev.map(function(i){ return i.id === id ? Object.assign({}, i, {favorite: !i.favorite}) : i; }); });
+        showToast('⭐ Favourite updated');
+    }
+    function handleDelete(id) {
+        setItems(function(prev){ return prev.filter(function(i){ return i.id !== id; }); });
         showToast('🗑️ Artifact deleted');
-    }, [showToast]);
-
-    const addItem = useCallback((item) => {
-        setItems(prev => [item, ...prev]);
+    }
+    function handleAdd(item) {
+        setItems(function(prev){ return [item].concat(prev); });
         setAddOpen(false);
-        showToast('✨ Artifact indexed successfully!');
-    }, [showToast]);
-
-    const copyItem = useCallback((item) => {
+        showToast('✨ Artifact added!');
+    }
+    function handleCopy(item) {
         try {
             navigator.clipboard.writeText(item.snippet || item.title);
-            showToast(`📋 Copied "${item.title}"`);
-        } catch {
-            showToast('⚠️ Clipboard access unavailable');
+            showToast('📋 Copied to clipboard!');
+        } catch(e) {
+            showToast('⚠️ Could not access clipboard');
         }
-    }, [showToast]);
+    }
 
-    const filtered = useMemo(() => {
-        const q = searchQuery.trim().toLowerCase();
-        return items.filter(item => {
-            const matchTab = activeTab === 'all' || item.category === activeTab;
-            const matchQ   = !q
-                || item.title.toLowerCase().includes(q)
-                || item.description.toLowerCase().includes(q)
-                || item.source.toLowerCase().includes(q)
-                || item.tags.some(t => t.toLowerCase().includes(q))
-                || (item.snippet && item.snippet.toLowerCase().includes(q));
+    var filtered = useMemo(function() {
+        var q = query.trim().toLowerCase();
+        return items.filter(function(item) {
+            var matchTab = tab === 'all' || item.category === tab;
+            var matchQ = !q
+                || item.title.toLowerCase().indexOf(q) > -1
+                || item.description.toLowerCase().indexOf(q) > -1
+                || item.source.toLowerCase().indexOf(q) > -1
+                || item.tags.some(function(t){ return t.toLowerCase().indexOf(q) > -1; })
+                || (item.snippet && item.snippet.toLowerCase().indexOf(q) > -1);
             return matchTab && matchQ;
         });
-    }, [items, activeTab, searchQuery]);
+    }, [items, tab, query]);
 
-    const feedLabel = activeTab === 'all'
-        ? 'All Workspace Streams'
-        : { coders:'Coders Workspace', creators:'Creators Vault', leaders:'Executive Suite' }[activeTab];
+    var feedLabel = tab === 'all' ? 'All Workspace Streams' : {coders:'Coders Workspace', creators:'Creators Vault', leaders:'Executive Suite'}[tab];
 
     return (
-        <div className="min-h-screen flex flex-col text-slate-100">
+        <div style={{minHeight:'100vh',display:'flex',flexDirection:'column'}}>
             {toast && <Toast msg={toast} />}
-            {omniOpen && <OmniSearch items={items} query={searchQuery} setQuery={setSearchQuery} onClose={() => setOmniOpen(false)} />}
-            {addOpen  && <AddItemModal onClose={() => setAddOpen(false)} onAdd={addItem} />}
+            {omni && <OmniSearch items={items} query={query} setQuery={setQuery} onClose={function(){ setOmni(false); }} />}
+            {addOpen && <AddItemModal onClose={function(){ setAddOpen(false); }} onAdd={handleAdd} />}
 
-            <Header onAddClick={() => setAddOpen(true)} onSearchClick={() => setOmniOpen(true)} />
+            <Header onAdd={function(){ setAddOpen(true); }} onSearch={function(){ setOmni(true); }} />
 
-            <main className="flex-1 max-w-7xl w-full mx-auto px-5 py-7 grid grid-cols-1 lg:grid-cols-4 gap-7">
-                <Sidebar items={items} activeTab={activeTab} setActiveTab={setActiveTab} />
+            <main style={{flex:1,maxWidth:'1280px',width:'100%',margin:'0 auto',padding:'28px 20px',display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'24px'}}>
 
-                {/* Content area */}
-                <section className="lg:col-span-3 space-y-6">
+                <Sidebar items={items} active={tab} setActive={setTab} />
 
-                    {/* Hero search banner */}
-                    <div className="glass-flat rounded-3xl p-7 relative overflow-hidden border border-pink-500/30">
-                        <div className="absolute -right-16 -top-16 w-56 h-56 rounded-full pointer-events-none"
-                            style={{background:'radial-gradient(circle,rgba(236,72,153,0.28),rgba(168,85,247,0.12),transparent)',filter:'blur(40px)'}}></div>
-                        <h2 className="text-2xl font-black tracking-tight mb-1.5"
-                            style={{background:'linear-gradient(to right,#fff,#f9a8d4,#d8b4fe)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>
+                <section style={{gridColumn:'span 3',display:'flex',flexDirection:'column',gap:'20px'}}>
+
+                    {/* Search banner */}
+                    <div className="glass" style={{borderRadius:'22px',padding:'28px',position:'relative',overflow:'hidden',border:'1px solid rgba(236,72,153,0.25)'}}>
+                        <div style={{position:'absolute',right:'-40px',top:'-40px',width:'200px',height:'200px',borderRadius:'50%',background:'radial-gradient(circle,rgba(236,72,153,0.22),transparent)',filter:'blur(40px)',pointerEvents:'none'}}></div>
+                        <h2 style={{fontWeight:900,fontSize:'24px',marginBottom:'6px',background:'linear-gradient(to right,#fff,#f9a8d4,#d8b4fe)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>
                             Infinite Context Engine
                         </h2>
-                        <p className="text-slate-400 text-sm mb-5 font-medium max-w-lg">
-                            Instant neural retrieval across your complete digital workspace.
+                        <p style={{fontSize:'13px',color:'#64748b',marginBottom:'18px',fontWeight:500}}>
+                            Instant retrieval across your entire digital workspace.
                         </p>
-                        <div className="relative">
-                            <Icon name="search" cls="w-4 h-4 absolute left-4 top-3.5 text-pink-400 pointer-events-none" />
-                            <input type="text" value={searchQuery}
-                                onChange={e => setSearchQuery(e.target.value)}
-                                placeholder="Search by title, tag, keyword, or platform…"
-                                className="input-field pl-11 pr-16 py-3.5 text-sm rounded-2xl" />
-                            {searchQuery && (
-                                <button onClick={() => setSearchQuery('')}
-                                    className="absolute right-4 top-3.5 text-xs font-bold text-pink-400 hover:text-white transition">
+                        <div style={{position:'relative'}}>
+                            <div style={{position:'absolute',left:'14px',top:'50%',transform:'translateY(-50%)',pointerEvents:'none'}}>
+                                {icons.search('w-4 h-4 text-pink-400')}
+                            </div>
+                            <input type="text" value={query} onChange={function(e){ setQuery(e.target.value); }}
+                                placeholder="Search by title, tag, keyword or platform..."
+                                className="field" style={{paddingLeft:'40px',paddingRight: query ? '60px' : '14px',fontSize:'14px',borderRadius:'14px',padding:'13px 14px 13px 40px'}} />
+                            {query && (
+                                <button onClick={function(){ setQuery(''); }}
+                                    style={{position:'absolute',right:'12px',top:'50%',transform:'translateY(-50%)',fontSize:'11px',fontWeight:700,color:'#f472b6',background:'none',border:'none',cursor:'pointer'}}>
                                     Clear
                                 </button>
                             )}
                         </div>
                     </div>
 
-                    {/* Feed label */}
-                    <div className="flex items-center justify-between px-1">
-                        <h3 className="text-sm font-extrabold text-slate-200 flex items-center space-x-2">
-                            <span className="w-2 h-2 rounded-full"
-                                style={{background:'linear-gradient(to right,#f472b6,#a78bfa)'}}></span>
-                            <span>{feedLabel}</span>
-                        </h3>
-                        <span className="text-[11px] font-mono font-bold px-3 py-1 rounded-full border text-pink-300"
-                            style={{background:'rgba(236,72,153,0.08)', borderColor:'rgba(236,72,153,0.25)'}}>
+                    {/* Feed header */}
+                    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 4px'}}>
+                        <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                            <span style={{width:'8px',height:'8px',borderRadius:'50%',background:'linear-gradient(to right,#f472b6,#a78bfa)',display:'inline-block'}}></span>
+                            <span style={{fontSize:'13px',fontWeight:800,color:'#e2e8f0'}}>{feedLabel}</span>
+                        </div>
+                        <span style={{fontSize:'11px',fontFamily:'monospace',fontWeight:700,padding:'3px 12px',borderRadius:'20px',background:'rgba(236,72,153,0.08)',border:'1px solid rgba(236,72,153,0.22)',color:'#f472b6'}}>
                             {filtered.length} artifact{filtered.length !== 1 ? 's' : ''}
                         </span>
                     </div>
 
-                    {/* Grid or empty state */}
+                    {/* Cards or empty */}
                     {filtered.length === 0 ? (
-                        <div className="glass-flat rounded-3xl p-14 text-center border border-dashed border-pink-500/25">
-                            <Icon name="folder-open" cls="w-12 h-12 mx-auto mb-3 text-pink-400/50" />
-                            <p className="text-sm font-bold text-slate-300">No artifacts found</p>
-                            <p className="text-xs text-slate-500 mt-1">Try a different search or add a new artifact.</p>
+                        <div className="glass" style={{borderRadius:'22px',padding:'60px 20px',textAlign:'center',border:'1px dashed rgba(236,72,153,0.22)'}}>
+                            {icons.empty('w-12 h-12 text-pink-400 mx-auto mb-3')}
+                            <p style={{fontWeight:700,color:'#cbd5e1',fontSize:'14px'}}>No artifacts found</p>
+                            <p style={{fontSize:'12px',color:'#475569',marginTop:'4px'}}>Try a different search or add a new artifact.</p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            {filtered.map(item => (
-                                <ArtifactCard key={item.id} item={item}
-                                    onToggleFav={toggleFav}
-                                    onDelete={deleteItem}
-                                    onCopy={copyItem} />
-                            ))}
+                        <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:'16px'}}>
+                            {filtered.map(function(item) {
+                                return (
+                                    <ArtifactCard key={item.id} item={item}
+                                        onFav={handleFav} onDelete={handleDelete} onCopy={handleCopy} />
+                                );
+                            })}
                         </div>
                     )}
                 </section>
@@ -794,9 +846,7 @@ function App() {
     );
 }
 
-// ── Mount with React 18 createRoot ───────────────────────────────────────────
-const rootEl = document.getElementById('root');
-ReactDOM.createRoot(rootEl).render(<App />);
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
 </script>
 </body>
 </html>
