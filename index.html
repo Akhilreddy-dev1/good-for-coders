@@ -1,10 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ContextPulse â€” Lumina OS</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<title>ContextPulse - Lumina OS</title>
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -16,7 +15,6 @@ html{scroll-behavior:smooth;}
 body{font-family:'Plus Jakarta Sans',sans-serif;background:#030014;color:#f8fafc;overflow-x:hidden;min-height:100vh;}
 .mono{font-family:'JetBrains Mono',monospace;}
 
-/* Glass */
 .glass{
   background:linear-gradient(135deg,rgba(20,18,50,0.88),rgba(10,8,30,0.96));
   backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
@@ -37,7 +35,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#030014;color:#f8fafc
   transform:translateY(-4px);
 }
 
-/* Fields */
 .field{
   width:100%;
   background:rgba(2,6,23,0.92);
@@ -54,10 +51,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#030014;color:#f8fafc
 select.field{cursor:pointer;}
 textarea.field{resize:vertical;}
 
-/* Text clamp */
 .clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 
-/* Overlays */
 .overlay{
   position:fixed;inset:0;z-index:50;
   background:rgba(0,0,0,0.78);
@@ -68,7 +63,6 @@ textarea.field{resize:vertical;}
 }
 .overlay-top{align-items:flex-start;padding-top:72px;}
 
-/* Ambient orbs */
 .orb{position:fixed;pointer-events:none;z-index:0;border-radius:9999px;}
 .orb1{top:-12%;left:4%;width:620px;height:620px;background:radial-gradient(circle,rgba(168,85,247,0.38),transparent 70%);filter:blur(90px);animation:f1 13s ease-in-out infinite;}
 .orb2{top:28%;right:-2%;width:720px;height:720px;background:radial-gradient(circle,rgba(236,72,153,0.3),transparent 70%);filter:blur(100px);animation:f2 17s ease-in-out infinite;}
@@ -81,50 +75,30 @@ textarea.field{resize:vertical;}
 @keyframes popIn{from{opacity:0;transform:scale(0.93)}to{opacity:1;transform:scale(1)}}
 @keyframes fadeOv{from{opacity:0}to{opacity:1}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}
-@keyframes dot1{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
-@keyframes dot2{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
-@keyframes dot3{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
+@keyframes dotBounce{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
 
 .anim-slide-up{animation:slideUp 0.3s ease both;}
 .anim-pop-in{animation:popIn 0.28s cubic-bezier(0.16,1,0.3,1) both;}
 
-/* Scrollbar */
 ::-webkit-scrollbar{width:5px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:rgba(236,72,153,0.28);border-radius:4px;}
 ::-webkit-scrollbar-thumb:hover{background:rgba(236,72,153,0.55);}
 
-/* Responsive grid */
-.main-grid{
-  display:grid;
-  grid-template-columns:240px 1fr;
-  gap:24px;
-}
-.cards-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:16px;
-}
-@media(max-width:1024px){
-  .main-grid{grid-template-columns:1fr;}
-  .sidebar-aside{display:none;}
-}
-@media(max-width:640px){
-  .cards-grid{grid-template-columns:1fr;}
-}
+.main-grid{display:grid;grid-template-columns:240px 1fr;gap:24px;}
+.cards-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+@media(max-width:1024px){.main-grid{grid-template-columns:1fr;}.sidebar-aside{display:none;}}
+@media(max-width:640px){.cards-grid{grid-template-columns:1fr;}}
 
-/* Tag badge */
 .tag{
   font-family:'JetBrains Mono',monospace;
   font-size:10px;font-weight:700;
   padding:2px 9px;border-radius:6px;
   background:rgba(236,72,153,0.1);
   border:1px solid rgba(236,72,153,0.22);
-  color:#f472b6;
-  display:inline-block;
+  color:#f472b6;display:inline-block;
 }
 
-/* Gradient text */
 .grad-text{
   background:linear-gradient(to right,#fff,#f9a8d4,#d8b4fe);
   -webkit-background-clip:text;
@@ -141,8 +115,7 @@ textarea.field{resize:vertical;}
 <script type="text/babel">
 const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
-
-/* â”€â”€â”€ SVG Icons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ---- SVG Icon Library ---- */
 const IC = {
   zap:      (s)=><svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
   search:   (s)=><svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
@@ -163,57 +136,53 @@ const IC = {
   chat:     (s)=><svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>,
   send:     (s)=><svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>,
   inbox:    (s)=><svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>,
-  check:    (s)=><svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
 };
 
-/* icon size helper â€” returns a plain style object, avoids relying on Tailwind JIT for SVG */
 const SZ = {
   xs:  {width:12,height:12,display:'block',flexShrink:0},
   sm:  {width:14,height:14,display:'block',flexShrink:0},
   md:  {width:16,height:16,display:'block',flexShrink:0},
   lg:  {width:20,height:20,display:'block',flexShrink:0},
-  xl:  {width:24,height:24,display:'block',flexShrink:0},
-  xxl: {width:32,height:32,display:'block',flexShrink:0},
 };
 
-/* â”€â”€â”€ Seed Data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ---- Seed Data ---- */
 const SEED = [
   {
     id:'ctx-1', title:'Stripe Webhook Handler v2', category:'coders', source:'GitHub Gist',
     image:'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80',
     snippet:"app.post('/webhook', express.raw({type:'application/json'}), async (req,res)=>{\n  const sig = req.headers['stripe-signature'];\n  const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_SECRET);\n  if(event.type === 'checkout.session.completed') await fulfillOrder(event.data.object);\n  res.json({received:true});\n});",
     description:'Enterprise-grade async event processor for subscription renewals and edge runtime failures.',
-    metadata:'Repo: saas-core â€¢ 12m ago', favorite:true,
+    metadata:'Repo: saas-core - 12m ago', favorite:true,
     tags:['#Backend','#Stripe','#NodeJS','#Security'],
   },
   {
     id:'ctx-2', title:'Brand Guidelines & 4K B-Roll Pack', category:'creators', source:'Google Drive',
     image:'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80',
-    snippet:'Primary: #030014 (DeepVoid)\nAccent:  #ec4899 (Neon Pink)\nPurple:  #a855f7\nFont: Plus Jakarta Sans â€” weights 400/700/800\nHeadline size: 72px / line-height: 1.1',
+    snippet:'Primary: #030014 (DeepVoid)\nAccent: #ec4899 (Neon Pink)\nPurple: #a855f7\nFont: Plus Jakarta Sans - weights 400/700/800\nHeadline size: 72px / line-height: 1.1',
     description:'4K raw assets, typography configs, and cinematic color grading LUTs for global launch.',
-    metadata:'Size: 1.4 GB â€¢ 1h ago', favorite:false,
+    metadata:'Size: 1.4 GB - 1h ago', favorite:false,
     tags:['#BrandAssets','#ColorGrading','#YouTube'],
   },
   {
     id:'ctx-3', title:'Q3 Budget Realignment Decision', category:'leaders', source:'Executive Sync',
     image:'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&auto=format&fit=crop&q=80',
-    snippet:'RESOLUTION â€” Q3 Budget Realignment:\n1. Reallocate 40% capex â†’ AI compute clusters\n2. Reduce legacy infra spend by 25%\n3. Department heads sign off by Friday EOD\n4. CFO to present revised forecast Monday',
+    snippet:'RESOLUTION - Q3 Budget Realignment:\n1. Reallocate 40% capex -> AI compute clusters\n2. Reduce legacy infra spend by 25%\n3. Department heads sign off by Friday EOD\n4. CFO to present revised forecast Monday',
     description:'Board agreement on pivoting quarterly infrastructure investments toward ML compute nodes.',
-    metadata:'Meeting: Boardroom â€¢ 3h ago', favorite:true,
+    metadata:'Meeting: Boardroom - 3h ago', favorite:true,
     tags:['#Strategy','#BudgetQ3','#AI'],
   },
   {
     id:'ctx-4', title:'API Rate Limiting Architecture', category:'coders', source:'Notion Spec',
     image:'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80',
-    snippet:'// Redis token-bucket rate limiter\nconst MAX_REQUESTS = 150;\nconst WINDOW_MS    = 60_000;\n\nasync function checkRateLimit(apiKey) {\n  const key = `ratelimit:${apiKey}`;\n  const now = Date.now();\n  await redis.zremrangebyscore(key, 0, now - WINDOW_MS);\n  const count = await redis.zcard(key);\n  if(count >= MAX_REQUESTS) throw new Error("Rate limit exceeded");\n  await redis.zadd(key, now, now);\n  await redis.expire(key, 60);\n}',
+    snippet:'// Redis token-bucket rate limiter\nconst MAX_REQUESTS = 150;\nconst WINDOW_MS = 60000;\n\nasync function checkRateLimit(apiKey) {\n  const key = "ratelimit:" + apiKey;\n  const now = Date.now();\n  await redis.zremrangebyscore(key, 0, now - WINDOW_MS);\n  const count = await redis.zcard(key);\n  if(count >= MAX_REQUESTS) throw new Error("Rate limit exceeded");\n  await redis.zadd(key, now, now);\n  await redis.expire(key, 60);\n}',
     description:'Distributed rate-limiting spec using Redis sorted sets for public developer API keys.',
-    metadata:'Space: Engineering â€¢ Yesterday', favorite:false,
+    metadata:'Space: Engineering - Yesterday', favorite:false,
     tags:['#Architecture','#Redis','#API'],
   },
 ];
 
 
-/* â”€â”€â”€ Toast â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ---- Toast ---- */
 function Toast({msg}){
   return (
     <div className="anim-slide-up" style={{
@@ -230,35 +199,28 @@ function Toast({msg}){
   );
 }
 
-/* â”€â”€â”€ OmniSearch â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ---- OmniSearch ---- */
 function OmniSearch({items, query, setQuery, onClose, onSelect}){
   const inputRef = useRef(null);
-  useEffect(()=>{ setTimeout(()=>inputRef.current&&inputRef.current.focus(), 40); },[]);
+  useEffect(()=>{ setTimeout(()=>inputRef.current&&inputRef.current.focus(),40); },[]);
 
   const results = useMemo(()=>{
     const q = query.trim().toLowerCase();
     if(!q) return items.slice(0,7);
     return items.filter(i=>(
-      i.title.toLowerCase().includes(q) ||
-      i.description.toLowerCase().includes(q) ||
-      i.source.toLowerCase().includes(q) ||
-      (i.snippet && i.snippet.toLowerCase().includes(q)) ||
+      i.title.toLowerCase().includes(q)||
+      i.description.toLowerCase().includes(q)||
+      i.source.toLowerCase().includes(q)||
+      (i.snippet&&i.snippet.toLowerCase().includes(q))||
       i.tags.some(t=>t.toLowerCase().includes(q))
     ));
   },[items,query]);
 
-  function pick(item){
-    setQuery('');   /* clear search so "all" cards show, then highlight */
-    onSelect(item);
-    onClose();
-  }
+  function pick(item){ setQuery(''); onSelect(item); onClose(); }
 
   return (
     <div className="overlay overlay-top" onClick={onClose}>
-      <div className="glass anim-pop-in" onClick={e=>e.stopPropagation()} style={{
-        width:'100%',maxWidth:560,borderRadius:24,padding:22,
-        border:'1px solid rgba(236,72,153,0.45)',
-      }}>
+      <div className="glass anim-pop-in" onClick={e=>e.stopPropagation()} style={{width:'100%',maxWidth:560,borderRadius:24,padding:22,border:'1px solid rgba(236,72,153,0.45)'}}>
         <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',paddingBottom:14,borderBottom:'1px solid rgba(255,255,255,0.08)',marginBottom:14}}>
           <div style={{display:'flex',alignItems:'center',gap:8}}>
             {IC.search({...SZ.sm,color:'#f472b6'})}
@@ -267,28 +229,19 @@ function OmniSearch({items, query, setQuery, onClose, onSelect}){
           <button onClick={onClose} style={{fontSize:11,fontWeight:700,color:'#94a3b8',padding:'3px 10px',borderRadius:8,background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',cursor:'pointer'}}>ESC</button>
         </div>
         <div style={{position:'relative',marginBottom:12}}>
-          <span style={{position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',pointerEvents:'none',display:'flex'}}>
-            {IC.search({...SZ.sm,color:'#f472b6'})}
-          </span>
-          <input ref={inputRef} type="text" value={query} onChange={e=>setQuery(e.target.value)}
-            placeholder="Search title, tag, keyword, sourceâ€¦"
-            className="field" style={{paddingLeft:36}}/>
+          <span style={{position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',pointerEvents:'none',display:'flex'}}>{IC.search({...SZ.sm,color:'#f472b6'})}</span>
+          <input ref={inputRef} type="text" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search title, tag, keyword, source..." className="field" style={{paddingLeft:36}}/>
         </div>
         <div style={{maxHeight:280,overflowY:'auto',display:'flex',flexDirection:'column',gap:3}}>
           {results.length===0
             ? <p style={{textAlign:'center',color:'#475569',fontSize:12,padding:'28px 0'}}>No results found.</p>
             : results.map(item=>(
-              <button key={item.id} onClick={()=>pick(item)} style={{
-                display:'flex',alignItems:'center',justifyContent:'space-between',
-                padding:'10px 12px',borderRadius:12,cursor:'pointer',
-                border:'1px solid transparent',background:'transparent',
-                textAlign:'left',width:'100%',transition:'all 0.15s',
-              }}
-              onMouseEnter={e=>{e.currentTarget.style.background='rgba(255,255,255,0.05)';e.currentTarget.style.borderColor='rgba(236,72,153,0.2)';}}
-              onMouseLeave={e=>{e.currentTarget.style.background='transparent';e.currentTarget.style.borderColor='transparent';}}>
+              <button key={item.id} onClick={()=>pick(item)} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'10px 12px',borderRadius:12,cursor:'pointer',border:'1px solid transparent',background:'transparent',textAlign:'left',width:'100%',transition:'all 0.15s'}}
+                onMouseEnter={e=>{e.currentTarget.style.background='rgba(255,255,255,0.05)';e.currentTarget.style.borderColor='rgba(236,72,153,0.2)';}}
+                onMouseLeave={e=>{e.currentTarget.style.background='transparent';e.currentTarget.style.borderColor='transparent';}}>
                 <div>
                   <p style={{fontWeight:700,fontSize:12,color:'#f1f5f9'}}>{item.title}</p>
-                  <p style={{fontSize:10,color:'#64748b',marginTop:2}}>{item.source} Â· {item.category}</p>
+                  <p style={{fontSize:10,color:'#64748b',marginTop:2}}>{item.source} - {item.category}</p>
                 </div>
                 <span style={{fontSize:10,fontFamily:'monospace',color:'#f472b6',background:'rgba(236,72,153,0.1)',padding:'2px 8px',borderRadius:20,border:'1px solid rgba(236,72,153,0.2)',flexShrink:0,marginLeft:8}}>View</span>
               </button>
@@ -300,105 +253,57 @@ function OmniSearch({items, query, setQuery, onClose, onSelect}){
   );
 }
 
-/* â”€â”€â”€ AddItemModal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ---- AddItemModal ---- */
 function AddItemModal({onClose, onAdd}){
-  const [title,  setTitle]  = useState('');
-  const [cat,    setCat]    = useState('coders');
-  const [source, setSource] = useState('');
-  const [desc,   setDesc]   = useState('');
-  const [snippet,setSnippet]= useState('');
-  const [tags,   setTags]   = useState('');
-  const [image,  setImage]  = useState('');
-  const [err,    setErr]    = useState('');
+  const [title,setTitle]=useState('');
+  const [cat,setCat]=useState('coders');
+  const [source,setSource]=useState('');
+  const [desc,setDesc]=useState('');
+  const [snippet,setSnippet]=useState('');
+  const [tags,setTags]=useState('');
+  const [image,setImage]=useState('');
+  const [err,setErr]=useState('');
 
   function submit(e){
     e.preventDefault();
-    if(!title.trim()){ setErr('Title is required.'); return; }
+    if(!title.trim()){setErr('Title is required.');return;}
     setErr('');
-    const parsedTags = tags
-      ? tags.split(',').map(t=>{ const c=t.trim(); return c.startsWith('#')?c:'#'+c; }).filter(t=>t.length>1)
-      : ['#Custom'];
+    const parsedTags=tags?tags.split(',').map(t=>{const c=t.trim();return c.startsWith('#')?c:'#'+c;}).filter(t=>t.length>1):['#Custom'];
     onAdd({
-      id: 'ctx-' + Date.now(),
-      title: title.trim(), category: cat,
-      source: source.trim() || 'Manual Entry',
-      image:  image.trim()  || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80',
-      snippet: snippet.trim(),
-      description: desc.trim() || 'No description provided.',
-      metadata: 'Created: Just now',
-      favorite: false, tags: parsedTags,
+      id:'ctx-'+Date.now(), title:title.trim(), category:cat,
+      source:source.trim()||'Manual Entry',
+      image:image.trim()||'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80',
+      snippet:snippet.trim(), description:desc.trim()||'No description provided.',
+      metadata:'Created: Just now', favorite:false, tags:parsedTags,
     });
   }
 
-  const lbl = {display:'block',fontSize:10,fontWeight:800,textTransform:'uppercase',letterSpacing:'0.08em',color:'#f472b6',marginBottom:5};
-
+  const lbl={display:'block',fontSize:10,fontWeight:800,textTransform:'uppercase',letterSpacing:'0.08em',color:'#f472b6',marginBottom:5};
   return (
     <div className="overlay" onClick={onClose}>
-      <div className="glass anim-pop-in" onClick={e=>e.stopPropagation()} style={{
-        width:'100%',maxWidth:500,borderRadius:24,padding:24,
-        border:'1px solid rgba(236,72,153,0.38)',
-        maxHeight:'92vh',overflowY:'auto',
-      }}>
-        {/* Header */}
+      <div className="glass anim-pop-in" onClick={e=>e.stopPropagation()} style={{width:'100%',maxWidth:500,borderRadius:24,padding:24,border:'1px solid rgba(236,72,153,0.38)',maxHeight:'92vh',overflowY:'auto'}}>
         <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',paddingBottom:16,borderBottom:'1px solid rgba(255,255,255,0.08)',marginBottom:18}}>
           <div style={{display:'flex',alignItems:'center',gap:10}}>
-            <div style={{width:34,height:34,borderRadius:11,background:'linear-gradient(135deg,#ec4899,#7c3aed)',display:'flex',alignItems:'center',justifyContent:'center'}}>
-              {IC.sparkle({...SZ.sm,color:'#fff'})}
-            </div>
+            <div style={{width:34,height:34,borderRadius:11,background:'linear-gradient(135deg,#ec4899,#7c3aed)',display:'flex',alignItems:'center',justifyContent:'center'}}>{IC.sparkle({...SZ.sm,color:'#fff'})}</div>
             <span style={{fontWeight:800,fontSize:14,color:'#fff'}}>Add Context Artifact</span>
           </div>
-          <button onClick={onClose} style={{padding:6,borderRadius:10,background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',cursor:'pointer',color:'#94a3b8',display:'flex'}}>
-            {IC.x(SZ.md)}
-          </button>
+          <button onClick={onClose} style={{padding:6,borderRadius:10,background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',cursor:'pointer',color:'#94a3b8',display:'flex'}}>{IC.x(SZ.md)}</button>
         </div>
-
-        {err && (
-          <div style={{marginBottom:14,padding:'9px 14px',background:'rgba(239,68,68,0.12)',border:'1px solid rgba(239,68,68,0.35)',borderRadius:10,color:'#fca5a5',fontSize:12,fontWeight:600}}>
-            {err}
-          </div>
-        )}
-
+        {err&&<div style={{marginBottom:14,padding:'9px 14px',background:'rgba(239,68,68,0.12)',border:'1px solid rgba(239,68,68,0.35)',borderRadius:10,color:'#fca5a5',fontSize:12,fontWeight:600}}>{err}</div>}
         <form onSubmit={submit}>
-          <div style={{marginBottom:13}}>
-            <label style={lbl}>Title *</label>
-            <input type="text" value={title} onChange={e=>setTitle(e.target.value)} placeholder="e.g. JWT Auth Middleware" className="field"/>
-          </div>
+          <div style={{marginBottom:13}}><label style={lbl}>Title *</label><input type="text" value={title} onChange={e=>setTitle(e.target.value)} placeholder="e.g. JWT Auth Middleware" className="field"/></div>
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:13}}>
-            <div>
-              <label style={lbl}>Workspace</label>
-              <select value={cat} onChange={e=>setCat(e.target.value)} className="field">
-                <option value="coders">Coders</option>
-                <option value="creators">Creators</option>
-                <option value="leaders">Leaders</option>
-              </select>
-            </div>
-            <div>
-              <label style={lbl}>Source</label>
-              <input type="text" value={source} onChange={e=>setSource(e.target.value)} placeholder="GitHub, Notionâ€¦" className="field"/>
-            </div>
+            <div><label style={lbl}>Workspace</label><select value={cat} onChange={e=>setCat(e.target.value)} className="field"><option value="coders">Coders</option><option value="creators">Creators</option><option value="leaders">Leaders</option></select></div>
+            <div><label style={lbl}>Source</label><input type="text" value={source} onChange={e=>setSource(e.target.value)} placeholder="GitHub, Notion..." className="field"/></div>
           </div>
-          <div style={{marginBottom:13}}>
-            <label style={lbl}>Description</label>
-            <textarea rows="2" value={desc} onChange={e=>setDesc(e.target.value)} placeholder="Brief summaryâ€¦" className="field"/>
-          </div>
-          <div style={{marginBottom:13}}>
-            <label style={lbl}>Code / Snippet</label>
-            <textarea rows="4" value={snippet} onChange={e=>setSnippet(e.target.value)} placeholder="const token = req.headers.authorization;" className="field mono" style={{fontSize:12,color:'#f9a8d4'}}/>
-          </div>
+          <div style={{marginBottom:13}}><label style={lbl}>Description</label><textarea rows="2" value={desc} onChange={e=>setDesc(e.target.value)} placeholder="Brief summary..." className="field"/></div>
+          <div style={{marginBottom:13}}><label style={lbl}>Code / Snippet</label><textarea rows="4" value={snippet} onChange={e=>setSnippet(e.target.value)} placeholder="const token = req.headers.authorization;" className="field mono" style={{fontSize:12,color:'#f9a8d4'}}/></div>
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:20}}>
-            <div>
-              <label style={lbl}>Tags (comma-separated)</label>
-              <input type="text" value={tags} onChange={e=>setTags(e.target.value)} placeholder="#Auth, #Security" className="field"/>
-            </div>
-            <div>
-              <label style={lbl}>Image URL</label>
-              <input type="text" value={image} onChange={e=>setImage(e.target.value)} placeholder="https://â€¦" className="field"/>
-            </div>
+            <div><label style={lbl}>Tags (comma-separated)</label><input type="text" value={tags} onChange={e=>setTags(e.target.value)} placeholder="#Auth, #Security" className="field"/></div>
+            <div><label style={lbl}>Image URL</label><input type="text" value={image} onChange={e=>setImage(e.target.value)} placeholder="https://..." className="field"/></div>
           </div>
           <div style={{display:'flex',justifyContent:'flex-end',gap:10}}>
-            <button type="button" onClick={onClose} style={{padding:'8px 16px',borderRadius:10,fontSize:12,fontWeight:700,background:'rgba(255,255,255,0.05)',color:'#94a3b8',border:'1px solid rgba(255,255,255,0.08)',cursor:'pointer'}}>
-              Cancel
-            </button>
+            <button type="button" onClick={onClose} style={{padding:'8px 16px',borderRadius:10,fontSize:12,fontWeight:700,background:'rgba(255,255,255,0.05)',color:'#94a3b8',border:'1px solid rgba(255,255,255,0.08)',cursor:'pointer'}}>Cancel</button>
             <button type="submit" style={{padding:'8px 18px',borderRadius:10,fontSize:12,fontWeight:700,background:'linear-gradient(135deg,#db2777,#7c3aed)',color:'#fff',border:'none',cursor:'pointer',display:'flex',alignItems:'center',gap:6,boxShadow:'0 4px 16px rgba(219,39,119,0.35)'}}>
               {IC.plus({...SZ.sm,color:'#fff'})} Index Artifact
             </button>
@@ -410,56 +315,32 @@ function AddItemModal({onClose, onAdd}){
 }
 
 
-/* â”€â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ---- Header ---- */
 function Header({onAdd, onSearch}){
   return (
-    <header style={{
-      position:'sticky',top:0,zIndex:40,
-      background:'rgba(3,0,20,0.9)',backdropFilter:'blur(30px)',
-      borderBottom:'1px solid rgba(255,255,255,0.07)',
-    }}>
+    <header style={{position:'sticky',top:0,zIndex:40,background:'rgba(3,0,20,0.9)',backdropFilter:'blur(30px)',borderBottom:'1px solid rgba(255,255,255,0.07)'}}>
       <div style={{maxWidth:1320,margin:'0 auto',padding:'0 20px',height:64,display:'flex',alignItems:'center',justifyContent:'space-between',gap:12}}>
-        {/* Logo */}
         <div style={{display:'flex',alignItems:'center',gap:12,flexShrink:0}}>
           <div style={{width:40,height:40,borderRadius:14,background:'linear-gradient(135deg,#ec4899,#7c3aed,#6366f1)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 4px 18px rgba(236,72,153,0.45)',flexShrink:0}}>
             {IC.zap({...SZ.md,color:'#fff'})}
           </div>
           <div>
             <div className="grad-text" style={{fontWeight:800,fontSize:18,lineHeight:1.2}}>ContextPulse</div>
-            <div style={{fontSize:9,fontWeight:900,textTransform:'uppercase',letterSpacing:'0.1em',padding:'1px 7px',borderRadius:20,background:'rgba(236,72,153,0.12)',color:'#f9a8d4',border:'1px solid rgba(236,72,153,0.28)',display:'inline-block',marginTop:1}}>
-              Lumina OS v5
-            </div>
+            <div style={{fontSize:9,fontWeight:900,textTransform:'uppercase',letterSpacing:'0.1em',padding:'1px 7px',borderRadius:20,background:'rgba(236,72,153,0.12)',color:'#f9a8d4',border:'1px solid rgba(236,72,153,0.28)',display:'inline-block',marginTop:1}}>Lumina OS v5</div>
           </div>
         </div>
-
-        {/* Actions */}
         <div style={{display:'flex',alignItems:'center',gap:8}}>
-          <button onClick={onSearch} style={{
-            display:'flex',alignItems:'center',gap:8,
-            padding:'7px 14px',borderRadius:12,fontSize:12,fontWeight:600,
-            color:'#cbd5e1',background:'rgba(15,10,40,0.8)',
-            border:'1px solid rgba(255,255,255,0.1)',cursor:'pointer',
-          }}>
+          <button onClick={onSearch} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 14px',borderRadius:12,fontSize:12,fontWeight:600,color:'#cbd5e1',background:'rgba(15,10,40,0.8)',border:'1px solid rgba(255,255,255,0.1)',cursor:'pointer'}}>
             {IC.search({...SZ.sm,color:'#f472b6'})}
-            <span style={{display:'none',minWidth:36}}>Search</span>
-            <kbd style={{fontSize:10,fontFamily:'monospace',padding:'1px 6px',borderRadius:5,background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.12)',color:'#f472b6'}}>âŒ˜K</kbd>
+            <kbd style={{fontSize:10,fontFamily:'monospace',padding:'1px 6px',borderRadius:5,background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.12)',color:'#f472b6'}}>Ctrl+K</kbd>
           </button>
-          <button onClick={onAdd} style={{
-            display:'flex',alignItems:'center',gap:6,
-            padding:'7px 16px',borderRadius:12,fontSize:12,fontWeight:700,
-            color:'#fff',background:'linear-gradient(135deg,#db2777,#7c3aed)',
-            border:'none',cursor:'pointer',boxShadow:'0 4px 16px rgba(219,39,119,0.35)',
-          }}>
+          <button onClick={onAdd} style={{display:'flex',alignItems:'center',gap:6,padding:'7px 16px',borderRadius:12,fontSize:12,fontWeight:700,color:'#fff',background:'linear-gradient(135deg,#db2777,#7c3aed)',border:'none',cursor:'pointer',boxShadow:'0 4px 16px rgba(219,39,119,0.35)'}}>
             {IC.sparkle({...SZ.sm,color:'#fff'})}
             <span>Add Context</span>
           </button>
           <div style={{width:1,height:24,background:'rgba(255,255,255,0.1)',flexShrink:0}}/>
           <div style={{position:'relative',flexShrink:0}}>
-            <img
-              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces"
-              style={{width:36,height:36,borderRadius:10,objectFit:'cover',border:'2px solid rgba(236,72,153,0.55)',display:'block'}}
-              alt="avatar"
-            />
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces" style={{width:36,height:36,borderRadius:10,objectFit:'cover',border:'2px solid rgba(236,72,153,0.55)',display:'block'}} alt="avatar"/>
             <span style={{position:'absolute',bottom:0,right:0,width:10,height:10,borderRadius:'50%',background:'#34d399',border:'2px solid #030014'}}/>
           </div>
         </div>
@@ -468,18 +349,17 @@ function Header({onAdd, onSearch}){
   );
 }
 
-/* â”€â”€â”€ Sidebar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-const TABS = [
-  {id:'all',      label:'All Streams',       icon:IC.grid,  activeGrad:'linear-gradient(135deg,rgba(219,39,119,0.22),rgba(124,58,237,0.22))', activeBdr:'rgba(236,72,153,0.45)'},
-  {id:'coders',   label:'Coders Workspace',  icon:IC.code,  activeGrad:'linear-gradient(135deg,rgba(8,145,178,0.22),rgba(37,99,235,0.22))',   activeBdr:'rgba(6,182,212,0.45)'},
-  {id:'creators', label:'Creators Vault',    icon:IC.video, activeGrad:'linear-gradient(135deg,rgba(225,29,72,0.22),rgba(219,39,119,0.22))',   activeBdr:'rgba(244,63,94,0.45)'},
-  {id:'leaders',  label:'Executive Suite',   icon:IC.brief, activeGrad:'linear-gradient(135deg,rgba(217,119,6,0.22),rgba(234,88,12,0.22))',    activeBdr:'rgba(245,158,11,0.45)'},
+/* ---- Sidebar ---- */
+const TABS=[
+  {id:'all',      label:'All Streams',      icon:IC.grid,  activeGrad:'linear-gradient(135deg,rgba(219,39,119,0.22),rgba(124,58,237,0.22))',activeBdr:'rgba(236,72,153,0.45)'},
+  {id:'coders',   label:'Coders Workspace', icon:IC.code,  activeGrad:'linear-gradient(135deg,rgba(8,145,178,0.22),rgba(37,99,235,0.22))',  activeBdr:'rgba(6,182,212,0.45)'},
+  {id:'creators', label:'Creators Vault',   icon:IC.video, activeGrad:'linear-gradient(135deg,rgba(225,29,72,0.22),rgba(219,39,119,0.22))',  activeBdr:'rgba(244,63,94,0.45)'},
+  {id:'leaders',  label:'Executive Suite',  icon:IC.brief, activeGrad:'linear-gradient(135deg,rgba(217,119,6,0.22),rgba(234,88,12,0.22))',   activeBdr:'rgba(245,158,11,0.45)'},
 ];
 
 function Sidebar({items, active, setActive}){
   return (
     <aside className="sidebar-aside" style={{display:'flex',flexDirection:'column',gap:16}}>
-      {/* Workspace nav */}
       <div className="glass" style={{borderRadius:22,padding:14}}>
         <div style={{display:'flex',alignItems:'center',gap:6,padding:'0 4px',marginBottom:10}}>
           {IC.layers({...SZ.sm,color:'#f472b6'})}
@@ -487,43 +367,25 @@ function Sidebar({items, active, setActive}){
         </div>
         <nav style={{display:'flex',flexDirection:'column',gap:4}}>
           {TABS.map(tab=>{
-            const on = active === tab.id;
-            const cnt = tab.id==='all' ? items.length : items.filter(i=>i.category===tab.id).length;
+            const on=active===tab.id;
+            const cnt=tab.id==='all'?items.length:items.filter(i=>i.category===tab.id).length;
             return (
-              <button key={tab.id} onClick={()=>setActive(tab.id)} style={{
-                width:'100%',display:'flex',alignItems:'center',justifyContent:'space-between',
-                padding:'9px 12px',borderRadius:13,
-                background: on ? tab.activeGrad : 'transparent',
-                border: on ? '1px solid '+tab.activeBdr : '1px solid transparent',
-                color: on ? '#fff' : '#94a3b8',
-                cursor:'pointer',transition:'all 0.15s',fontFamily:'inherit',
-              }}
-              onMouseEnter={e=>{ if(!on){ e.currentTarget.style.background='rgba(255,255,255,0.04)'; e.currentTarget.style.color='#e2e8f0'; }}}
-              onMouseLeave={e=>{ if(!on){ e.currentTarget.style.background='transparent'; e.currentTarget.style.color='#94a3b8'; }}}>
-                <div style={{display:'flex',alignItems:'center',gap:9}}>
-                  {tab.icon({...SZ.md,color:'currentColor'})}
-                  <span style={{fontSize:13,fontWeight:600}}>{tab.label}</span>
-                </div>
-                <span style={{fontSize:11,fontFamily:'monospace',fontWeight:700,padding:'1px 7px',borderRadius:20,background:'rgba(255,255,255,0.07)',color:'#e2e8f0',flexShrink:0}}>
-                  {cnt}
-                </span>
+              <button key={tab.id} onClick={()=>setActive(tab.id)} style={{width:'100%',display:'flex',alignItems:'center',justifyContent:'space-between',padding:'9px 12px',borderRadius:13,background:on?tab.activeGrad:'transparent',border:on?'1px solid '+tab.activeBdr:'1px solid transparent',color:on?'#fff':'#94a3b8',cursor:'pointer',transition:'all 0.15s',fontFamily:'inherit'}}
+                onMouseEnter={e=>{if(!on){e.currentTarget.style.background='rgba(255,255,255,0.04)';e.currentTarget.style.color='#e2e8f0';}}}
+                onMouseLeave={e=>{if(!on){e.currentTarget.style.background='transparent';e.currentTarget.style.color='#94a3b8';}}}>
+                <div style={{display:'flex',alignItems:'center',gap:9}}>{tab.icon({...SZ.md,color:'currentColor'})}<span style={{fontSize:13,fontWeight:600}}>{tab.label}</span></div>
+                <span style={{fontSize:11,fontFamily:'monospace',fontWeight:700,padding:'1px 7px',borderRadius:20,background:'rgba(255,255,255,0.07)',color:'#e2e8f0',flexShrink:0}}>{cnt}</span>
               </button>
             );
           })}
         </nav>
       </div>
-
-      {/* Neural Sync widget */}
       <div style={{borderRadius:22,padding:16,background:'linear-gradient(135deg,rgba(49,8,99,0.5),rgba(3,0,20,0.75),rgba(80,7,36,0.4))',border:'1px solid rgba(236,72,153,0.16)'}}>
         <div style={{display:'flex',alignItems:'center',gap:7,marginBottom:8}}>
           {IC.cpu({...SZ.sm,color:'#f472b6'})}
-          <span style={{fontSize:10,fontWeight:900,textTransform:'uppercase',letterSpacing:'0.08em',background:'linear-gradient(to right,#f9a8d4,#d8b4fe)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>
-            Neural Sync Active
-          </span>
+          <span style={{fontSize:10,fontWeight:900,textTransform:'uppercase',letterSpacing:'0.08em',background:'linear-gradient(to right,#f9a8d4,#d8b4fe)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>Neural Sync Active</span>
         </div>
-        <p style={{fontSize:11,color:'#475569',lineHeight:1.6,marginBottom:10}}>
-          Live indexing across GitHub, Drive, Notion and Slack.
-        </p>
+        <p style={{fontSize:11,color:'#475569',lineHeight:1.6,marginBottom:10}}>Live indexing across GitHub, Drive, Notion and Slack.</p>
         <div style={{width:'100%',height:5,borderRadius:3,background:'rgba(15,10,40,0.8)',overflow:'hidden'}}>
           <div style={{height:'100%',width:'100%',borderRadius:3,background:'linear-gradient(to right,#ec4899,#a855f7,#22d3ee)',animation:'pulse 2s ease infinite'}}/>
         </div>
@@ -539,83 +401,52 @@ function Sidebar({items, active, setActive}){
   );
 }
 
-
-/* â”€â”€â”€ ArtifactCard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-const CAT_META = {
+/* ---- ArtifactCard ---- */
+const CAT_META={
   coders:   {icon:IC.code,  bg:'rgba(6,182,212,0.1)',  bdr:'rgba(6,182,212,0.32)',  color:'#67e8f9'},
   creators: {icon:IC.video, bg:'rgba(244,63,94,0.1)',  bdr:'rgba(244,63,94,0.32)',  color:'#fda4af'},
   leaders:  {icon:IC.brief, bg:'rgba(245,158,11,0.1)', bdr:'rgba(245,158,11,0.32)', color:'#fcd34d'},
 };
 
 function ArtifactCard({item, onFav, onDelete, onCopy, onDownload, onExpand}){
-  const m = CAT_META[item.category] || CAT_META.coders;
-  const [hov, setHov] = useState(false);
-
+  const m=CAT_META[item.category]||CAT_META.coders;
+  const [hov,setHov]=useState(false);
   return (
-    <div className="glass-card" style={{padding:20,display:'flex',flexDirection:'column',gap:12,position:'relative'}}
-      onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}>
-
-      {/* Category badge + action buttons */}
+    <div className="glass-card" style={{padding:20,display:'flex',flexDirection:'column',gap:12,position:'relative'}} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}>
       <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:8}}>
         <div style={{display:'flex',alignItems:'center',gap:5,padding:'4px 10px',borderRadius:9,background:m.bg,border:'1px solid '+m.bdr,fontSize:10,fontWeight:800,textTransform:'uppercase',letterSpacing:'0.06em',color:m.color,flexShrink:0}}>
           {m.icon({...SZ.xs,color:'currentColor'})}
-          <span>{item.category} Â· {item.source}</span>
+          <span>{item.category} - {item.source}</span>
         </div>
         <div style={{display:'flex',gap:5,flexShrink:0}}>
-          <button onClick={()=>onFav(item.id)} title="Favourite" style={{
-            padding:6,borderRadius:9,cursor:'pointer',display:'flex',
-            background: item.favorite ? 'rgba(245,158,11,0.18)' : 'rgba(255,255,255,0.05)',
-            border: item.favorite ? '1px solid rgba(245,158,11,0.5)' : '1px solid rgba(255,255,255,0.08)',
-            color: item.favorite ? '#fcd34d' : '#64748b',
-            transition:'all 0.15s',
-          }}>
-            {IC.star({...SZ.sm,color:'currentColor'}, item.favorite)}
+          <button onClick={()=>onFav(item.id)} title="Favourite" style={{padding:6,borderRadius:9,cursor:'pointer',display:'flex',background:item.favorite?'rgba(245,158,11,0.18)':'rgba(255,255,255,0.05)',border:item.favorite?'1px solid rgba(245,158,11,0.5)':'1px solid rgba(255,255,255,0.08)',color:item.favorite?'#fcd34d':'#64748b',transition:'all 0.15s'}}>
+            {IC.star({...SZ.sm,color:'currentColor'},item.favorite)}
           </button>
-          <button onClick={()=>onDelete(item.id)} title="Delete" style={{
-            padding:6,borderRadius:9,cursor:'pointer',display:'flex',
-            background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',
-            color:'#ef4444',opacity: hov ? 1 : 0,transition:'opacity 0.2s',
-          }}>
+          <button onClick={()=>onDelete(item.id)} title="Delete" style={{padding:6,borderRadius:9,cursor:'pointer',display:'flex',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',color:'#ef4444',opacity:hov?1:0,transition:'opacity 0.2s'}}>
             {IC.trash({...SZ.sm,color:'currentColor'})}
           </button>
         </div>
       </div>
-
-      {/* Title + description */}
       <div>
-        <h4 style={{fontWeight:800,fontSize:15,color:'#f1f5f9',marginBottom:5,lineHeight:1.3}}>
-          {item.title}
-        </h4>
-        <p className="clamp2" style={{fontSize:12,color:'#64748b',lineHeight:1.65}}>
-          {item.description}
-        </p>
+        <h4 style={{fontWeight:800,fontSize:15,color:'#f1f5f9',marginBottom:5,lineHeight:1.3}}>{item.title}</h4>
+        <p className="clamp2" style={{fontSize:12,color:'#64748b',lineHeight:1.65}}>{item.description}</p>
       </div>
-
-      {/* Image */}
-      {item.image && (
+      {item.image&&(
         <div style={{borderRadius:13,overflow:'hidden',height:118,border:'1px solid rgba(255,255,255,0.07)',position:'relative',flexShrink:0}}>
-          <img src={item.image} alt={item.title} style={{width:'100%',height:'100%',objectFit:'cover',transition:'transform 0.4s',transform: hov ? 'scale(1.05)' : 'scale(1)'}}/>
+          <img src={item.image} alt={item.title} style={{width:'100%',height:'100%',objectFit:'cover',transition:'transform 0.4s',transform:hov?'scale(1.05)':'scale(1)'}}/>
           <div style={{position:'absolute',inset:0,background:'linear-gradient(to top,rgba(3,0,20,0.65),transparent)',pointerEvents:'none'}}/>
         </div>
       )}
-
-      {/* Snippet */}
-      {item.snippet && (
+      {item.snippet&&(
         <div className="mono" style={{background:'rgba(2,6,23,0.92)',borderRadius:11,padding:11,fontSize:11,color:'#f9a8d4',border:'1px solid rgba(255,255,255,0.06)',maxHeight:82,overflowY:'auto',lineHeight:1.65}}>
           <pre style={{margin:0,whiteSpace:'pre-wrap',wordBreak:'break-all'}}>{item.snippet}</pre>
         </div>
       )}
-
-      {/* Tags */}
-      {item.tags && item.tags.length > 0 && (
+      {item.tags&&item.tags.length>0&&(
         <div style={{display:'flex',flexWrap:'wrap',gap:5}}>
-          {item.tags.map((tag,i)=>(
-            <span key={i} className="tag">{tag}</span>
-          ))}
+          {item.tags.map((tag,i)=><span key={i} className="tag">{tag}</span>)}
         </div>
       )}
-
-      {/* Footer */}
       <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',paddingTop:10,borderTop:'1px solid rgba(255,255,255,0.07)',marginTop:'auto',gap:6,flexWrap:'wrap'}}>
         <span className="mono" style={{fontSize:11,color:'#475569',flexShrink:0}}>{item.metadata}</span>
         <div style={{display:'flex',gap:5,flexWrap:'wrap'}}>
@@ -634,38 +465,25 @@ function ArtifactCard({item, onFav, onDelete, onCopy, onDownload, onExpand}){
   );
 }
 
-/* â”€â”€â”€ ExpandModal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ---- ExpandModal ---- */
 function ExpandModal({item, onClose, onCopy, onDownload}){
   return (
     <div className="overlay" onClick={onClose}>
-      <div className="glass anim-pop-in" onClick={e=>e.stopPropagation()} style={{
-        width:'100%',maxWidth:700,borderRadius:24,padding:28,
-        border:'1px solid rgba(236,72,153,0.42)',
-        maxHeight:'90vh',overflowY:'auto',
-      }}>
-        {/* Header */}
+      <div className="glass anim-pop-in" onClick={e=>e.stopPropagation()} style={{width:'100%',maxWidth:700,borderRadius:24,padding:28,border:'1px solid rgba(236,72,153,0.42)',maxHeight:'90vh',overflowY:'auto'}}>
         <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:18,gap:12}}>
           <div>
             <h2 style={{fontWeight:900,fontSize:20,color:'#fff',marginBottom:4,lineHeight:1.25}}>{item.title}</h2>
-            <span className="mono" style={{fontSize:11,color:'#f472b6'}}>{item.category} Â· {item.source}</span>
+            <span className="mono" style={{fontSize:11,color:'#f472b6'}}>{item.category} - {item.source}</span>
           </div>
-          <button onClick={onClose} style={{padding:7,borderRadius:10,background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.1)',cursor:'pointer',color:'#94a3b8',display:'flex',flexShrink:0}}>
-            {IC.x(SZ.md)}
-          </button>
+          <button onClick={onClose} style={{padding:7,borderRadius:10,background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.1)',cursor:'pointer',color:'#94a3b8',display:'flex',flexShrink:0}}>{IC.x(SZ.md)}</button>
         </div>
-
-        {/* Image */}
-        {item.image && (
+        {item.image&&(
           <div style={{borderRadius:16,overflow:'hidden',height:210,marginBottom:18,border:'1px solid rgba(255,255,255,0.09)'}}>
             <img src={item.image} alt={item.title} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
           </div>
         )}
-
-        {/* Description */}
         <p style={{fontSize:13,color:'#94a3b8',lineHeight:1.75,marginBottom:18}}>{item.description}</p>
-
-        {/* Snippet */}
-        {item.snippet && (
+        {item.snippet&&(
           <div style={{marginBottom:16}}>
             <div style={{fontSize:10,fontWeight:800,textTransform:'uppercase',letterSpacing:'0.08em',color:'#f472b6',marginBottom:7}}>Snippet</div>
             <div className="mono" style={{background:'rgba(2,6,23,0.96)',borderRadius:14,padding:16,fontSize:12,color:'#f9a8d4',border:'1px solid rgba(255,255,255,0.07)',lineHeight:1.75,overflowX:'auto'}}>
@@ -673,15 +491,11 @@ function ExpandModal({item, onClose, onCopy, onDownload}){
             </div>
           </div>
         )}
-
-        {/* Tags */}
-        {item.tags && item.tags.length > 0 && (
+        {item.tags&&item.tags.length>0&&(
           <div style={{display:'flex',flexWrap:'wrap',gap:6,marginBottom:4}}>
             {item.tags.map((tag,i)=><span key={i} className="tag">{tag}</span>)}
           </div>
         )}
-
-        {/* Actions */}
         <div style={{display:'flex',gap:10,marginTop:18,paddingTop:16,borderTop:'1px solid rgba(255,255,255,0.07)'}}>
           <button onClick={()=>onCopy(item)} style={{flex:1,padding:11,borderRadius:12,fontSize:12,fontWeight:700,color:'#fff',background:'linear-gradient(135deg,#db2777,#7c3aed)',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:7}}>
             {IC.copy({...SZ.sm,color:'#fff'})} Copy Snippet
@@ -696,144 +510,118 @@ function ExpandModal({item, onClose, onCopy, onDownload}){
 }
 
 
-/* â”€â”€â”€ ChatBot Brain (fixed & improved) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ---- ChatBot Brain ---- */
 function botReply(msg, items){
   const m = msg.toLowerCase().trim();
-
-  /* Robust keyword matcher â€” checks if ANY of the words appear */
   const has = (...words) => words.some(w => m.includes(w));
 
-  /* â”€â”€ Greetings â”€â”€ */
-  if(has('hi','hello','hey','sup','yo','howdy','good morning','good evening','good afternoon','whats up','what\'s up'))
-    return "Hey! ðŸ‘‹ I'm your ContextPulse AI.\n\nHere's what I can help with:\n\nðŸ› ï¸  \"tools\"       â€” see all features\nðŸ“‹  \"copy\"        â€” how to copy a snippet\nâ¬‡ï¸  \"save\"        â€” how to download\nðŸ”  \"search\"      â€” how to filter & search\nâ­  \"favourites\"  â€” your starred items\nðŸ“Š  \"stats\"       â€” workspace counts\nðŸ·ï¸  \"tags\"        â€” list all tags\nâž•  \"add\"         â€” create a new artifact\n\nOr just type any artifact title to find it!";
+  if(has('hi','hello','hey','sup','yo','howdy','good morning','good afternoon','good evening','whats up'))
+    return "Hey! I'm your ContextPulse AI assistant.\n\nHere is what I can help with:\n\n[tools]       - see all features\n[copy]        - how to copy a snippet\n[save]        - how to download\n[search]      - how to filter and search\n[favourites]  - your starred items\n[stats]       - workspace counts\n[tags]        - list all tags\n[add]         - create a new artifact\n\nOr just type any artifact title to find it!";
 
-  /* â”€â”€ Tools / Features â”€â”€ */
-  if(has('tools','features','capabilities','what can you do','what does this do','how does this work','all features','feature list'))
-    return "ðŸ› ï¸  ALL TOOLS IN CONTEXTPULSE:\n\nðŸ“‹  COPY â€” Pink button on each card. Copies the code snippet instantly. Works locally and on hosted sites (fallback method included).\n\nâ¬‡ï¸  SAVE â€” Cyan 'Save' button. Downloads the snippet as a .txt file.\n\nðŸ”  VIEW â€” Purple 'View' button. Opens a full-screen detail modal.\n\nâž•  ADD CONTEXT â€” Header top-right. Create an artifact with title, snippet, tags and more.\n\nðŸ”Ž  SEARCH â€” Type in the main search bar or press Ctrl+K / âŒ˜K for Omni Search.\n\nâ­  FAVOURITE â€” Click the â­ star on any card to bookmark it.\n\nðŸ—‘ï¸  DELETE â€” Hover a card â†’ trash icon appears â†’ click to remove.\n\nðŸ’¬  CHAT â€” That's me! Ask anything about the app.";
+  if(has('tools','features','capabilities','what can you do','how does this work','all features','feature list'))
+    return "ALL TOOLS IN CONTEXTPULSE:\n\nCOPY - Pink button on each card. Copies the code snippet instantly.\n\nSAVE - Cyan Save button. Downloads the snippet as a .txt file.\n\nVIEW - Purple View button. Opens a full-screen detail modal.\n\nADD CONTEXT - Header button. Create an artifact with title, snippet, tags and more.\n\nSEARCH - Type in the main search bar or press Ctrl+K for Omni Search.\n\nFAVOURITE - Click the star on any card to bookmark it.\n\nDELETE - Hover a card and the trash icon appears. Click to remove.\n\nCHAT - That's me! Ask anything about the app.";
 
-  /* â”€â”€ Help / Guide â”€â”€ */
-  if(has('help','guide','tutorial','command','how to use','usage'))
-    return "ðŸ’¡ QUICK REFERENCE:\n\nâ€¢ \"tools\"       â†’ all features explained\nâ€¢ \"copy\"        â†’ copy snippet to clipboard\nâ€¢ \"save\"        â†’ download snippet as file\nâ€¢ \"view\"        â†’ open full artifact detail\nâ€¢ \"search\"      â†’ search & filter workspace\nâ€¢ \"add\"         â†’ create new artifact\nâ€¢ \"favourites\"  â†’ your bookmarked items\nâ€¢ \"delete\"      â†’ remove an artifact\nâ€¢ \"tags\"        â†’ list all existing tags\nâ€¢ \"stats\"       â†’ item counts per workspace\n\nOr just type any artifact title to find it!";
+  if(has('help','guide','tutorial','how to use','usage'))
+    return "QUICK REFERENCE:\n\n- tools       -> all features explained\n- copy        -> copy snippet to clipboard\n- save        -> download snippet as file\n- view        -> open full artifact detail\n- search      -> search and filter workspace\n- add         -> create new artifact\n- favourites  -> your bookmarked items\n- delete      -> remove an artifact\n- tags        -> list all existing tags\n- stats       -> item counts per workspace\n\nOr type any artifact title to find it!";
 
-  /* â”€â”€ Copy â”€â”€ */
   if(has('copy','clipboard','how to copy','copying'))
-    return "ðŸ“‹  HOW TO COPY A SNIPPET:\n\n1ï¸âƒ£  Find the artifact card you want\n2ï¸âƒ£  Click the pink gradient 'Copy' button (bottom-right of card)\n3ï¸âƒ£  The snippet is copied to your clipboard âœ…\n\nYou can also copy from inside the 'View' modal.\n\nâœ…  Works on both local file:// and hosted https:// â€” a fallback method (execCommand) runs automatically if the Clipboard API is blocked.";
+    return "HOW TO COPY A SNIPPET:\n\n1. Find the artifact card you want\n2. Click the pink gradient Copy button at the bottom-right of the card\n3. The snippet is copied to your clipboard\n\nYou can also copy from inside the View modal.\n\nWorks on both local file:// and hosted https:// - a fallback method runs automatically if the Clipboard API is blocked.";
 
-  /* â”€â”€ Save / Download â”€â”€ */
-  if(has('save','download','export','get file','how to download','how to save'))
-    return "â¬‡ï¸  HOW TO DOWNLOAD A SNIPPET:\n\n1ï¸âƒ£  Find the artifact card\n2ï¸âƒ£  Click the cyan 'Save' button at the bottom of the card\n3ï¸âƒ£  A .txt file downloads to your computer âœ…\n\nYou can also download from inside the 'View' modal.";
+  if(has('save','download','export','how to download','how to save'))
+    return "HOW TO DOWNLOAD A SNIPPET:\n\n1. Find the artifact card\n2. Click the cyan Save button at the bottom of the card\n3. A .txt file downloads to your computer\n\nYou can also download from inside the View modal.";
 
-  /* â”€â”€ View / Expand â”€â”€ */
   if(has('view','expand','open','full detail','preview','modal','see full','see more','full screen'))
-    return "ðŸ”  HOW TO VIEW FULL ARTIFACT:\n\n1ï¸âƒ£  Click the purple 'View' button on any card\n2ï¸âƒ£  A full-screen overlay opens with:\n     â€¢ Full title & source\n     â€¢ Complete code snippet\n     â€¢ Description & tags\n     â€¢ Full-size image\n3ï¸âƒ£  Copy or Download directly from this modal âœ…";
+    return "HOW TO VIEW FULL ARTIFACT:\n\n1. Click the purple View button on any card\n2. A full-screen overlay opens with:\n   - Full title and source\n   - Complete code snippet\n   - Description and tags\n   - Full-size image\n3. Copy or Download directly from this modal";
 
-  /* â”€â”€ Search â”€â”€ */
   if(has('search','find','filter','query','look for','how to search','how to find'))
-    return "ðŸ”Ž  HOW TO SEARCH:\n\nâ€¢ Type in the main search bar (center of page) â€” cards filter in real-time\nâ€¢ Press Ctrl+K (Windows) or âŒ˜K (Mac) for Omni Search overlay\nâ€¢ Searches across: title, description, tags, source, and snippet content\nâ€¢ Click the sidebar tabs to filter by workspace\nâ€¢ Click 'Clear' to reset the search âœ…";
+    return "HOW TO SEARCH:\n\n- Type in the main search bar (center of page) - cards filter in real-time\n- Press Ctrl+K for Omni Search overlay\n- Searches across: title, description, tags, source, and snippet content\n- Click the sidebar tabs to filter by workspace\n- Click Clear to reset the search";
 
-  /* â”€â”€ Add / Create â”€â”€ */
   if(has('add','create','new artifact','index artifact','upload','new context','make new','how to add'))
-    return "âž•  HOW TO ADD A NEW ARTIFACT:\n\n1ï¸âƒ£  Click 'Add Context' (top-right header button)\n2ï¸âƒ£  Fill in the form:\n     â€¢ Title (required)\n     â€¢ Workspace: Coders / Creators / Leaders\n     â€¢ Source (GitHub, Notion, etc.)\n     â€¢ Description\n     â€¢ Code snippet\n     â€¢ Tags (comma-separated, e.g. #Auth, #NodeJS)\n     â€¢ Image URL (optional)\n3ï¸âƒ£  Click 'Index Artifact' to save âœ…\n\nArtifacts are saved in your browser's localStorage automatically.";
+    return "HOW TO ADD A NEW ARTIFACT:\n\n1. Click Add Context in the top-right header\n2. Fill in the form:\n   - Title (required)\n   - Workspace: Coders / Creators / Leaders\n   - Source (GitHub, Notion, etc.)\n   - Description\n   - Code snippet\n   - Tags (comma-separated, e.g. #Auth, #NodeJS)\n   - Image URL (optional)\n3. Click Index Artifact to save\n\nArtifacts are saved in your browser localStorage automatically.";
 
-  /* â”€â”€ Favourites / Starred â”€â”€ */
   if(has('favourite','favorites','star','starred','bookmark','bookmarks','liked')){
-    const favs = items.filter(i=>i.favorite);
+    const favs=items.filter(i=>i.favorite);
     if(favs.length===0)
-      return "â­  You have no starred artifacts yet.\n\nTo favourite one:\n1ï¸âƒ£  Find any artifact card\n2ï¸âƒ£  Click the â­ star icon in the top-right corner of the card\n3ï¸âƒ£  It turns gold and is bookmarked âœ…\n\nClick it again to un-favourite.";
-    return "â­  YOUR STARRED ARTIFACTS ("+favs.length+"):\n\n"+favs.map(i=>"â€¢ "+i.title+" ["+i.category+"]").join('\n')+"\n\nClick â­ on any card to toggle its favourite status.";
+      return "You have no starred artifacts yet.\n\nTo favourite one:\n1. Find any artifact card\n2. Click the star icon in the top-right corner of the card\n3. It turns gold and is bookmarked\n\nClick it again to un-favourite.";
+    return "YOUR STARRED ARTIFACTS ("+favs.length+"):\n\n"+favs.map(i=>"- "+i.title+" ["+i.category+"]").join('\n')+"\n\nClick the star on any card to toggle its favourite status.";
   }
 
-  /* â”€â”€ Delete / Remove â”€â”€ */
-  if(has('delete','remove','trash','clear artifact','how to delete','how to remove'))
-    return "ðŸ—‘ï¸  HOW TO DELETE AN ARTIFACT:\n\n1ï¸âƒ£  Hover your mouse over any artifact card\n2ï¸âƒ£  The ðŸ—‘ï¸ trash icon appears in the top-right corner\n3ï¸âƒ£  Click it â€” the artifact is permanently removed âœ…\n\nâš ï¸  Deletion is instant. Refresh the page if you want to restore defaults (clears localStorage).";
+  if(has('delete','remove','trash','how to delete','how to remove'))
+    return "HOW TO DELETE AN ARTIFACT:\n\n1. Hover your mouse over any artifact card\n2. The trash icon appears in the top-right corner\n3. Click it - the artifact is permanently removed\n\nNote: Deletion is instant. Refresh the page if you want to restore the default seed data.";
 
-  /* â”€â”€ Tags â”€â”€ */
-  if(has('tag','tags','#') && !has('add','create')){
-    const all = [];
+  if(has('tag','tags') && !has('add','create')){
+    const all=[];
     items.forEach(i=>i.tags&&i.tags.forEach(t=>{ if(!all.includes(t)) all.push(t); }));
-    return "ðŸ·ï¸  ALL TAGS IN YOUR WORKSPACE:\n\n"+(all.length>0 ? all.join('   ') : 'No tags found yet. Add tags when creating artifacts.');
+    return "ALL TAGS IN YOUR WORKSPACE:\n\n"+(all.length>0?all.join('  |  '):'No tags found yet. Add tags when creating artifacts.');
   }
 
-  /* â”€â”€ Stats / Workspace counts â”€â”€ */
   if(has('stat','stats','count','how many','total','workspace','coders','creators','leaders','category')){
-    const c  = items.filter(i=>i.category==='coders').length;
-    const cr = items.filter(i=>i.category==='creators').length;
-    const l  = items.filter(i=>i.category==='leaders').length;
-    const fav= items.filter(i=>i.favorite).length;
-    return "ðŸ“Š  WORKSPACE STATS:\n\nðŸ’»  Coders Workspace   â†’ "+c+" artifact"+(c!==1?'s':'')+
-           "\nðŸŽ¬  Creators Vault     â†’ "+cr+" artifact"+(cr!==1?'s':'')+
-           "\nðŸ’¼  Executive Suite    â†’ "+l+" artifact"+(l!==1?'s':'')+
-           "\n\nðŸ“¦  Total: "+items.length+" artifacts indexed"+
-           "\nâ­  Starred: "+fav+" artifact"+(fav!==1?'s':'');
+    const c=items.filter(i=>i.category==='coders').length;
+    const cr=items.filter(i=>i.category==='creators').length;
+    const l=items.filter(i=>i.category==='leaders').length;
+    const fav=items.filter(i=>i.favorite).length;
+    return "WORKSPACE STATS:\n\nCoders Workspace   -> "+c+" artifact"+(c!==1?'s':'')+
+           "\nCreators Vault     -> "+cr+" artifact"+(cr!==1?'s':'')+
+           "\nExecutive Suite    -> "+l+" artifact"+(l!==1?'s':'')+
+           "\n\nTotal: "+items.length+" artifacts indexed"+
+           "\nStarred: "+fav+" artifact"+(fav!==1?'s':'');
   }
 
-  /* â”€â”€ Keyboard shortcuts â”€â”€ */
   if(has('keyboard','shortcut','hotkey','ctrl','cmd','key'))
-    return "âŒ¨ï¸  KEYBOARD SHORTCUTS:\n\nâ€¢ Ctrl+K / âŒ˜K  â†’ Open Omni Search overlay\nâ€¢ Escape         â†’ Close any open modal or overlay\nâ€¢ Enter          â†’ Submit chat message";
+    return "KEYBOARD SHORTCUTS:\n\n- Ctrl+K        -> Open Omni Search overlay\n- Escape        -> Close any open modal\n- Enter         -> Submit chat message";
 
-  /* â”€â”€ Search artifact by title â”€â”€ */
-  const found = items.filter(i=>
-    i.title.toLowerCase().includes(m) ||
-    i.tags.some(t=>t.toLowerCase().includes(m)) ||
+  const found=items.filter(i=>
+    i.title.toLowerCase().includes(m)||
+    i.tags.some(t=>t.toLowerCase().includes(m))||
     i.source.toLowerCase().includes(m)
   );
-  if(found.length > 0)
-    return "ðŸ”  Found "+found.length+" artifact"+(found.length>1?'s':'')+' matching "'+msg+'":\n\n'+
-           found.map(i=>"â€¢ "+i.title+"\n  ["+i.category+"] â€” "+i.source+"\n  Tags: "+i.tags.join(', ')).join('\n\n');
+  if(found.length>0)
+    return "Found "+found.length+" artifact"+(found.length>1?'s':'')+' matching "'+msg+'":\n\n'+
+           found.map(i=>"- "+i.title+"\n  ["+i.category+"] - "+i.source+"\n  Tags: "+i.tags.join(', ')).join('\n\n');
 
-  /* â”€â”€ Fallback â”€â”€ */
-  return "ðŸ¤”  I didn't quite catch that.\n\nTry one of these:\nâ€¢ \"tools\"       â†’ all features\nâ€¢ \"copy\"        â†’ copy a snippet\nâ€¢ \"save\"        â†’ download snippet\nâ€¢ \"view\"        â†’ full artifact details\nâ€¢ \"search\"      â†’ find artifacts\nâ€¢ \"add\"         â†’ create new artifact\nâ€¢ \"favourites\"  â†’ your starred items\nâ€¢ \"tags\"        â†’ list all tags\nâ€¢ \"stats\"       â†’ workspace counts\nâ€¢ \"shortcuts\"   â†’ keyboard shortcuts\n\nOr type any artifact title or tag to find it!";
+  return "I didn't quite catch that.\n\nTry one of these:\n- tools       -> all features\n- copy        -> copy a snippet\n- save        -> download snippet\n- view        -> full artifact details\n- search      -> find artifacts\n- add         -> create new artifact\n- favourites  -> your starred items\n- tags        -> list all tags\n- stats       -> workspace counts\n- shortcuts   -> keyboard shortcuts\n\nOr type any artifact title or tag to find it!";
 }
 
-
-/* â”€â”€â”€ ChatPanel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-const CHAT_CHIPS = [
-  {label:'ðŸ› ï¸ tools',   send:'tools'},
-  {label:'ðŸ“‹ copy',    send:'copy'},
-  {label:'â¬‡ï¸ save',    send:'save'},
-  {label:'ðŸ” search',  send:'search'},
-  {label:'â­ starred', send:'favourites'},
-  {label:'ðŸ“Š stats',   send:'stats'},
+/* ---- ChatPanel ---- */
+const CHAT_CHIPS=[
+  {label:'Tools',     send:'tools'},
+  {label:'Copy',      send:'copy'},
+  {label:'Save',      send:'save'},
+  {label:'Search',    send:'search'},
+  {label:'Starred',   send:'favourites'},
+  {label:'Stats',     send:'stats'},
 ];
 
 function ChatPanel({onClose, items}){
-  const [msgs,   setMsgs]   = useState([{from:'ai', text:"Hi! I'm your ContextPulse AI ðŸ¤–\n\nClick a quick button below, or ask me anything:\nðŸ› ï¸  \"tools\"  â€” see all features\nðŸ“‹  \"copy\"   â€” copy a snippet\nðŸ”  \"search\" â€” find artifacts\n\nOr type any artifact title to find it!"}]);
-  const [input,  setInput]  = useState('');
-  const [typing, setTyping] = useState(false);
-  const bottomRef = useRef(null);
+  const [msgs,setMsgs]=useState([{from:'ai',text:"Hi! I'm your ContextPulse AI assistant.\n\nClick a quick button below or ask me anything:\n- Type 'tools' to see all features\n- Type 'copy' to learn how to copy snippets\n- Type 'search' to find artifacts\n\nOr type any artifact title to find it!"}]);
+  const [input,setInput]=useState('');
+  const [typing,setTyping]=useState(false);
+  const bottomRef=useRef(null);
 
-  /* Auto-scroll to bottom whenever messages or typing state changes */
   useEffect(()=>{
     if(bottomRef.current) bottomRef.current.scrollIntoView({behavior:'smooth'});
   },[msgs,typing]);
 
-  const sendMsg = useCallback((text)=>{
-    const t = text.trim();
+  const sendMsg=useCallback((text)=>{
+    const t=text.trim();
     if(!t) return;
-    setMsgs(prev=>[...prev, {from:'user', text:t}]);
+    setMsgs(prev=>[...prev,{from:'user',text:t}]);
     setInput('');
     setTyping(true);
     setTimeout(()=>{
-      const reply = botReply(t, items);
-      setMsgs(prev=>[...prev, {from:'ai', text:reply}]);
+      const reply=botReply(t,items);
+      setMsgs(prev=>[...prev,{from:'ai',text:reply}]);
       setTyping(false);
-    }, 520);
+    },500);
   },[items]);
 
   function onKey(e){
-    if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendMsg(input); }
+    if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg(input);}
   }
 
   return (
-    <div className="glass anim-slide-up" style={{
-      position:'fixed', bottom:92, left:24, zIndex:89,
-      width:345, maxHeight:510, borderRadius:22,
-      border:'1px solid rgba(236,72,153,0.38)',
-      display:'flex', flexDirection:'column', overflow:'hidden',
-      boxShadow:'0 28px 64px rgba(0,0,0,0.75)',
-    }}>
-
-      {/* Chat Header */}
+    <div className="glass anim-slide-up" style={{position:'fixed',bottom:92,left:24,zIndex:89,width:345,maxHeight:510,borderRadius:22,border:'1px solid rgba(236,72,153,0.38)',display:'flex',flexDirection:'column',overflow:'hidden',boxShadow:'0 28px 64px rgba(0,0,0,0.75)'}}>
+      {/* Header */}
       <div style={{padding:'12px 14px',borderBottom:'1px solid rgba(255,255,255,0.08)',display:'flex',alignItems:'center',justifyContent:'space-between',background:'rgba(15,10,40,0.92)',flexShrink:0}}>
         <div style={{display:'flex',alignItems:'center',gap:9}}>
           <div style={{width:32,height:32,borderRadius:'50%',background:'linear-gradient(135deg,#ec4899,#7c3aed)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
@@ -843,7 +631,7 @@ function ChatPanel({onClose, items}){
             <div style={{fontSize:12,fontWeight:800,color:'#fff'}}>ContextPulse AI</div>
             <div style={{fontSize:10,color:'#34d399',display:'flex',alignItems:'center',gap:4}}>
               <span style={{width:5,height:5,borderRadius:'50%',background:'#34d399',display:'inline-block',animation:'pulse 1.4s ease infinite'}}/>
-              Online Â· Ready
+              Online - Ready
             </div>
           </div>
         </div>
@@ -855,33 +643,20 @@ function ChatPanel({onClose, items}){
       {/* Messages */}
       <div style={{flex:1,overflowY:'auto',padding:12,display:'flex',flexDirection:'column',gap:9}}>
         {msgs.map((msg,i)=>{
-          const isAI = msg.from === 'ai';
+          const isAI=msg.from==='ai';
           return (
             <div key={i}>
-              <div style={{display:'flex',justifyContent: isAI ? 'flex-start' : 'flex-end'}}>
-                <div style={{
-                  maxWidth:'87%', padding:'9px 12px',
-                  borderRadius: isAI ? '4px 14px 14px 14px' : '14px 4px 14px 14px',
-                  fontSize:12, lineHeight:1.72, whiteSpace:'pre-wrap', wordBreak:'break-word',
-                  background: isAI ? 'rgba(124,58,237,0.18)' : 'linear-gradient(135deg,rgba(219,39,119,0.38),rgba(124,58,237,0.38))',
-                  border: isAI ? '1px solid rgba(124,58,237,0.28)' : '1px solid rgba(236,72,153,0.28)',
-                  color:'#f1f5f9',
-                }}>
+              <div style={{display:'flex',justifyContent:isAI?'flex-start':'flex-end'}}>
+                <div style={{maxWidth:'87%',padding:'9px 12px',borderRadius:isAI?'4px 14px 14px 14px':'14px 4px 14px 14px',fontSize:12,lineHeight:1.72,whiteSpace:'pre-wrap',wordBreak:'break-word',background:isAI?'rgba(124,58,237,0.18)':'linear-gradient(135deg,rgba(219,39,119,0.38),rgba(124,58,237,0.38))',border:isAI?'1px solid rgba(124,58,237,0.28)':'1px solid rgba(236,72,153,0.28)',color:'#f1f5f9'}}>
                   {msg.text}
                 </div>
               </div>
-
-              {/* Quick chip buttons â€” shown only after the FIRST AI message */}
-              {isAI && i===0 && (
+              {isAI&&i===0&&(
                 <div style={{display:'flex',flexWrap:'wrap',gap:5,marginTop:9}}>
                   {CHAT_CHIPS.map(chip=>(
-                    <button key={chip.send} onClick={()=>sendMsg(chip.send)} style={{
-                      fontSize:10,fontWeight:700,padding:'3px 10px',borderRadius:20,
-                      background:'rgba(124,58,237,0.14)',border:'1px solid rgba(124,58,237,0.38)',
-                      color:'#c4b5fd',cursor:'pointer',fontFamily:'inherit',transition:'all 0.15s',
-                    }}
-                    onMouseEnter={e=>e.currentTarget.style.background='rgba(124,58,237,0.38)'}
-                    onMouseLeave={e=>e.currentTarget.style.background='rgba(124,58,237,0.14)'}>
+                    <button key={chip.send} onClick={()=>sendMsg(chip.send)} style={{fontSize:10,fontWeight:700,padding:'3px 10px',borderRadius:20,background:'rgba(124,58,237,0.14)',border:'1px solid rgba(124,58,237,0.38)',color:'#c4b5fd',cursor:'pointer',fontFamily:'inherit',transition:'all 0.15s'}}
+                      onMouseEnter={e=>e.currentTarget.style.background='rgba(124,58,237,0.38)'}
+                      onMouseLeave={e=>e.currentTarget.style.background='rgba(124,58,237,0.14)'}>
                       {chip.label}
                     </button>
                   ))}
@@ -890,14 +665,12 @@ function ChatPanel({onClose, items}){
             </div>
           );
         })}
-
-        {/* Typing indicator */}
-        {typing && (
+        {typing&&(
           <div style={{display:'flex',justifyContent:'flex-start'}}>
             <div style={{padding:'10px 14px',borderRadius:'4px 14px 14px 14px',background:'rgba(124,58,237,0.18)',border:'1px solid rgba(124,58,237,0.28)',display:'flex',gap:4,alignItems:'center'}}>
-              <span style={{width:6,height:6,borderRadius:'50%',background:'#a78bfa',display:'inline-block',animation:'dot1 1.2s ease 0s infinite'}}/>
-              <span style={{width:6,height:6,borderRadius:'50%',background:'#a78bfa',display:'inline-block',animation:'dot2 1.2s ease 0.2s infinite'}}/>
-              <span style={{width:6,height:6,borderRadius:'50%',background:'#a78bfa',display:'inline-block',animation:'dot3 1.2s ease 0.4s infinite'}}/>
+              <span style={{width:6,height:6,borderRadius:'50%',background:'#a78bfa',display:'inline-block',animation:'dotBounce 1.2s ease 0s infinite'}}/>
+              <span style={{width:6,height:6,borderRadius:'50%',background:'#a78bfa',display:'inline-block',animation:'dotBounce 1.2s ease 0.2s infinite'}}/>
+              <span style={{width:6,height:6,borderRadius:'50%',background:'#a78bfa',display:'inline-block',animation:'dotBounce 1.2s ease 0.4s infinite'}}/>
             </div>
           </div>
         )}
@@ -906,11 +679,7 @@ function ChatPanel({onClose, items}){
 
       {/* Input */}
       <div style={{padding:'10px 12px',borderTop:'1px solid rgba(255,255,255,0.07)',display:'flex',gap:8,background:'rgba(15,10,40,0.92)',flexShrink:0}}>
-        <input
-          type="text" value={input}
-          onChange={e=>setInput(e.target.value)}
-          onKeyDown={onKey}
-          placeholder="Ask anything about this appâ€¦"
+        <input type="text" value={input} onChange={e=>setInput(e.target.value)} onKeyDown={onKey} placeholder="Ask anything about this app..."
           style={{flex:1,background:'rgba(2,6,23,0.9)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:10,padding:'8px 12px',fontSize:12,color:'#f1f5f9',outline:'none',fontFamily:'inherit',transition:'border-color 0.2s'}}
           onFocus={e=>e.target.style.borderColor='rgba(236,72,153,0.55)'}
           onBlur={e=>e.target.style.borderColor='rgba(255,255,255,0.1)'}
@@ -924,185 +693,109 @@ function ChatPanel({onClose, items}){
 }
 
 
-/* â”€â”€â”€ App â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ---- App ---- */
 function App(){
-  /* State */
-  const [items, setItems] = useState(()=>{
+  const [items,setItems]=useState(()=>{
     try{
-      const s = localStorage.getItem('cp_v5');
-      if(s){ const p=JSON.parse(s); if(Array.isArray(p) && p.length>0) return p; }
+      const s=localStorage.getItem('cp_v5');
+      if(s){const p=JSON.parse(s);if(Array.isArray(p)&&p.length>0)return p;}
     }catch(e){}
     return SEED;
   });
-  const [tab,      setTab]      = useState('all');
-  const [query,    setQuery]    = useState('');
-  const [omni,     setOmni]     = useState(false);
-  const [addOpen,  setAddOpen]  = useState(false);
-  const [toast,    setToast]    = useState(null);
-  const [expanded, setExpanded] = useState(null);
-  const [chatOpen, setChatOpen] = useState(false);
+  const [tab,setTab]=useState('all');
+  const [query,setQuery]=useState('');
+  const [omni,setOmni]=useState(false);
+  const [addOpen,setAddOpen]=useState(false);
+  const [toast,setToast]=useState(null);
+  const [expanded,setExpanded]=useState(null);
+  const [chatOpen,setChatOpen]=useState(false);
 
-  /* Persist to localStorage */
   useEffect(()=>{
-    try{ localStorage.setItem('cp_v5', JSON.stringify(items)); }catch(e){}
+    try{localStorage.setItem('cp_v5',JSON.stringify(items));}catch(e){}
   },[items]);
 
-  /* Global keyboard shortcuts */
   useEffect(()=>{
     function kd(e){
-      if((e.metaKey||e.ctrlKey) && e.key.toLowerCase()==='k'){
-        e.preventDefault(); setOmni(p=>!p);
-      }
-      if(e.key==='Escape'){
-        setOmni(false); setAddOpen(false); setExpanded(null);
-      }
+      if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();setOmni(p=>!p);}
+      if(e.key==='Escape'){setOmni(false);setAddOpen(false);setExpanded(null);}
     }
-    window.addEventListener('keydown', kd);
-    return ()=>window.removeEventListener('keydown', kd);
+    window.addEventListener('keydown',kd);
+    return ()=>window.removeEventListener('keydown',kd);
   },[]);
 
-  /* Toast helper */
-  function showToast(msg){
-    setToast(msg);
-    setTimeout(()=>setToast(null), 3000);
+  function showToast(msg){setToast(msg);setTimeout(()=>setToast(null),3000);}
+
+  function handleFav(id){setItems(p=>p.map(i=>i.id===id?{...i,favorite:!i.favorite}:i));showToast('Favourite updated');}
+  function handleDelete(id){setItems(p=>p.filter(i=>i.id!==id));showToast('Artifact deleted');}
+  function handleAdd(item){setItems(p=>[item,...p]);setAddOpen(false);showToast('Artifact indexed!');}
+
+  function handleDownload(item){
+    const text=item.snippet||item.title;
+    const blob=new Blob([text],{type:'text/plain'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download=item.title.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'.txt';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Snippet downloaded!');
   }
 
-  /* Handlers */
-  function handleFav(id){
-    setItems(p=>p.map(i=>i.id===id ? {...i,favorite:!i.favorite} : i));
-    showToast('â­ Favourite updated');
-  }
-  function handleDelete(id){
-    setItems(p=>p.filter(i=>i.id!==id));
-    showToast('ðŸ—‘ï¸ Artifact deleted');
-  }
-  function handleAdd(item){
-    setItems(p=>[item,...p]);
-    setAddOpen(false);
-    showToast('âœ¨ Artifact indexed!');
-  }
-  function handleDownload(item){
-    const text = item.snippet || item.title;
-    const blob = new Blob([text],{type:'text/plain'});
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href = url;
-    a.download = item.title.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'.txt';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    showToast('â¬‡ï¸ Snippet downloaded!');
-  }
   function fallbackCopy(text){
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
-    document.body.appendChild(ta);
-    ta.focus(); ta.select();
-    try{
-      const ok = document.execCommand('copy');
-      showToast(ok ? 'ðŸ“‹ Copied to clipboard!' : 'âš ï¸ Copy failed â€” try manually');
-    }catch(e){ showToast('âš ï¸ Copy not supported here'); }
+    const ta=document.createElement('textarea');
+    ta.value=text;ta.style.cssText='position:fixed;top:-9999px;left:-9999px;opacity:0;';
+    document.body.appendChild(ta);ta.focus();ta.select();
+    try{const ok=document.execCommand('copy');showToast(ok?'Copied to clipboard!':'Copy failed - try manually');}
+    catch(e){showToast('Copy not supported here');}
     document.body.removeChild(ta);
   }
+
   function handleCopy(item){
-    const text = item.snippet || item.title;
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(text)
-        .then(()=>showToast('ðŸ“‹ Copied to clipboard!'))
-        .catch(()=>fallbackCopy(text));
-    } else {
-      fallbackCopy(text);
-    }
+    const text=item.snippet||item.title;
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(()=>showToast('Copied to clipboard!')).catch(()=>fallbackCopy(text));
+    } else {fallbackCopy(text);}
   }
 
-  /* OmniSearch result â†’ open expand modal */
-  function handleOmniSelect(item){
-    setExpanded(item);
-  }
-
-  /* Filtered items */
-  const filtered = useMemo(()=>{
-    const q = query.trim().toLowerCase();
+  const filtered=useMemo(()=>{
+    const q=query.trim().toLowerCase();
     return items.filter(item=>{
-      const matchTab = tab==='all' || item.category===tab;
-      const matchQ   = !q ||
-        item.title.toLowerCase().includes(q) ||
-        item.description.toLowerCase().includes(q) ||
-        item.source.toLowerCase().includes(q) ||
-        (item.snippet && item.snippet.toLowerCase().includes(q)) ||
+      const matchTab=tab==='all'||item.category===tab;
+      const matchQ=!q||
+        item.title.toLowerCase().includes(q)||
+        item.description.toLowerCase().includes(q)||
+        item.source.toLowerCase().includes(q)||
+        (item.snippet&&item.snippet.toLowerCase().includes(q))||
         item.tags.some(t=>t.toLowerCase().includes(q));
-      return matchTab && matchQ;
+      return matchTab&&matchQ;
     });
-  },[items, tab, query]);
+  },[items,tab,query]);
 
-  const feedLabel = tab==='all' ? 'All Workspace Streams' : {
-    coders:'Coders Workspace', creators:'Creators Vault', leaders:'Executive Suite'
-  }[tab];
+  const feedLabel=tab==='all'?'All Workspace Streams':{coders:'Coders Workspace',creators:'Creators Vault',leaders:'Executive Suite'}[tab];
 
   return (
     <div style={{minHeight:'100vh',display:'flex',flexDirection:'column'}}>
+      {toast&&<Toast msg={toast}/>}
+      {omni&&<OmniSearch items={items} query={query} setQuery={setQuery} onClose={()=>setOmni(false)} onSelect={setExpanded}/>}
+      {addOpen&&<AddItemModal onClose={()=>setAddOpen(false)} onAdd={handleAdd}/>}
+      {expanded&&<ExpandModal item={expanded} onClose={()=>setExpanded(null)} onCopy={handleCopy} onDownload={handleDownload}/>}
 
-      {/* Toast */}
-      {toast && <Toast msg={toast}/>}
-
-      {/* OmniSearch overlay */}
-      {omni && (
-        <OmniSearch
-          items={items} query={query} setQuery={setQuery}
-          onClose={()=>setOmni(false)}
-          onSelect={handleOmniSelect}
-        />
-      )}
-
-      {/* Add artifact modal */}
-      {addOpen && <AddItemModal onClose={()=>setAddOpen(false)} onAdd={handleAdd}/>}
-
-      {/* Expand / detail modal */}
-      {expanded && (
-        <ExpandModal
-          item={expanded}
-          onClose={()=>setExpanded(null)}
-          onCopy={handleCopy}
-          onDownload={handleDownload}
-        />
-      )}
-
-      {/* Header */}
       <Header onAdd={()=>setAddOpen(true)} onSearch={()=>setOmni(true)}/>
 
-      {/* Main content */}
       <main style={{flex:1,maxWidth:1320,width:'100%',margin:'0 auto',padding:'28px 20px'}}>
         <div className="main-grid">
-          {/* Sidebar */}
           <Sidebar items={items} active={tab} setActive={setTab}/>
 
-          {/* Feed */}
           <section style={{display:'flex',flexDirection:'column',gap:20,minWidth:0}}>
-
             {/* Search banner */}
             <div className="glass" style={{borderRadius:22,padding:26,position:'relative',overflow:'hidden',border:'1px solid rgba(236,72,153,0.22)'}}>
               <div style={{position:'absolute',right:-50,top:-50,width:220,height:220,borderRadius:'50%',background:'radial-gradient(circle,rgba(236,72,153,0.2),transparent)',filter:'blur(40px)',pointerEvents:'none'}}/>
               <h2 className="grad-text" style={{fontWeight:900,fontSize:22,marginBottom:5}}>Infinite Context Engine</h2>
               <p style={{fontSize:13,color:'#64748b',marginBottom:16,fontWeight:500}}>Instant retrieval across your entire digital workspace.</p>
               <div style={{position:'relative'}}>
-                <span style={{position:'absolute',left:14,top:'50%',transform:'translateY(-50%)',pointerEvents:'none',display:'flex'}}>
-                  {IC.search({...SZ.md,color:'#f472b6'})}
-                </span>
-                <input
-                  type="text"
-                  value={query}
-                  onChange={e=>setQuery(e.target.value)}
-                  placeholder="Search by title, tag, keyword or platform…"
-                  className="field"
-                  style={{paddingLeft:42,fontSize:14,borderRadius:14,padding:'13px 14px 13px 42px'}}
-                />
-                {query && (
-                  <button onClick={()=>setQuery('')} style={{position:'absolute',right:12,top:'50%',transform:'translateY(-50%)',fontSize:11,fontWeight:700,color:'#f472b6',background:'none',border:'none',cursor:'pointer'}}>
-                    Clear
-                  </button>
-                )}
+                <span style={{position:'absolute',left:14,top:'50%',transform:'translateY(-50%)',pointerEvents:'none',display:'flex'}}>{IC.search({...SZ.md,color:'#f472b6'})}</span>
+                <input type="text" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search by title, tag, keyword or platform..." className="field" style={{paddingLeft:42,fontSize:14,borderRadius:14,padding:'13px 14px 13px 42px'}}/>
+                {query&&<button onClick={()=>setQuery('')} style={{position:'absolute',right:12,top:'50%',transform:'translateY(-50%)',fontSize:11,fontWeight:700,color:'#f472b6',background:'none',border:'none',cursor:'pointer'}}>Clear</button>}
               </div>
             </div>
 
@@ -1117,71 +810,36 @@ function App(){
               </span>
             </div>
 
-            {/* Cards or empty state */}
-            {filtered.length===0 ? (
+            {/* Cards */}
+            {filtered.length===0?(
               <div className="glass" style={{borderRadius:22,padding:'56px 20px',textAlign:'center',border:'1px dashed rgba(236,72,153,0.2)'}}>
-                <div style={{display:'flex',justifyContent:'center',marginBottom:14}}>
-                  {IC.inbox({width:44,height:44,color:'#ec4899',display:'block'})}
-                </div>
+                <div style={{display:'flex',justifyContent:'center',marginBottom:14}}>{IC.inbox({width:44,height:44,color:'#ec4899',display:'block'})}</div>
                 <p style={{fontWeight:700,color:'#cbd5e1',fontSize:14,marginBottom:4}}>No artifacts found</p>
                 <p style={{fontSize:12,color:'#475569'}}>Try a different search or add a new artifact.</p>
               </div>
-            ) : (
+            ):(
               <div className="cards-grid">
                 {filtered.map(item=>(
-                  <ArtifactCard
-                    key={item.id}
-                    item={item}
-                    onFav={handleFav}
-                    onDelete={handleDelete}
-                    onCopy={handleCopy}
-                    onDownload={handleDownload}
-                    onExpand={setExpanded}
-                  />
+                  <ArtifactCard key={item.id} item={item} onFav={handleFav} onDelete={handleDelete} onCopy={handleCopy} onDownload={handleDownload} onExpand={setExpanded}/>
                 ))}
               </div>
             )}
-
           </section>
         </div>
       </main>
 
-      {/* Chat FAB button */}
-      <button
-        onClick={()=>setChatOpen(p=>!p)}
-        title="Open AI Chat"
-        style={{
-          position:'fixed',bottom:24,left:24,zIndex:90,
-          width:52,height:52,borderRadius:'50%',
-          background: chatOpen
-            ? 'linear-gradient(135deg,#7c3aed,#ec4899)'
-            : 'linear-gradient(135deg,#ec4899,#7c3aed)',
-          border:'none',cursor:'pointer',
-          display:'flex',alignItems:'center',justifyContent:'center',
-          boxShadow:'0 6px 24px rgba(236,72,153,0.55)',
-          transition:'transform 0.2s, box-shadow 0.2s',
-        }}
+      {/* Chat FAB */}
+      <button onClick={()=>setChatOpen(p=>!p)} title="Open AI Chat" style={{position:'fixed',bottom:24,left:24,zIndex:90,width:52,height:52,borderRadius:'50%',background:chatOpen?'linear-gradient(135deg,#7c3aed,#ec4899)':'linear-gradient(135deg,#ec4899,#7c3aed)',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 6px 24px rgba(236,72,153,0.55)',transition:'transform 0.2s,box-shadow 0.2s'}}
         onMouseEnter={e=>{e.currentTarget.style.transform='scale(1.12)';e.currentTarget.style.boxShadow='0 8px 30px rgba(236,72,153,0.7)';}}
-        onMouseLeave={e=>{e.currentTarget.style.transform='scale(1)';e.currentTarget.style.boxShadow='0 6px 24px rgba(236,72,153,0.55)';}}
-      >
-        {chatOpen ? IC.x({...SZ.lg,color:'#fff'}) : IC.chat({...SZ.lg,color:'#fff'})}
+        onMouseLeave={e=>{e.currentTarget.style.transform='scale(1)';e.currentTarget.style.boxShadow='0 6px 24px rgba(236,72,153,0.55)';}}>
+        {chatOpen?IC.x({...SZ.lg,color:'#fff'}):IC.chat({...SZ.lg,color:'#fff'})}
       </button>
 
-      {/* Chat panel */}
-      {chatOpen && <ChatPanel onClose={()=>setChatOpen(false)} items={items}/>}
-
+      {chatOpen&&<ChatPanel onClose={()=>setChatOpen(false)} items={items}/>}
     </div>
   );
 }
 
-
-/* ─── Mount ──────────────────────────────────────────────────────────────── */
-ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
-</script>
-</body>
-</html>
-
-/* ─── Mount ──────────────────────────────────────────────────────────────── */
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>
