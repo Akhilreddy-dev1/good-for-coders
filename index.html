@@ -1,1213 +1,1188 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ContextPulse — Lumina OS</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ContextPulse â€” Lumina OS</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-        * { box-sizing: border-box; }
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#030014;color:#f8fafc;overflow-x:hidden;min-height:100vh;}
+.mono{font-family:'JetBrains Mono',monospace;}
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #030014;
-            color: #f8fafc;
-            overflow-x: hidden;
-        }
+/* Glass */
+.glass{
+  background:linear-gradient(135deg,rgba(20,18,50,0.88),rgba(10,8,30,0.96));
+  backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+  border:1px solid rgba(236,72,153,0.2);
+  box-shadow:0 16px 48px rgba(0,0,0,0.55);
+}
+.glass-card{
+  background:linear-gradient(135deg,rgba(20,18,50,0.88),rgba(10,8,30,0.96));
+  backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+  border:1px solid rgba(236,72,153,0.18);
+  box-shadow:0 16px 48px rgba(0,0,0,0.55);
+  border-radius:22px;
+  transition:all 0.35s cubic-bezier(0.16,1,0.3,1);
+}
+.glass-card:hover{
+  border-color:rgba(236,72,153,0.55);
+  box-shadow:0 28px 64px rgba(236,72,153,0.18),0 8px 24px rgba(0,0,0,0.5);
+  transform:translateY(-4px);
+}
 
-        .mono { font-family: 'JetBrains Mono', monospace; }
+/* Fields */
+.field{
+  width:100%;
+  background:rgba(2,6,23,0.92);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:10px;
+  padding:9px 14px;
+  font-size:13px;
+  color:#f1f5f9;
+  outline:none;
+  transition:border-color 0.2s;
+  font-family:'Plus Jakarta Sans',sans-serif;
+}
+.field:focus{border-color:rgba(236,72,153,0.65);}
+select.field{cursor:pointer;}
+textarea.field{resize:vertical;}
 
-        /* Glass cards */
-        .glass {
-            background: linear-gradient(135deg, rgba(20,18,50,0.82) 0%, rgba(10,8,30,0.94) 100%);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(236,72,153,0.2);
-            box-shadow: 0 16px 48px rgba(0,0,0,0.6);
-        }
-        .glass-hover {
-            background: linear-gradient(135deg, rgba(20,18,50,0.82) 0%, rgba(10,8,30,0.94) 100%);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(236,72,153,0.2);
-            box-shadow: 0 16px 48px rgba(0,0,0,0.6);
-            transition: all 0.3s ease;
-        }
-        .glass-hover:hover {
-            border-color: rgba(236,72,153,0.5);
-            box-shadow: 0 24px 60px rgba(236,72,153,0.18);
-            transform: translateY(-3px);
-        }
+/* Text clamp */
+.clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 
-        /* Ambient orbs */
-        .orb {
-            position: fixed;
-            pointer-events: none;
-            z-index: 0;
-            border-radius: 9999px;
-        }
-        .orb1 {
-            top: -10%; left: 5%;
-            width: 600px; height: 600px;
-            background: radial-gradient(circle, rgba(168,85,247,0.35) 0%, transparent 70%);
-            filter: blur(80px);
-            animation: float1 12s ease-in-out infinite;
-        }
-        .orb2 {
-            top: 30%; right: 0%;
-            width: 700px; height: 700px;
-            background: radial-gradient(circle, rgba(236,72,153,0.28) 0%, transparent 70%);
-            filter: blur(90px);
-            animation: float2 16s ease-in-out infinite;
-        }
-        .orb3 {
-            bottom: -10%; left: 25%;
-            width: 650px; height: 650px;
-            background: radial-gradient(circle, rgba(6,182,212,0.22) 0%, transparent 70%);
-            filter: blur(100px);
-            animation: float3 20s ease-in-out infinite;
-        }
+/* Overlays */
+.overlay{
+  position:fixed;inset:0;z-index:50;
+  background:rgba(0,0,0,0.78);
+  backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;
+  padding:16px;
+  animation:fadeOv 0.2s ease both;
+}
+.overlay-top{align-items:flex-start;padding-top:72px;}
 
-        @keyframes float1 {
-            0%,100% { transform: translate(0,0); }
-            50%      { transform: translate(50px,-70px); }
-        }
-        @keyframes float2 {
-            0%,100% { transform: translate(0,0); }
-            50%      { transform: translate(-60px,50px); }
-        }
-        @keyframes float3 {
-            0%,100% { transform: translate(0,0); }
-            50%      { transform: translate(40px,60px); }
-        }
-        @keyframes slideUp {
-            from { opacity:0; transform: translateY(14px); }
-            to   { opacity:1; transform: translateY(0); }
-        }
-        @keyframes popIn {
-            from { opacity:0; transform: scale(0.95); }
-            to   { opacity:1; transform: scale(1); }
-        }
-        @keyframes pulse-bar {
-            0%,100% { opacity:1; }
-            50%      { opacity:0.5; }
-        }
+/* Ambient orbs */
+.orb{position:fixed;pointer-events:none;z-index:0;border-radius:9999px;}
+.orb1{top:-12%;left:4%;width:620px;height:620px;background:radial-gradient(circle,rgba(168,85,247,0.38),transparent 70%);filter:blur(90px);animation:f1 13s ease-in-out infinite;}
+.orb2{top:28%;right:-2%;width:720px;height:720px;background:radial-gradient(circle,rgba(236,72,153,0.3),transparent 70%);filter:blur(100px);animation:f2 17s ease-in-out infinite;}
+.orb3{bottom:-12%;left:22%;width:680px;height:680px;background:radial-gradient(circle,rgba(6,182,212,0.22),transparent 70%);filter:blur(110px);animation:f3 21s ease-in-out infinite;}
 
-        .anim-slide-up { animation: slideUp 0.3s ease both; }
-        .anim-pop-in   { animation: popIn  0.25s cubic-bezier(0.16,1,0.3,1) both; }
+@keyframes f1{0%,100%{transform:translate(0,0)}50%{transform:translate(55px,-75px)}}
+@keyframes f2{0%,100%{transform:translate(0,0)}50%{transform:translate(-65px,55px)}}
+@keyframes f3{0%,100%{transform:translate(0,0)}50%{transform:translate(45px,65px)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{from{opacity:0;transform:scale(0.93)}to{opacity:1;transform:scale(1)}}
+@keyframes fadeOv{from{opacity:0}to{opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}
+@keyframes dot1{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
+@keyframes dot2{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
+@keyframes dot3{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
 
-        /* Inputs */
-        .field {
-            width: 100%;
-            background: rgba(2,6,23,0.92);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 9px 14px;
-            font-size: 13px;
-            color: #f1f5f9;
-            outline: none;
-            transition: border-color 0.2s;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-        .field:focus { border-color: rgba(236,72,153,0.65); }
-        select.field { cursor: pointer; }
-        textarea.field { resize: vertical; }
+.anim-slide-up{animation:slideUp 0.3s ease both;}
+.anim-pop-in{animation:popIn 0.28s cubic-bezier(0.16,1,0.3,1) both;}
 
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #030014; }
-        ::-webkit-scrollbar-thumb { background: rgba(236,72,153,0.3); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(236,72,153,0.6); }
+/* Scrollbar */
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(236,72,153,0.28);border-radius:4px;}
+::-webkit-scrollbar-thumb:hover{background:rgba(236,72,153,0.55);}
 
-        /* Line clamp */
-        .clamp2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+/* Responsive grid */
+.main-grid{
+  display:grid;
+  grid-template-columns:240px 1fr;
+  gap:24px;
+}
+.cards-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
+}
+@media(max-width:1024px){
+  .main-grid{grid-template-columns:1fr;}
+  .sidebar-aside{display:none;}
+}
+@media(max-width:640px){
+  .cards-grid{grid-template-columns:1fr;}
+}
 
-        /* Overlay backdrop */
-        .overlay {
-            position: fixed; inset: 0; z-index: 50;
-            background: rgba(0,0,0,0.72);
-            backdrop-filter: blur(10px);
-            display: flex; align-items: center; justify-content: center;
-            padding: 16px;
-            animation: fadeOverlay 0.2s ease both;
-        }
-        .overlay-top { align-items: flex-start; padding-top: 80px; }
-        @keyframes fadeOverlay {
-            from { opacity:0; }
-            to   { opacity:1; }
-        }
-    </style>
+/* Tag badge */
+.tag{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;font-weight:700;
+  padding:2px 9px;border-radius:6px;
+  background:rgba(236,72,153,0.1);
+  border:1px solid rgba(236,72,153,0.22);
+  color:#f472b6;
+  display:inline-block;
+}
+
+/* Gradient text */
+.grad-text{
+  background:linear-gradient(to right,#fff,#f9a8d4,#d8b4fe);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+</style>
 </head>
-<body style="position:relative; min-height:100vh;">
-
+<body>
 <div class="orb orb1"></div>
 <div class="orb orb2"></div>
 <div class="orb orb3"></div>
-
-<div id="root" style="position:relative; z-index:1;"></div>
-
+<div id="root" style="position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;"></div>
 <script type="text/babel">
 const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
 
-// ── SVG Icons — NO React fragments, each icon is a single <svg> ─────────────
-const icons = {
-    zap: (c) => (
-        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-        </svg>
-    ),
-    search: (c) => (
-        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-        </svg>
-    ),
-    plus: (c) => (
-        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-            <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
-    ),
-    x: (c) => (
-        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-            <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
-    ),
-    star: (c, filled) => (
-        <svg className={c} viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-        </svg>
-    ),
-    trash: (c) => (
-        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-            <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M9 6V4h6v2" />
-        </svg>
-    ),
-    copy: (c) => (
-        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-            <rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-        </svg>
-    ),
-    code: (c) => (
-        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-            <polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" />
-        </svg>
-    ),
-    video: (c) => (
-        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-            <polygon points="23 7 16 12 23 17 23 7" /><rect x="1" y="5" width="15" height="14" rx="2" />
-        </svg>
-    ),
-    briefcase: (c) => (
-        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-            <rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
-        </svg>
-    ),
-    grid: (c) => (
-        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-            <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
-        </svg>
-    ),
-    cpu: (c) => (
-        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-            <rect x="4" y="4" width="16" height="16" rx="2" /><rect x="9" y="9" width="6" height="6" /><line x1="9" y1="1" x2="9" y2="4" /><line x1="15" y1="1" x2="15" y2="4" /><line x1="9" y1="20" x2="9" y2="23" /><line x1="15" y1="20" x2="15" y2="23" /><line x1="20" y1="9" x2="23" y2="9" /><line x1="20" y1="14" x2="23" y2="14" /><line x1="1" y1="9" x2="4" y2="9" /><line x1="1" y1="14" x2="4" y2="14" />
-        </svg>
-    ),
-    layers: (c) => (
-        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-            <polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 17 12 22 22 17" /><polyline points="2 12 12 17 22 12" />
-        </svg>
-    ),
-    empty: (c) => (
-        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /><line x1="12" y1="11" x2="12" y2="17" /><line x1="9" y1="14" x2="15" y2="14" />
-        </svg>
-    ),
-    sparkle: (c) => (
-        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
-        </svg>
-    ),
-    download: (c) => (
-        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
-        </svg>
-    ),
-    expand: (c) => (
-        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
-        </svg>
-    ),
-    chat: (c) => (
-        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-        </svg>
-    ),
-    send: (c) => (
-        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-            <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
-        </svg>
-    ),
+/* â”€â”€â”€ SVG Icons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+const IC = {
+  zap:      (s)=><svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
+  search:   (s)=><svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
+  plus:     (s)=><svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+  x:        (s)=><svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+  star:     (s,f)=><svg style={s} viewBox="0 0 24 24" fill={f?'currentColor':'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+  trash:    (s)=><svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>,
+  copy:     (s)=><svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>,
+  code:     (s)=><svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>,
+  video:    (s)=><svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>,
+  brief:    (s)=><svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>,
+  grid:     (s)=><svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>,
+  cpu:      (s)=><svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>,
+  layers:   (s)=><svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>,
+  sparkle:  (s)=><svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>,
+  download: (s)=><svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>,
+  expand:   (s)=><svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>,
+  chat:     (s)=><svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>,
+  send:     (s)=><svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>,
+  inbox:    (s)=><svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>,
+  check:    (s)=><svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
 };
 
-// ── Seed data ────────────────────────────────────────────────────────────────
+/* icon size helper â€” returns a plain style object, avoids relying on Tailwind JIT for SVG */
+const SZ = {
+  xs:  {width:12,height:12,display:'block',flexShrink:0},
+  sm:  {width:14,height:14,display:'block',flexShrink:0},
+  md:  {width:16,height:16,display:'block',flexShrink:0},
+  lg:  {width:20,height:20,display:'block',flexShrink:0},
+  xl:  {width:24,height:24,display:'block',flexShrink:0},
+  xxl: {width:32,height:32,display:'block',flexShrink:0},
+};
+
+/* â”€â”€â”€ Seed Data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 const SEED = [
-    {
-        id: 'ctx-1',
-        title: 'Stripe Webhook Handler v2',
-        category: 'coders',
-        source: 'GitHub Gist',
-        image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80',
-        snippet: "app.post('/webhook', express.raw({type: 'application/json'}), async (req, res) => {\n  const event = stripe.webhooks.constructEvent(req.body, sig, secret);\n  // Handle fulfillment\n});",
-        description: 'Enterprise-grade async event processor for subscription renewals and edge runtime failures.',
-        metadata: 'Repo: saas-core • 12m ago',
-        favorite: true,
-        tags: ['#Backend', '#Stripe', '#NodeJS', '#Security']
-    },
-    {
-        id: 'ctx-2',
-        title: 'Brand Guidelines & 4K B-Roll Pack',
-        category: 'creators',
-        source: 'Google Drive',
-        image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80',
-        snippet: 'Primary: #030014 (DeepVoid), #ec4899 (Neon Pink), #a855f7 (Purple).\nFont: Plus Jakarta Sans.',
-        description: '4K raw assets, typography configs, and cinematic color grading LUTs for global launch.',
-        metadata: 'Size: 1.4 GB • 1h ago',
-        favorite: false,
-        tags: ['#BrandAssets', '#ColorGrading', '#YouTube']
-    },
-    {
-        id: 'ctx-3',
-        title: 'Q3 Budget Realignment Decision',
-        category: 'leaders',
-        source: 'Executive Sync',
-        image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&auto=format&fit=crop&q=80',
-        snippet: '1. Reallocate 40% capex to AI compute clusters.\n2. Department signoffs due Friday.',
-        description: 'Board agreement on pivoting quarterly infrastructure investments toward ML compute nodes.',
-        metadata: 'Meeting: Boardroom • 3h ago',
-        favorite: true,
-        tags: ['#Strategy', '#BudgetQ3', '#AI']
-    },
-    {
-        id: 'ctx-4',
-        title: 'API Rate Limiting Architecture',
-        category: 'coders',
-        source: 'Notion Spec',
-        image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80',
-        snippet: 'MAX_REQUESTS = 150 per 60s window\nBackend: Redis token bucket algorithm.',
-        description: 'Distributed rate-limiting spec using Redis sorted sets for public developer API keys.',
-        metadata: 'Space: Engineering • Yesterday',
-        favorite: false,
-        tags: ['#Architecture', '#Redis', '#API']
-    }
+  {
+    id:'ctx-1', title:'Stripe Webhook Handler v2', category:'coders', source:'GitHub Gist',
+    image:'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80',
+    snippet:"app.post('/webhook', express.raw({type:'application/json'}), async (req,res)=>{\n  const sig = req.headers['stripe-signature'];\n  const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_SECRET);\n  if(event.type === 'checkout.session.completed') await fulfillOrder(event.data.object);\n  res.json({received:true});\n});",
+    description:'Enterprise-grade async event processor for subscription renewals and edge runtime failures.',
+    metadata:'Repo: saas-core â€¢ 12m ago', favorite:true,
+    tags:['#Backend','#Stripe','#NodeJS','#Security'],
+  },
+  {
+    id:'ctx-2', title:'Brand Guidelines & 4K B-Roll Pack', category:'creators', source:'Google Drive',
+    image:'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80',
+    snippet:'Primary: #030014 (DeepVoid)\nAccent:  #ec4899 (Neon Pink)\nPurple:  #a855f7\nFont: Plus Jakarta Sans â€” weights 400/700/800\nHeadline size: 72px / line-height: 1.1',
+    description:'4K raw assets, typography configs, and cinematic color grading LUTs for global launch.',
+    metadata:'Size: 1.4 GB â€¢ 1h ago', favorite:false,
+    tags:['#BrandAssets','#ColorGrading','#YouTube'],
+  },
+  {
+    id:'ctx-3', title:'Q3 Budget Realignment Decision', category:'leaders', source:'Executive Sync',
+    image:'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&auto=format&fit=crop&q=80',
+    snippet:'RESOLUTION â€” Q3 Budget Realignment:\n1. Reallocate 40% capex â†’ AI compute clusters\n2. Reduce legacy infra spend by 25%\n3. Department heads sign off by Friday EOD\n4. CFO to present revised forecast Monday',
+    description:'Board agreement on pivoting quarterly infrastructure investments toward ML compute nodes.',
+    metadata:'Meeting: Boardroom â€¢ 3h ago', favorite:true,
+    tags:['#Strategy','#BudgetQ3','#AI'],
+  },
+  {
+    id:'ctx-4', title:'API Rate Limiting Architecture', category:'coders', source:'Notion Spec',
+    image:'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80',
+    snippet:'// Redis token-bucket rate limiter\nconst MAX_REQUESTS = 150;\nconst WINDOW_MS    = 60_000;\n\nasync function checkRateLimit(apiKey) {\n  const key = `ratelimit:${apiKey}`;\n  const now = Date.now();\n  await redis.zremrangebyscore(key, 0, now - WINDOW_MS);\n  const count = await redis.zcard(key);\n  if(count >= MAX_REQUESTS) throw new Error("Rate limit exceeded");\n  await redis.zadd(key, now, now);\n  await redis.expire(key, 60);\n}',
+    description:'Distributed rate-limiting spec using Redis sorted sets for public developer API keys.',
+    metadata:'Space: Engineering â€¢ Yesterday', favorite:false,
+    tags:['#Architecture','#Redis','#API'],
+  },
 ];
 
-// ── Toast ────────────────────────────────────────────────────────────────────
-function Toast({ msg }) {
-    return (
-        <div className="anim-slide-up" style={{
-            position:'fixed', bottom:'24px', right:'24px', zIndex:100,
-            display:'flex', alignItems:'center', gap:'10px',
-            padding:'12px 20px', borderRadius:'16px',
-            background:'linear-gradient(135deg,rgba(88,28,135,0.97),rgba(157,23,77,0.97))',
-            border:'1px solid rgba(236,72,153,0.5)',
-            boxShadow:'0 8px 32px rgba(0,0,0,0.5)'
-        }}>
-            <span style={{
-                width:'8px', height:'8px', borderRadius:'50%',
-                background:'#f472b6', flexShrink:0,
-                animation:'pulse-bar 1s ease infinite'
-            }}></span>
-            <span style={{fontSize:'12px', fontWeight:700, color:'#fff'}}>{msg}</span>
+
+/* â”€â”€â”€ Toast â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+function Toast({msg}){
+  return (
+    <div className="anim-slide-up" style={{
+      position:'fixed',bottom:28,right:28,zIndex:200,
+      display:'flex',alignItems:'center',gap:10,
+      padding:'11px 18px',borderRadius:14,
+      background:'linear-gradient(135deg,rgba(88,28,135,0.97),rgba(157,23,77,0.97))',
+      border:'1px solid rgba(236,72,153,0.45)',
+      boxShadow:'0 8px 32px rgba(0,0,0,0.55)',
+    }}>
+      <span style={{width:7,height:7,borderRadius:'50%',background:'#f472b6',flexShrink:0,animation:'pulse 1s ease infinite'}}/>
+      <span style={{fontSize:12,fontWeight:700,color:'#fff'}}>{msg}</span>
+    </div>
+  );
+}
+
+/* â”€â”€â”€ OmniSearch â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+function OmniSearch({items, query, setQuery, onClose, onSelect}){
+  const inputRef = useRef(null);
+  useEffect(()=>{ setTimeout(()=>inputRef.current&&inputRef.current.focus(), 40); },[]);
+
+  const results = useMemo(()=>{
+    const q = query.trim().toLowerCase();
+    if(!q) return items.slice(0,7);
+    return items.filter(i=>(
+      i.title.toLowerCase().includes(q) ||
+      i.description.toLowerCase().includes(q) ||
+      i.source.toLowerCase().includes(q) ||
+      (i.snippet && i.snippet.toLowerCase().includes(q)) ||
+      i.tags.some(t=>t.toLowerCase().includes(q))
+    ));
+  },[items,query]);
+
+  function pick(item){
+    setQuery('');   /* clear search so "all" cards show, then highlight */
+    onSelect(item);
+    onClose();
+  }
+
+  return (
+    <div className="overlay overlay-top" onClick={onClose}>
+      <div className="glass anim-pop-in" onClick={e=>e.stopPropagation()} style={{
+        width:'100%',maxWidth:560,borderRadius:24,padding:22,
+        border:'1px solid rgba(236,72,153,0.45)',
+      }}>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',paddingBottom:14,borderBottom:'1px solid rgba(255,255,255,0.08)',marginBottom:14}}>
+          <div style={{display:'flex',alignItems:'center',gap:8}}>
+            {IC.search({...SZ.sm,color:'#f472b6'})}
+            <span style={{fontWeight:800,fontSize:14,color:'#fff'}}>Omni Search</span>
+          </div>
+          <button onClick={onClose} style={{fontSize:11,fontWeight:700,color:'#94a3b8',padding:'3px 10px',borderRadius:8,background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',cursor:'pointer'}}>ESC</button>
         </div>
-    );
-}
-
-// ── OmniSearch modal ─────────────────────────────────────────────────────────
-function OmniSearch({ items, query, setQuery, onClose }) {
-    const ref = useRef(null);
-    useEffect(() => { setTimeout(() => ref.current && ref.current.focus(), 40); }, []);
-
-    const results = useMemo(() => {
-        const q = query.trim().toLowerCase();
-        if (!q) return items.slice(0, 6);
-        return items.filter(function(i) {
-            return i.title.toLowerCase().indexOf(q) > -1
-                || i.description.toLowerCase().indexOf(q) > -1
-                || i.source.toLowerCase().indexOf(q) > -1
-                || i.tags.some(function(t) { return t.toLowerCase().indexOf(q) > -1; })
-                || (i.snippet && i.snippet.toLowerCase().indexOf(q) > -1);
-        });
-    }, [items, query]);
-
-    return (
-        <div className="overlay overlay-top" onClick={onClose}>
-            <div className="glass anim-pop-in" onClick={function(e){ e.stopPropagation(); }} style={{
-                width:'100%', maxWidth:'560px', borderRadius:'24px', padding:'24px',
-                border:'1px solid rgba(236,72,153,0.45)'
-            }}>
-                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',paddingBottom:'16px',borderBottom:'1px solid rgba(255,255,255,0.08)',marginBottom:'16px'}}>
-                    <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
-                        {icons.search('w-4 h-4 text-pink-400')}
-                        <span style={{fontWeight:800,fontSize:'14px',color:'#fff'}}>Omni-Search</span>
-                    </div>
-                    <button onClick={onClose} style={{fontSize:'11px',fontWeight:700,color:'#94a3b8',padding:'4px 10px',borderRadius:'8px',background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',cursor:'pointer'}}>ESC</button>
-                </div>
-                <div style={{position:'relative',marginBottom:'14px'}}>
-                    <div style={{position:'absolute',left:'12px',top:'50%',transform:'translateY(-50%)',pointerEvents:'none'}}>
-                        {icons.search('w-4 h-4 text-pink-400')}
-                    </div>
-                    <input ref={ref} type="text" value={query} onChange={function(e){ setQuery(e.target.value); }}
-                        placeholder="Search across all workspaces..."
-                        className="field" style={{paddingLeft:'38px'}} />
-                </div>
-                <div style={{maxHeight:'260px',overflowY:'auto'}}>
-                    {results.length === 0 ? (
-                        <p style={{textAlign:'center',color:'#64748b',fontSize:'12px',padding:'24px 0'}}>No results found.</p>
-                    ) : results.map(function(item) {
-                        return (
-                            <div key={item.id} onClick={function(){ setQuery(item.title); onClose(); }}
-                                style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'10px 12px',borderRadius:'12px',cursor:'pointer',border:'1px solid transparent',marginBottom:'4px',transition:'all 0.15s'}}
-                                onMouseEnter={function(e){ e.currentTarget.style.background='rgba(255,255,255,0.05)'; e.currentTarget.style.borderColor='rgba(236,72,153,0.2)'; }}
-                                onMouseLeave={function(e){ e.currentTarget.style.background='transparent'; e.currentTarget.style.borderColor='transparent'; }}>
-                                <div>
-                                    <p style={{fontWeight:700,fontSize:'12px',color:'#f1f5f9'}}>{item.title}</p>
-                                    <p style={{fontSize:'10px',color:'#64748b',marginTop:'2px'}}>{item.source} · {item.category}</p>
-                                </div>
-                                <span style={{fontSize:'10px',fontFamily:'monospace',color:'#f472b6',background:'rgba(236,72,153,0.1)',padding:'2px 8px',borderRadius:'20px',border:'1px solid rgba(236,72,153,0.2)',flexShrink:0}}>Open</span>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
+        <div style={{position:'relative',marginBottom:12}}>
+          <span style={{position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',pointerEvents:'none',display:'flex'}}>
+            {IC.search({...SZ.sm,color:'#f472b6'})}
+          </span>
+          <input ref={inputRef} type="text" value={query} onChange={e=>setQuery(e.target.value)}
+            placeholder="Search title, tag, keyword, sourceâ€¦"
+            className="field" style={{paddingLeft:36}}/>
         </div>
-    );
-}
-
-
-// ── AddItemModal ─────────────────────────────────────────────────────────────
-function AddItemModal({ onClose, onAdd }) {
-    const [title,    setTitle]   = useState('');
-    const [category, setCat]     = useState('coders');
-    const [source,   setSource]  = useState('');
-    const [desc,     setDesc]    = useState('');
-    const [snippet,  setSnippet] = useState('');
-    const [tags,     setTags]    = useState('');
-    const [image,    setImage]   = useState('');
-    const [err,      setErr]     = useState('');
-
-    function submit(e) {
-        e.preventDefault();
-        if (!title.trim()) { setErr('Title is required.'); return; }
-        setErr('');
-        var parsedTags = tags
-            ? tags.split(',').map(function(t) {
-                var c = t.trim();
-                return c.startsWith('#') ? c : '#' + c;
-              }).filter(function(t){ return t.length > 1; })
-            : ['#Custom'];
-        onAdd({
-            id: 'ctx-' + Date.now(),
-            title: title.trim(),
-            category: category,
-            source: source.trim() || 'Manual Entry',
-            image: image.trim() || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80',
-            snippet: snippet.trim(),
-            description: desc.trim() || 'No description provided.',
-            metadata: 'Created: Just now',
-            favorite: false,
-            tags: parsedTags
-        });
-    }
-
-    var lbl = { display:'block', fontSize:'10px', fontWeight:800, textTransform:'uppercase', letterSpacing:'0.08em', color:'#f472b6', marginBottom:'6px' };
-
-    return (
-        <div className="overlay" onClick={onClose}>
-            <div className="glass anim-pop-in" onClick={function(e){ e.stopPropagation(); }} style={{
-                width:'100%', maxWidth:'500px', borderRadius:'24px', padding:'24px',
-                border:'1px solid rgba(236,72,153,0.4)', maxHeight:'92vh', overflowY:'auto'
-            }}>
-                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',paddingBottom:'16px',borderBottom:'1px solid rgba(255,255,255,0.08)',marginBottom:'20px'}}>
-                    <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
-                        <div style={{width:'32px',height:'32px',borderRadius:'10px',background:'linear-gradient(135deg,#ec4899,#7c3aed)',display:'flex',alignItems:'center',justifyContent:'center'}}>
-                            {icons.sparkle('w-4 h-4 text-white')}
-                        </div>
-                        <span style={{fontWeight:800,fontSize:'14px',color:'#fff'}}>Add Context Artifact</span>
-                    </div>
-                    <button onClick={onClose} style={{padding:'6px',borderRadius:'10px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',cursor:'pointer',color:'#94a3b8',display:'flex'}}>
-                        {icons.x('w-4 h-4')}
-                    </button>
+        <div style={{maxHeight:280,overflowY:'auto',display:'flex',flexDirection:'column',gap:3}}>
+          {results.length===0
+            ? <p style={{textAlign:'center',color:'#475569',fontSize:12,padding:'28px 0'}}>No results found.</p>
+            : results.map(item=>(
+              <button key={item.id} onClick={()=>pick(item)} style={{
+                display:'flex',alignItems:'center',justifyContent:'space-between',
+                padding:'10px 12px',borderRadius:12,cursor:'pointer',
+                border:'1px solid transparent',background:'transparent',
+                textAlign:'left',width:'100%',transition:'all 0.15s',
+              }}
+              onMouseEnter={e=>{e.currentTarget.style.background='rgba(255,255,255,0.05)';e.currentTarget.style.borderColor='rgba(236,72,153,0.2)';}}
+              onMouseLeave={e=>{e.currentTarget.style.background='transparent';e.currentTarget.style.borderColor='transparent';}}>
+                <div>
+                  <p style={{fontWeight:700,fontSize:12,color:'#f1f5f9'}}>{item.title}</p>
+                  <p style={{fontSize:10,color:'#64748b',marginTop:2}}>{item.source} Â· {item.category}</p>
                 </div>
-
-                {err && (
-                    <div style={{marginBottom:'14px',padding:'10px 14px',background:'rgba(239,68,68,0.12)',border:'1px solid rgba(239,68,68,0.35)',borderRadius:'10px',color:'#fca5a5',fontSize:'12px',fontWeight:600}}>
-                        {err}
-                    </div>
-                )}
-
-                <form onSubmit={submit}>
-                    <div style={{marginBottom:'14px'}}>
-                        <label style={lbl}>Title *</label>
-                        <input type="text" value={title} onChange={function(e){setTitle(e.target.value);}} placeholder="e.g. JWT Auth Middleware" className="field" />
-                    </div>
-                    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px',marginBottom:'14px'}}>
-                        <div>
-                            <label style={lbl}>Workspace</label>
-                            <select value={category} onChange={function(e){setCat(e.target.value);}} className="field">
-                                <option value="coders">Coders</option>
-                                <option value="creators">Creators</option>
-                                <option value="leaders">Leaders</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label style={lbl}>Source</label>
-                            <input type="text" value={source} onChange={function(e){setSource(e.target.value);}} placeholder="GitHub, Notion..." className="field" />
-                        </div>
-                    </div>
-                    <div style={{marginBottom:'14px'}}>
-                        <label style={lbl}>Description</label>
-                        <textarea rows="2" value={desc} onChange={function(e){setDesc(e.target.value);}} placeholder="Brief summary..." className="field" />
-                    </div>
-                    <div style={{marginBottom:'14px'}}>
-                        <label style={lbl}>Code / Snippet</label>
-                        <textarea rows="3" value={snippet} onChange={function(e){setSnippet(e.target.value);}} placeholder="const token = req.headers.authorization;" className="field mono" style={{fontSize:'12px',color:'#f9a8d4'}} />
-                    </div>
-                    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px',marginBottom:'20px'}}>
-                        <div>
-                            <label style={lbl}>Tags (comma-separated)</label>
-                            <input type="text" value={tags} onChange={function(e){setTags(e.target.value);}} placeholder="#Auth, #Security" className="field" />
-                        </div>
-                        <div>
-                            <label style={lbl}>Image URL</label>
-                            <input type="text" value={image} onChange={function(e){setImage(e.target.value);}} placeholder="https://..." className="field" />
-                        </div>
-                    </div>
-                    <div style={{display:'flex',justifyContent:'flex-end',gap:'10px'}}>
-                        <button type="button" onClick={onClose} style={{padding:'8px 16px',borderRadius:'10px',fontSize:'12px',fontWeight:700,background:'rgba(255,255,255,0.05)',color:'#94a3b8',border:'1px solid rgba(255,255,255,0.08)',cursor:'pointer'}}>Cancel</button>
-                        <button type="submit" style={{padding:'8px 18px',borderRadius:'10px',fontSize:'12px',fontWeight:700,background:'linear-gradient(135deg,#db2777,#7c3aed)',color:'#fff',border:'none',cursor:'pointer',display:'flex',alignItems:'center',gap:'6px',boxShadow:'0 4px 16px rgba(219,39,119,0.35)'}}>
-                            {icons.plus('w-3.5 h-3.5')}
-                            Index Artifact
-                        </button>
-                    </div>
-                </form>
-            </div>
+                <span style={{fontSize:10,fontFamily:'monospace',color:'#f472b6',background:'rgba(236,72,153,0.1)',padding:'2px 8px',borderRadius:20,border:'1px solid rgba(236,72,153,0.2)',flexShrink:0,marginLeft:8}}>View</span>
+              </button>
+            ))
+          }
         </div>
-    );
+      </div>
+    </div>
+  );
 }
 
-// ── Header ───────────────────────────────────────────────────────────────────
-function Header({ onAdd, onSearch }) {
-    return (
-        <header style={{
-            position:'sticky', top:0, zIndex:40,
-            background:'rgba(3,0,20,0.88)', backdropFilter:'blur(28px)',
-            borderBottom:'1px solid rgba(255,255,255,0.07)'
-        }}>
-            <div style={{maxWidth:'1280px',margin:'0 auto',padding:'0 20px',height:'66px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+/* â”€â”€â”€ AddItemModal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+function AddItemModal({onClose, onAdd}){
+  const [title,  setTitle]  = useState('');
+  const [cat,    setCat]    = useState('coders');
+  const [source, setSource] = useState('');
+  const [desc,   setDesc]   = useState('');
+  const [snippet,setSnippet]= useState('');
+  const [tags,   setTags]   = useState('');
+  const [image,  setImage]  = useState('');
+  const [err,    setErr]    = useState('');
 
-                {/* Logo */}
-                <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
-                    <div style={{width:'40px',height:'40px',borderRadius:'14px',background:'linear-gradient(135deg,#ec4899,#7c3aed,#6366f1)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 4px 20px rgba(236,72,153,0.4)'}}>
-                        {icons.zap('w-5 h-5 text-white')}
-                    </div>
-                    <div>
-                        <div style={{fontWeight:800,fontSize:'18px',lineHeight:1.2,background:'linear-gradient(to right,#fff,#f9a8d4,#d8b4fe)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>
-                            ContextPulse
-                        </div>
-                        <div style={{fontSize:'9px',fontWeight:900,textTransform:'uppercase',letterSpacing:'0.1em',padding:'1px 8px',borderRadius:'20px',background:'rgba(236,72,153,0.12)',color:'#f9a8d4',border:'1px solid rgba(236,72,153,0.3)',display:'inline-block'}}>
-                            Lumina OS v5
-                        </div>
-                    </div>
-                </div>
-
-                {/* Actions */}
-                <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
-                    <button onClick={onAdd} style={{display:'flex',alignItems:'center',gap:'6px',padding:'8px 16px',borderRadius:'12px',fontSize:'12px',fontWeight:700,color:'#fff',background:'linear-gradient(135deg,#db2777,#7c3aed)',border:'none',cursor:'pointer',boxShadow:'0 4px 16px rgba(219,39,119,0.35)'}}>
-                        {icons.sparkle('w-3.5 h-3.5')}
-                        Add Context
-                    </button>
-                    <button onClick={onSearch} style={{display:'flex',alignItems:'center',gap:'8px',padding:'8px 14px',borderRadius:'12px',fontSize:'12px',fontWeight:600,color:'#cbd5e1',background:'rgba(15,10,40,0.8)',border:'1px solid rgba(255,255,255,0.1)',cursor:'pointer'}}>
-                        {icons.search('w-4 h-4 text-pink-400')}
-                        <span>Search</span>
-                        <kbd style={{fontSize:'10px',fontFamily:'monospace',padding:'1px 6px',borderRadius:'5px',background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.12)',color:'#f472b6'}}>⌘K</kbd>
-                    </button>
-                    <div style={{width:'1px',height:'24px',background:'rgba(255,255,255,0.1)'}}></div>
-                    <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
-                        <div style={{position:'relative'}}>
-                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces"
-                                style={{width:'36px',height:'36px',borderRadius:'10px',objectFit:'cover',border:'2px solid rgba(236,72,153,0.55)'}} alt="avatar" />
-                            <span style={{position:'absolute',bottom:0,right:0,width:'10px',height:'10px',borderRadius:'50%',background:'#34d399',border:'2px solid #030014'}}></span>
-                        </div>
-                        <div style={{display:'none'}}>
-                            <div style={{fontSize:'12px',fontWeight:700,color:'#fff'}}>Alex Morgan</div>
-                            <div style={{fontSize:'10px',fontWeight:700,color:'#f472b6'}}>Elite Admin</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
-    );
-}
-
-
-// ── Sidebar ──────────────────────────────────────────────────────────────────
-function Sidebar({ items, active, setActive }) {
-    var tabs = [
-        { id:'all',      label:'All Streams',      icon:icons.grid,      color:'#f472b6' },
-        { id:'coders',   label:'Coders Workspace', icon:icons.code,      color:'#22d3ee' },
-        { id:'creators', label:'Creators Vault',   icon:icons.video,     color:'#fb7185' },
-        { id:'leaders',  label:'Executive Suite',  icon:icons.briefcase, color:'#fbbf24' },
-    ];
-
-    function count(id) {
-        return id === 'all' ? items.length : items.filter(function(i){ return i.category === id; }).length;
-    }
-
-    var activeBgs = {
-        all:      'linear-gradient(135deg,rgba(219,39,119,0.22),rgba(124,58,237,0.22))',
-        coders:   'linear-gradient(135deg,rgba(8,145,178,0.22),rgba(37,99,235,0.22))',
-        creators: 'linear-gradient(135deg,rgba(225,29,72,0.22),rgba(219,39,119,0.22))',
-        leaders:  'linear-gradient(135deg,rgba(217,119,6,0.22),rgba(234,88,12,0.22))',
-    };
-    var activeBorders = { all:'rgba(236,72,153,0.45)', coders:'rgba(6,182,212,0.45)', creators:'rgba(244,63,94,0.45)', leaders:'rgba(245,158,11,0.45)' };
-
-    return (
-        <aside style={{gridColumn:'span 1'}}>
-            {/* Nav */}
-            <div className="glass" style={{borderRadius:'22px',padding:'16px',marginBottom:'16px'}}>
-                <div style={{display:'flex',alignItems:'center',gap:'6px',padding:'0 4px',marginBottom:'12px'}}>
-                    {icons.layers('w-3.5 h-3.5 text-pink-400')}
-                    <span style={{fontSize:'10px',fontWeight:900,textTransform:'uppercase',letterSpacing:'0.08em',color:'#f472b6'}}>Workspaces</span>
-                </div>
-                <nav>
-                    {tabs.map(function(tab) {
-                        var isActive = active === tab.id;
-                        return (
-                            <button key={tab.id} onClick={function(){ setActive(tab.id); }}
-                                style={{
-                                    width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between',
-                                    padding:'10px 12px', borderRadius:'14px', marginBottom:'6px',
-                                    background: isActive ? activeBgs[tab.id] : 'transparent',
-                                    border: isActive ? '1px solid ' + activeBorders[tab.id] : '1px solid transparent',
-                                    color: isActive ? '#fff' : '#94a3b8',
-                                    cursor:'pointer', transition:'all 0.15s', fontFamily:'inherit'
-                                }}>
-                                <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
-                                    {tab.icon('w-4 h-4')}
-                                    <span style={{fontSize:'13px',fontWeight:600}}>{tab.label}</span>
-                                </div>
-                                <span style={{fontSize:'11px',fontFamily:'monospace',fontWeight:700,padding:'1px 8px',borderRadius:'20px',background:'rgba(255,255,255,0.07)',color:'#e2e8f0'}}>
-                                    {count(tab.id)}
-                                </span>
-                            </button>
-                        );
-                    })}
-                </nav>
-            </div>
-
-            {/* Neural status */}
-            <div style={{borderRadius:'22px',padding:'18px',background:'linear-gradient(135deg,rgba(49,8,99,0.5),rgba(3,0,20,0.75),rgba(80,7,36,0.4))',border:'1px solid rgba(236,72,153,0.18)'}}>
-                <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'10px'}}>
-                    <div style={{animation:'float1 2s linear infinite'}}>
-                        {icons.cpu('w-3.5 h-3.5 text-pink-400')}
-                    </div>
-                    <span style={{fontSize:'10px',fontWeight:900,textTransform:'uppercase',letterSpacing:'0.08em',background:'linear-gradient(to right,#f9a8d4,#d8b4fe)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>
-                        Neural Sync Active
-                    </span>
-                </div>
-                <p style={{fontSize:'11px',color:'#64748b',lineHeight:1.6,marginBottom:'12px'}}>
-                    Live indexing across GitHub, Drive, Notion and Slack.
-                </p>
-                <div style={{width:'100%',height:'6px',borderRadius:'3px',background:'rgba(15,10,40,0.8)',overflow:'hidden'}}>
-                    <div style={{height:'100%',width:'100%',borderRadius:'3px',background:'linear-gradient(to right,#ec4899,#a855f7,#22d3ee)',animation:'pulse-bar 2s ease infinite'}}></div>
-                </div>
-                <div style={{display:'flex',justifyContent:'space-between',marginTop:'8px',fontSize:'10px',fontFamily:'monospace',fontWeight:600,color:'#475569'}}>
-                    <span>Latency: 6ms</span>
-                    <span style={{color:'#34d399',display:'flex',alignItems:'center',gap:'4px'}}>
-                        <span style={{width:'6px',height:'6px',borderRadius:'50%',background:'#34d399',display:'inline-block',animation:'pulse-bar 1s ease infinite'}}></span>
-                        256-bit Encrypted
-                    </span>
-                </div>
-            </div>
-        </aside>
-    );
-}
-
-// ── ArtifactCard ─────────────────────────────────────────────────────────────
-var CAT = {
-    coders:   { icon: icons.code,      badgeBg:'rgba(6,182,212,0.12)',   badgeBorder:'rgba(6,182,212,0.35)',   badgeColor:'#67e8f9' },
-    creators: { icon: icons.video,     badgeBg:'rgba(244,63,94,0.12)',   badgeBorder:'rgba(244,63,94,0.35)',   badgeColor:'#fda4af' },
-    leaders:  { icon: icons.briefcase, badgeBg:'rgba(245,158,11,0.12)',  badgeBorder:'rgba(245,158,11,0.35)',  badgeColor:'#fcd34d' },
-};
-
-function ArtifactCard({ item, onFav, onDelete, onCopy, onDownload, onExpand }) {
-    var m = CAT[item.category] || CAT.coders;
-    var [hovered, setHovered] = useState(false);
-
-    return (
-        <div className="glass-hover" onMouseEnter={function(){setHovered(true);}} onMouseLeave={function(){setHovered(false);}}
-            style={{borderRadius:'22px',padding:'20px',display:'flex',flexDirection:'column',gap:'12px',position:'relative'}}>
-
-            {/* Top row: badge + actions */}
-            <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:'8px'}}>
-                <div style={{display:'flex',alignItems:'center',gap:'6px',padding:'5px 10px',borderRadius:'10px',background:m.badgeBg,border:'1px solid '+m.badgeBorder,fontSize:'10px',fontWeight:800,textTransform:'uppercase',letterSpacing:'0.06em',color:m.badgeColor}}>
-                    {m.icon('w-3 h-3')}
-                    <span>{item.category} · {item.source}</span>
-                </div>
-                <div style={{display:'flex',gap:'6px',flexShrink:0}}>
-                    <button onClick={function(){ onFav(item.id); }} title="Favourite"
-                        style={{padding:'6px',borderRadius:'10px',cursor:'pointer',display:'flex',
-                            background: item.favorite ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.05)',
-                            border: item.favorite ? '1px solid rgba(245,158,11,0.5)' : '1px solid rgba(255,255,255,0.08)',
-                            color: item.favorite ? '#fcd34d' : '#64748b'}}>
-                        {icons.star('w-3.5 h-3.5', item.favorite)}
-                    </button>
-                    <button onClick={function(){ onDelete(item.id); }} title="Delete"
-                        style={{padding:'6px',borderRadius:'10px',cursor:'pointer',display:'flex',
-                            background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',
-                            color:'#64748b',opacity: hovered ? 1 : 0, transition:'opacity 0.2s'}}>
-                        {icons.trash('w-3.5 h-3.5')}
-                    </button>
-                </div>
-            </div>
-
-            {/* Title + desc */}
-            <div>
-                <h4 style={{fontWeight:800,fontSize:'15px',color:'#f1f5f9',marginBottom:'6px',lineHeight:1.3}}>{item.title}</h4>
-                <p className="clamp2" style={{fontSize:'12px',color:'#64748b',lineHeight:1.6}}>{item.description}</p>
-            </div>
-
-            {/* Image */}
-            {item.image && (
-                <div style={{borderRadius:'14px',overflow:'hidden',height:'120px',border:'1px solid rgba(255,255,255,0.08)',position:'relative'}}>
-                    <img src={item.image} alt={item.title} style={{width:'100%',height:'100%',objectFit:'cover',transition:'transform 0.4s',transform: hovered ? 'scale(1.04)' : 'scale(1)'}} />
-                    <div style={{position:'absolute',inset:0,background:'linear-gradient(to top,rgba(3,0,20,0.7),transparent)',pointerEvents:'none'}}></div>
-                </div>
-            )}
-
-            {/* Snippet */}
-            {item.snippet && (
-                <div className="mono" style={{background:'rgba(2,6,23,0.9)',borderRadius:'12px',padding:'12px',fontSize:'11px',color:'#f9a8d4',border:'1px solid rgba(255,255,255,0.07)',maxHeight:'80px',overflowY:'auto',lineHeight:1.6}}>
-                    <pre style={{margin:0,whiteSpace:'pre-wrap',wordBreak:'break-word'}}>{item.snippet}</pre>
-                </div>
-            )}
-
-            {/* Tags */}
-            {item.tags && item.tags.length > 0 && (
-                <div style={{display:'flex',flexWrap:'wrap',gap:'6px'}}>
-                    {item.tags.map(function(tag, i) {
-                        return (
-                            <span key={i} className="mono" style={{fontSize:'10px',fontWeight:700,padding:'2px 8px',borderRadius:'6px',background:'rgba(236,72,153,0.1)',border:'1px solid rgba(236,72,153,0.22)',color:'#f472b6'}}>
-                                {tag}
-                            </span>
-                        );
-                    })}
-                </div>
-            )}
-
-            {/* Footer */}
-            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',paddingTop:'12px',borderTop:'1px solid rgba(255,255,255,0.07)',marginTop:'auto'}}>
-                <span className="mono" style={{fontSize:'11px',color:'#475569'}}>{item.metadata}</span>
-                <div style={{display:'flex',gap:'6px'}}>
-                    <button onClick={function(){ onDownload(item); }} title="Download snippet"
-                        style={{display:'flex',alignItems:'center',gap:'4px',padding:'6px 10px',borderRadius:'10px',fontSize:'11px',fontWeight:700,color:'#67e8f9',background:'rgba(6,182,212,0.12)',border:'1px solid rgba(6,182,212,0.3)',cursor:'pointer'}}>
-                        {icons.download('w-3 h-3')}
-                        <span>Save</span>
-                    </button>
-                    <button onClick={function(){ onExpand(item); }} title="View full artifact"
-                        style={{display:'flex',alignItems:'center',gap:'4px',padding:'6px 10px',borderRadius:'10px',fontSize:'11px',fontWeight:700,color:'#d8b4fe',background:'rgba(124,58,237,0.12)',border:'1px solid rgba(124,58,237,0.3)',cursor:'pointer'}}>
-                        {icons.expand('w-3 h-3')}
-                        <span>View</span>
-                    </button>
-                    <button onClick={function(){ onCopy(item); }} title="Copy snippet"
-                        style={{display:'flex',alignItems:'center',gap:'6px',padding:'6px 14px',borderRadius:'10px',fontSize:'11px',fontWeight:700,color:'#fff',background:'linear-gradient(135deg,#db2777,#7c3aed)',border:'none',cursor:'pointer',boxShadow:'0 3px 12px rgba(219,39,119,0.3)'}}>
-                        Copy
-                        {icons.copy('w-3 h-3')}
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-// ── ChatPanel — AI assistant sidebar ────────────────────────────────────────
-var CHAT_KNOWLEDGE = {
-    greet:    ['hi','hello','hey','sup','yo','howdy','good morning','good evening'],
-    help:     ['help','what can you do','commands','features','guide','tutorial','how does'],
-    copy:     ['copy','clipboard','how to copy','copy button','copied'],
-    tools:    ['tools','tool','features list','what tools','app tools','toolbar','what does this do','capabilities'],
-    search:   ['search','find','filter','query','look for','discover'],
-    add:      ['add','create','new artifact','index','upload','submit','new context'],
-    fav:      ['favourite','favorite','star','starred','bookmarked'],
-    delete:   ['delete','remove','trash','clear'],
-    tag:      ['tag','tags','#'],
-    download: ['download','save','export','get file'],
-    view:     ['view','expand','open','full','detail','preview'],
-    workspace:['workspace','coders','creators','leaders','category','section'],
-};
-
-function smartReply(msg, items) {
-    var m = msg.toLowerCase().trim();
-
-    // Greet
-    if (CHAT_KNOWLEDGE.greet.some(function(w){ return m.indexOf(w) > -1; }))
-        return "Hey! 👋 I'm your ContextPulse AI assistant.\n\nHere's what I can help with:\n• 🛠️ Explain any tool or feature\n• 🔍 Search artifacts by title or tag\n• ⭐ Show your favourites\n• 📋 Help you copy, save, or view snippets\n• 📊 Workspace stats\n\nJust ask naturally — or type a title to find it!";
-
-    // Help / guide
-    if (CHAT_KNOWLEDGE.help.some(function(w){ return m.indexOf(w) > -1; }))
-        return "Here's everything I can help you with:\n\n🛠️ Tools & Features:\n• Copy — copies a snippet to clipboard\n• Save — downloads snippet as a file\n• View — opens full artifact details\n• Add Context — creates a new artifact\n• Search / ⌘K — searches everything\n• ⭐ Star — marks as favourite\n• 🗑️ Delete — removes an artifact\n\n📊 Data:\n• \"show favourites\" — lists starred items\n• \"list tags\" — all tags in workspace\n• \"workspace stats\" — counts per category\n\nJust type naturally — I'll figure it out!";
-
-    // Tools / features overview  ← NEW
-    if (CHAT_KNOWLEDGE.tools.some(function(w){ return m.indexOf(w) > -1; }))
-        return "Here are all the tools available in ContextPulse:\n\n📋 Copy — Click the pink \"Copy\" button on any card to copy the code snippet to your clipboard instantly.\n\n⬇️ Save — Click the cyan \"Save\" button to download the snippet as a .txt file.\n\n🔍 View — Click the purple \"View\" button to open the full artifact in a detailed modal.\n\n➕ Add Context — Use the button in the top-right header to add a new artifact with title, snippet, tags and more.\n\n🔎 Search — Type in the main search bar or press Ctrl+K / ⌘K for Omni-Search overlay.\n\n⭐ Favourite — Click the star icon on any card to bookmark it.\n\n🗑️ Delete — Hover over a card and click the trash icon to remove it.\n\n💬 Chat — That's me! Ask me anything.";
-
-    // Copy
-    if (CHAT_KNOWLEDGE.copy.some(function(w){ return m.indexOf(w) > -1; }))
-        return "To copy a snippet:\n1️⃣ Find the artifact card\n2️⃣ Click the pink \"Copy\" button at the bottom right of the card\n3️⃣ The snippet is instantly copied to your clipboard ✅\n\nWorks on both local (file://) and hosted pages. If your browser blocks clipboard access, the app uses a safe fallback method automatically.";
-
-    // Download
-    if (CHAT_KNOWLEDGE.download.some(function(w){ return m.indexOf(w) > -1; }))
-        return "To download a snippet:\n1️⃣ Find the artifact card\n2️⃣ Click the cyan \"Save\" button at the bottom of the card\n3️⃣ A .txt file with the snippet downloads to your computer ✅\n\nYou can also download from the expanded View modal.";
-
-    // View / expand
-    if (CHAT_KNOWLEDGE.view.some(function(w){ return m.indexOf(w) > -1; }))
-        return "To view full artifact details:\n1️⃣ Click the purple \"View\" button at the bottom of any card\n2️⃣ A full-screen modal opens with the complete snippet, description, image, and tags\n3️⃣ You can Copy or Download directly from the modal too ✅";
-
-    // Search
-    if (CHAT_KNOWLEDGE.search.some(function(w){ return m.indexOf(w) > -1; }))
-        return "To search your workspace:\n• Type in the search bar in the main panel — it filters cards live\n• Press Ctrl+K or ⌘K to open the Omni-Search overlay for quick results\n• Search works on title, description, tags, source, and snippet content ✅";
-
-    // Add
-    if (CHAT_KNOWLEDGE.add.some(function(w){ return m.indexOf(w) > -1; }))
-        return "To add a new artifact:\n1️⃣ Click \"Add Context\" in the top-right header\n2️⃣ Fill in: title, workspace, source, description, code snippet, and tags\n3️⃣ Click \"Index Artifact\" to save it ✅\n\nArtifacts are saved to your browser's local storage automatically.";
-
-    // Favourites
-    if (CHAT_KNOWLEDGE.fav.some(function(w){ return m.indexOf(w) > -1; })) {
-        var favs = items.filter(function(i){ return i.favorite; });
-        if (favs.length === 0) return "You have no starred artifacts yet.\nClick the ⭐ icon on the top-right of any card to favourite it.";
-        return "Your starred artifacts (" + favs.length + "):\n" + favs.map(function(i){ return "• " + i.title + " [" + i.category + "]"; }).join('\n');
-    }
-
-    // Delete
-    if (CHAT_KNOWLEDGE.delete.some(function(w){ return m.indexOf(w) > -1; }))
-        return "To delete an artifact:\n1️⃣ Hover your mouse over the card\n2️⃣ The 🗑️ trash icon appears in the top-right corner of the card\n3️⃣ Click it to permanently remove the artifact ✅";
-
-    // Tags
-    if (CHAT_KNOWLEDGE.tag.some(function(w){ return m.indexOf(w) > -1; })) {
-        var allTags = [];
-        items.forEach(function(i){ i.tags && i.tags.forEach(function(t){ if (allTags.indexOf(t) < 0) allTags.push(t); }); });
-        return "All tags in your workspace:\n" + (allTags.length > 0 ? allTags.join('  ') : 'No tags found yet.');
-    }
-
-    // Workspace stats
-    if (CHAT_KNOWLEDGE.workspace.some(function(w){ return m.indexOf(w) > -1; })) {
-        var c  = items.filter(function(i){ return i.category==='coders'; }).length;
-        var cr = items.filter(function(i){ return i.category==='creators'; }).length;
-        var l  = items.filter(function(i){ return i.category==='leaders'; }).length;
-        return "Workspace breakdown:\n• 💻 Coders Workspace: " + c + " artifact" + (c!==1?'s':'') + "\n• 🎬 Creators Vault: " + cr + " artifact" + (cr!==1?'s':'') + "\n• 💼 Executive Suite: " + l + " artifact" + (l!==1?'s':'') + "\n• 📦 Total: " + items.length + " artifacts";
-    }
-
-    // Search for a specific artifact by name
-    var found = items.filter(function(i){ return i.title.toLowerCase().indexOf(m) > -1; });
-    if (found.length > 0)
-        return "Found " + found.length + " artifact" + (found.length!==1?'s':'') + " matching \"" + msg + "\":\n" + found.map(function(i){ return "• " + i.title + " [" + i.category + "]"; }).join('\n');
-
-    // Count / total
-    if (m.indexOf('how many') > -1 || m.indexOf('count') > -1 || m.indexOf('total') > -1)
-        return "You have " + items.length + " artifact" + (items.length!==1?'s':'') + " indexed across all workspaces.";
-
-    // Fallback
-    return "I didn't quite catch that 🤔\n\nTry asking about:\n• \"tools\" — see all features\n• \"copy\" — how to copy snippets\n• \"search\" — find artifacts\n• \"add\" — create new artifact\n• \"favourites\" — your starred items\n• \"tags\" — list all tags\n• \"workspace stats\" — item counts\n\nOr just type a title to search for it!";
-}
-
-function ChatPanel({ onClose, items }) {
-    var [msgs, setMsgs] = useState([
-        { from:'ai', text:"Hi! I'm your ContextPulse AI 🤖\n\nI can help you use every feature of this app:\n🛠️ Ask \"tools\" — see all features\n📋 Ask \"copy\" — copy a snippet\n⬇️ Ask \"save\" — download a snippet\n🔍 Ask \"search\" — find artifacts\n⭐ Ask \"favourites\" — your starred items\n\nOr just type any artifact title to find it instantly!" }
-    ]);
-    var [input, setInput] = useState('');
-    var [typing, setTyping] = useState(false);
-    var bottomRef = useRef(null);
-
-    useEffect(function() {
-        if (bottomRef.current) bottomRef.current.scrollIntoView({ behavior:'smooth' });
-    }, [msgs]);
-
-    function send() {
-        var text = input.trim();
-        if (!text) return;
-        var userMsg = { from:'user', text: text };
-        setMsgs(function(p){ return p.concat(userMsg); });
-        setInput('');
-        setTyping(true);
-        setTimeout(function() {
-            var reply = smartReply(text, items);
-            setMsgs(function(p){ return p.concat({ from:'ai', text: reply }); });
-            setTyping(false);
-        }, 600);
-    }
-
-    function onKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }
-
-    return (
-        <div className="glass anim-slide-up" style={{
-            position:'fixed', bottom:'96px', left:'28px', zIndex:89,
-            width:'340px', maxHeight:'480px', borderRadius:'22px',
-            border:'1px solid rgba(236,72,153,0.4)',
-            display:'flex', flexDirection:'column', overflow:'hidden',
-            boxShadow:'0 24px 60px rgba(0,0,0,0.7)'
-        }}>
-            {/* Header */}
-            <div style={{padding:'14px 16px',borderBottom:'1px solid rgba(255,255,255,0.08)',display:'flex',alignItems:'center',justifyContent:'space-between',background:'rgba(15,10,40,0.8)'}}>
-                <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
-                    <div style={{width:'30px',height:'30px',borderRadius:'50%',background:'linear-gradient(135deg,#ec4899,#7c3aed)',display:'flex',alignItems:'center',justifyContent:'center'}}>
-                        {icons.sparkle('w-3.5 h-3.5 text-white')}
-                    </div>
-                    <div>
-                        <div style={{fontSize:'12px',fontWeight:800,color:'#fff'}}>ContextPulse AI</div>
-                        <div style={{fontSize:'10px',color:'#34d399',display:'flex',alignItems:'center',gap:'4px'}}>
-                            <span style={{width:'5px',height:'5px',borderRadius:'50%',background:'#34d399',display:'inline-block'}}></span>
-                            Online
-                        </div>
-                    </div>
-                </div>
-                <button onClick={onClose} style={{padding:'5px',borderRadius:'8px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',cursor:'pointer',color:'#64748b',display:'flex'}}>
-                    {icons.x('w-3.5 h-3.5')}
-                </button>
-            </div>
-
-            {/* Messages */}
-            <div style={{flex:1,overflowY:'auto',padding:'14px',display:'flex',flexDirection:'column',gap:'10px'}}>
-                {msgs.map(function(msg, i) {
-                    var isAI = msg.from === 'ai';
-                    return (
-                        <div key={i}>
-                            <div style={{display:'flex',justifyContent: isAI ? 'flex-start' : 'flex-end'}}>
-                                <div style={{
-                                    maxWidth:'82%', padding:'9px 12px', borderRadius: isAI ? '4px 14px 14px 14px' : '14px 4px 14px 14px',
-                                    fontSize:'12px', lineHeight:1.6, whiteSpace:'pre-wrap', wordBreak:'break-word',
-                                    background: isAI ? 'rgba(124,58,237,0.2)' : 'linear-gradient(135deg,rgba(219,39,119,0.4),rgba(124,58,237,0.4))',
-                                    border: isAI ? '1px solid rgba(124,58,237,0.3)' : '1px solid rgba(236,72,153,0.3)',
-                                    color: '#f1f5f9'
-                                }}>
-                                    {msg.text}
-                                </div>
-                            </div>
-                            {/* Quick-reply chips only after the first AI message */}
-                            {isAI && i === 0 && (
-                                <div style={{display:'flex',flexWrap:'wrap',gap:'6px',marginTop:'8px',paddingLeft:'2px'}}>
-                                    {['🛠️ tools','📋 copy','⬇️ save','🔍 search','⭐ favourites','📊 workspace stats'].map(function(chip) {
-                                        var chipText = chip.replace(/^\S+\s/,'');
-                                        return (
-                                            <button key={chip} onClick={function(){
-                                                    var userMsg = { from:'user', text: chipText };
-                                                    setMsgs(function(p){ return p.concat(userMsg); });
-                                                    setTyping(true);
-                                                    setTimeout(function() {
-                                                        var reply = smartReply(chipText, items);
-                                                        setMsgs(function(p){ return p.concat({ from:'ai', text: reply }); });
-                                                        setTyping(false);
-                                                    }, 400);
-                                                }}
-                                                style={{fontSize:'11px',fontWeight:700,padding:'4px 10px',borderRadius:'20px',
-                                                    background:'rgba(124,58,237,0.15)',border:'1px solid rgba(124,58,237,0.35)',
-                                                    color:'#c4b5fd',cursor:'pointer',fontFamily:'inherit',transition:'all 0.15s'}}
-                                                onMouseEnter={function(e){ e.currentTarget.style.background='rgba(124,58,237,0.35)'; }}
-                                                onMouseLeave={function(e){ e.currentTarget.style.background='rgba(124,58,237,0.15)'; }}>
-                                                {chip}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            )}
-                        </div>
-                    );
-                })}
-                {typing && (
-                    <div style={{display:'flex',justifyContent:'flex-start'}}>
-                        <div style={{padding:'9px 14px',borderRadius:'4px 14px 14px 14px',background:'rgba(124,58,237,0.2)',border:'1px solid rgba(124,58,237,0.3)',display:'flex',gap:'4px',alignItems:'center'}}>
-                            {[0,1,2].map(function(d){
-                                return <span key={d} style={{width:'5px',height:'5px',borderRadius:'50%',background:'#a78bfa',animation:'pulse-bar 1s ease '+(d*0.2)+'s infinite',display:'inline-block'}}></span>;
-                            })}
-                        </div>
-                    </div>
-                )}
-                <div ref={bottomRef}></div>
-            </div>
-
-            {/* Input */}
-            <div style={{padding:'12px',borderTop:'1px solid rgba(255,255,255,0.07)',display:'flex',gap:'8px',background:'rgba(15,10,40,0.8)'}}>
-                <input
-                    type="text" value={input} onChange={function(e){ setInput(e.target.value); }} onKeyDown={onKey}
-                    placeholder="Ask anything..."
-                    style={{flex:1,background:'rgba(2,6,23,0.9)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'10px',padding:'8px 12px',fontSize:'12px',color:'#f1f5f9',outline:'none',fontFamily:'inherit'}}
-                />
-                <button onClick={send}
-                    style={{padding:'8px 12px',borderRadius:'10px',background:'linear-gradient(135deg,#db2777,#7c3aed)',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff'}}>
-                    {icons.send('w-4 h-4')}
-                </button>
-            </div>
-        </div>
-    );
-}
-
-
-// ── App ───────────────────────────────────────────────────────────────────────
-function App() {
-    var [items,   setItems]   = useState(function() {
-        try {
-            var s = localStorage.getItem('cp_v5');
-            if (s) { var p = JSON.parse(s); if (Array.isArray(p)) return p; }
-        } catch(e) {}
-        return SEED;
+  function submit(e){
+    e.preventDefault();
+    if(!title.trim()){ setErr('Title is required.'); return; }
+    setErr('');
+    const parsedTags = tags
+      ? tags.split(',').map(t=>{ const c=t.trim(); return c.startsWith('#')?c:'#'+c; }).filter(t=>t.length>1)
+      : ['#Custom'];
+    onAdd({
+      id: 'ctx-' + Date.now(),
+      title: title.trim(), category: cat,
+      source: source.trim() || 'Manual Entry',
+      image:  image.trim()  || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80',
+      snippet: snippet.trim(),
+      description: desc.trim() || 'No description provided.',
+      metadata: 'Created: Just now',
+      favorite: false, tags: parsedTags,
     });
-    var [tab,      setTab]     = useState('all');
-    var [query,    setQuery]   = useState('');
-    var [omni,     setOmni]    = useState(false);
-    var [addOpen,  setAddOpen] = useState(false);
-    var [toast,    setToast]   = useState(null);
-    var [expanded, setExpanded]= useState(null);   // artifact being viewed full-screen
-    var [chatOpen, setChatOpen]= useState(false);  // AI chatbot panel
+  }
 
-    useEffect(function() {
-        try { localStorage.setItem('cp_v5', JSON.stringify(items)); } catch(e) {}
-    }, [items]);
+  const lbl = {display:'block',fontSize:10,fontWeight:800,textTransform:'uppercase',letterSpacing:'0.08em',color:'#f472b6',marginBottom:5};
 
-    useEffect(function() {
-        function handler(e) {
-            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-                e.preventDefault(); setOmni(function(p){ return !p; });
-            }
-            if (e.key === 'Escape') { setOmni(false); setAddOpen(false); setExpanded(null); setChatOpen(false); }
-        }
-        window.addEventListener('keydown', handler);
-        return function() { window.removeEventListener('keydown', handler); };
-    }, []);
-
-    function showToast(msg) { setToast(msg); setTimeout(function(){ setToast(null); }, 3000); }
-
-    function handleFav(id) {
-        setItems(function(prev){ return prev.map(function(i){ return i.id === id ? Object.assign({}, i, {favorite: !i.favorite}) : i; }); });
-        showToast('⭐ Favourite updated');
-    }
-    function handleDelete(id) {
-        setItems(function(prev){ return prev.filter(function(i){ return i.id !== id; }); });
-        showToast('🗑️ Artifact deleted');
-    }
-    function handleAdd(item) {
-        setItems(function(prev){ return [item].concat(prev); });
-        setAddOpen(false);
-        showToast('✨ Artifact added!');
-    }
-
-    function handleDownload(item) {
-        var text = item.snippet || item.title;
-        var ext = item.category === 'coders' ? '.txt' : '.txt';
-        var blob = new Blob([text], { type: 'text/plain' });
-        var url  = URL.createObjectURL(blob);
-        var a    = document.createElement('a');
-        a.href     = url;
-        a.download = item.title.replace(/[^a-z0-9]/gi,'_').toLowerCase() + ext;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        showToast('⬇️ Snippet downloaded!');
-    }
-
-    function handleExpand(item) {
-        setExpanded(item);
-    }
-    function handleCopy(item) {
-        var text = item.snippet || item.title;
-        // Modern async clipboard API (works on HTTPS / localhost)
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(text).then(function() {
-                showToast('📋 Copied to clipboard!');
-            }).catch(function() {
-                fallbackCopy(text);
-            });
-        } else {
-            fallbackCopy(text);
-        }
-    }
-
-    function fallbackCopy(text) {
-        // Works on file:// and older browsers via hidden textarea
-        var ta = document.createElement('textarea');
-        ta.value = text;
-        ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
-        document.body.appendChild(ta);
-        ta.focus();
-        ta.select();
-        try {
-            var ok = document.execCommand('copy');
-            showToast(ok ? '📋 Copied to clipboard!' : '⚠️ Copy failed — select manually');
-        } catch(e) {
-            showToast('⚠️ Copy not supported in this browser');
-        }
-        document.body.removeChild(ta);
-    }
-
-    var filtered = useMemo(function() {
-        var q = query.trim().toLowerCase();
-        return items.filter(function(item) {
-            var matchTab = tab === 'all' || item.category === tab;
-            var matchQ = !q
-                || item.title.toLowerCase().indexOf(q) > -1
-                || item.description.toLowerCase().indexOf(q) > -1
-                || item.source.toLowerCase().indexOf(q) > -1
-                || item.tags.some(function(t){ return t.toLowerCase().indexOf(q) > -1; })
-                || (item.snippet && item.snippet.toLowerCase().indexOf(q) > -1);
-            return matchTab && matchQ;
-        });
-    }, [items, tab, query]);
-
-    var feedLabel = tab === 'all' ? 'All Workspace Streams' : {coders:'Coders Workspace', creators:'Creators Vault', leaders:'Executive Suite'}[tab];
-
-    return (
-        <div style={{minHeight:'100vh',display:'flex',flexDirection:'column'}}>
-            {toast && <Toast msg={toast} />}
-            {omni && <OmniSearch items={items} query={query} setQuery={setQuery} onClose={function(){ setOmni(false); }} />}
-            {addOpen && <AddItemModal onClose={function(){ setAddOpen(false); }} onAdd={handleAdd} />}
-
-            {/* Expanded artifact modal */}
-            {expanded && (
-                <div className="overlay" onClick={function(){ setExpanded(null); }}>
-                    <div className="glass anim-pop-in" onClick={function(e){ e.stopPropagation(); }} style={{
-                        width:'100%', maxWidth:'680px', borderRadius:'24px', padding:'28px',
-                        border:'1px solid rgba(236,72,153,0.45)', maxHeight:'90vh', overflowY:'auto'
-                    }}>
-                        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'20px'}}>
-                            <div>
-                                <h2 style={{fontWeight:900,fontSize:'18px',color:'#fff',marginBottom:'4px'}}>{expanded.title}</h2>
-                                <span style={{fontSize:'11px',color:'#f472b6',fontFamily:'monospace'}}>{expanded.category} · {expanded.source}</span>
-                            </div>
-                            <button onClick={function(){ setExpanded(null); }}
-                                style={{padding:'7px',borderRadius:'10px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.1)',cursor:'pointer',color:'#94a3b8',display:'flex'}}>
-                                {icons.x('w-4 h-4')}
-                            </button>
-                        </div>
-                        {expanded.image && (
-                            <div style={{borderRadius:'16px',overflow:'hidden',height:'200px',marginBottom:'20px',border:'1px solid rgba(255,255,255,0.1)'}}>
-                                <img src={expanded.image} alt={expanded.title} style={{width:'100%',height:'100%',objectFit:'cover'}} />
-                            </div>
-                        )}
-                        <p style={{fontSize:'13px',color:'#94a3b8',lineHeight:1.7,marginBottom:'20px'}}>{expanded.description}</p>
-                        {expanded.snippet && (
-                            <div>
-                                <div style={{fontSize:'10px',fontWeight:800,textTransform:'uppercase',letterSpacing:'0.08em',color:'#f472b6',marginBottom:'8px'}}>Snippet</div>
-                                <div className="mono" style={{background:'rgba(2,6,23,0.95)',borderRadius:'14px',padding:'16px',fontSize:'12px',color:'#f9a8d4',border:'1px solid rgba(255,255,255,0.08)',lineHeight:1.7,overflowX:'auto'}}>
-                                    <pre style={{margin:0,whiteSpace:'pre-wrap',wordBreak:'break-word'}}>{expanded.snippet}</pre>
-                                </div>
-                            </div>
-                        )}
-                        {expanded.tags && expanded.tags.length > 0 && (
-                            <div style={{display:'flex',flexWrap:'wrap',gap:'6px',marginTop:'16px'}}>
-                                {expanded.tags.map(function(tag,i){
-                                    return <span key={i} className="mono" style={{fontSize:'10px',fontWeight:700,padding:'3px 10px',borderRadius:'6px',background:'rgba(236,72,153,0.1)',border:'1px solid rgba(236,72,153,0.22)',color:'#f472b6'}}>{tag}</span>;
-                                })}
-                            </div>
-                        )}
-                        <div style={{display:'flex',gap:'10px',marginTop:'20px',paddingTop:'16px',borderTop:'1px solid rgba(255,255,255,0.07)'}}>
-                            <button onClick={function(){ handleCopy(expanded); }}
-                                style={{flex:1,padding:'10px',borderRadius:'12px',fontSize:'12px',fontWeight:700,color:'#fff',background:'linear-gradient(135deg,#db2777,#7c3aed)',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'6px'}}>
-                                {icons.copy('w-3.5 h-3.5')} Copy Snippet
-                            </button>
-                            <button onClick={function(){ handleDownload(expanded); }}
-                                style={{flex:1,padding:'10px',borderRadius:'12px',fontSize:'12px',fontWeight:700,color:'#67e8f9',background:'rgba(6,182,212,0.12)',border:'1px solid rgba(6,182,212,0.3)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'6px'}}>
-                                {icons.download('w-3.5 h-3.5')} Download
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* AI Chatbot floating button */}
-            <button onClick={function(){ setChatOpen(function(p){ return !p; }); }}
-                style={{position:'fixed',bottom:'28px',left:'28px',zIndex:90,width:'54px',height:'54px',borderRadius:'50%',
-                    background:'linear-gradient(135deg,#ec4899,#7c3aed)',border:'none',cursor:'pointer',
-                    display:'flex',alignItems:'center',justifyContent:'center',
-                    boxShadow:'0 6px 24px rgba(236,72,153,0.5)',transition:'transform 0.2s'}}>
-                {icons.chat('w-6 h-6 text-white')}
-            </button>
-
-            {/* AI Chatbot panel */}
-            {chatOpen && <ChatPanel onClose={function(){ setChatOpen(false); }} items={items} />}
-
-            <Header onAdd={function(){ setAddOpen(true); }} onSearch={function(){ setOmni(true); }} />
-
-            <main style={{flex:1,maxWidth:'1280px',width:'100%',margin:'0 auto',padding:'28px 20px',display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'24px'}}>
-
-                <Sidebar items={items} active={tab} setActive={setTab} />
-
-                <section style={{gridColumn:'span 3',display:'flex',flexDirection:'column',gap:'20px'}}>
-
-                    {/* Search banner */}
-                    <div className="glass" style={{borderRadius:'22px',padding:'28px',position:'relative',overflow:'hidden',border:'1px solid rgba(236,72,153,0.25)'}}>
-                        <div style={{position:'absolute',right:'-40px',top:'-40px',width:'200px',height:'200px',borderRadius:'50%',background:'radial-gradient(circle,rgba(236,72,153,0.22),transparent)',filter:'blur(40px)',pointerEvents:'none'}}></div>
-                        <h2 style={{fontWeight:900,fontSize:'24px',marginBottom:'6px',background:'linear-gradient(to right,#fff,#f9a8d4,#d8b4fe)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>
-                            Infinite Context Engine
-                        </h2>
-                        <p style={{fontSize:'13px',color:'#64748b',marginBottom:'18px',fontWeight:500}}>
-                            Instant retrieval across your entire digital workspace.
-                        </p>
-                        <div style={{position:'relative'}}>
-                            <div style={{position:'absolute',left:'14px',top:'50%',transform:'translateY(-50%)',pointerEvents:'none'}}>
-                                {icons.search('w-4 h-4 text-pink-400')}
-                            </div>
-                            <input type="text" value={query} onChange={function(e){ setQuery(e.target.value); }}
-                                placeholder="Search by title, tag, keyword or platform..."
-                                className="field" style={{paddingLeft:'40px',paddingRight: query ? '60px' : '14px',fontSize:'14px',borderRadius:'14px',padding:'13px 14px 13px 40px'}} />
-                            {query && (
-                                <button onClick={function(){ setQuery(''); }}
-                                    style={{position:'absolute',right:'12px',top:'50%',transform:'translateY(-50%)',fontSize:'11px',fontWeight:700,color:'#f472b6',background:'none',border:'none',cursor:'pointer'}}>
-                                    Clear
-                                </button>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Feed header */}
-                    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 4px'}}>
-                        <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
-                            <span style={{width:'8px',height:'8px',borderRadius:'50%',background:'linear-gradient(to right,#f472b6,#a78bfa)',display:'inline-block'}}></span>
-                            <span style={{fontSize:'13px',fontWeight:800,color:'#e2e8f0'}}>{feedLabel}</span>
-                        </div>
-                        <span style={{fontSize:'11px',fontFamily:'monospace',fontWeight:700,padding:'3px 12px',borderRadius:'20px',background:'rgba(236,72,153,0.08)',border:'1px solid rgba(236,72,153,0.22)',color:'#f472b6'}}>
-                            {filtered.length} artifact{filtered.length !== 1 ? 's' : ''}
-                        </span>
-                    </div>
-
-                    {/* Cards or empty */}
-                    {filtered.length === 0 ? (
-                        <div className="glass" style={{borderRadius:'22px',padding:'60px 20px',textAlign:'center',border:'1px dashed rgba(236,72,153,0.22)'}}>
-                            {icons.empty('w-12 h-12 text-pink-400 mx-auto mb-3')}
-                            <p style={{fontWeight:700,color:'#cbd5e1',fontSize:'14px'}}>No artifacts found</p>
-                            <p style={{fontSize:'12px',color:'#475569',marginTop:'4px'}}>Try a different search or add a new artifact.</p>
-                        </div>
-                    ) : (
-                        <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:'16px'}}>
-                            {filtered.map(function(item) {
-                                return (
-                                    <ArtifactCard key={item.id} item={item}
-                                        onFav={handleFav} onDelete={handleDelete} onCopy={handleCopy}
-                                        onDownload={handleDownload} onExpand={handleExpand} />
-                                );
-                            })}
-                        </div>
-                    )}
-                </section>
-            </main>
+  return (
+    <div className="overlay" onClick={onClose}>
+      <div className="glass anim-pop-in" onClick={e=>e.stopPropagation()} style={{
+        width:'100%',maxWidth:500,borderRadius:24,padding:24,
+        border:'1px solid rgba(236,72,153,0.38)',
+        maxHeight:'92vh',overflowY:'auto',
+      }}>
+        {/* Header */}
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',paddingBottom:16,borderBottom:'1px solid rgba(255,255,255,0.08)',marginBottom:18}}>
+          <div style={{display:'flex',alignItems:'center',gap:10}}>
+            <div style={{width:34,height:34,borderRadius:11,background:'linear-gradient(135deg,#ec4899,#7c3aed)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+              {IC.sparkle({...SZ.sm,color:'#fff'})}
+            </div>
+            <span style={{fontWeight:800,fontSize:14,color:'#fff'}}>Add Context Artifact</span>
+          </div>
+          <button onClick={onClose} style={{padding:6,borderRadius:10,background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',cursor:'pointer',color:'#94a3b8',display:'flex'}}>
+            {IC.x(SZ.md)}
+          </button>
         </div>
-    );
+
+        {err && (
+          <div style={{marginBottom:14,padding:'9px 14px',background:'rgba(239,68,68,0.12)',border:'1px solid rgba(239,68,68,0.35)',borderRadius:10,color:'#fca5a5',fontSize:12,fontWeight:600}}>
+            {err}
+          </div>
+        )}
+
+        <form onSubmit={submit}>
+          <div style={{marginBottom:13}}>
+            <label style={lbl}>Title *</label>
+            <input type="text" value={title} onChange={e=>setTitle(e.target.value)} placeholder="e.g. JWT Auth Middleware" className="field"/>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:13}}>
+            <div>
+              <label style={lbl}>Workspace</label>
+              <select value={cat} onChange={e=>setCat(e.target.value)} className="field">
+                <option value="coders">Coders</option>
+                <option value="creators">Creators</option>
+                <option value="leaders">Leaders</option>
+              </select>
+            </div>
+            <div>
+              <label style={lbl}>Source</label>
+              <input type="text" value={source} onChange={e=>setSource(e.target.value)} placeholder="GitHub, Notionâ€¦" className="field"/>
+            </div>
+          </div>
+          <div style={{marginBottom:13}}>
+            <label style={lbl}>Description</label>
+            <textarea rows="2" value={desc} onChange={e=>setDesc(e.target.value)} placeholder="Brief summaryâ€¦" className="field"/>
+          </div>
+          <div style={{marginBottom:13}}>
+            <label style={lbl}>Code / Snippet</label>
+            <textarea rows="4" value={snippet} onChange={e=>setSnippet(e.target.value)} placeholder="const token = req.headers.authorization;" className="field mono" style={{fontSize:12,color:'#f9a8d4'}}/>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:20}}>
+            <div>
+              <label style={lbl}>Tags (comma-separated)</label>
+              <input type="text" value={tags} onChange={e=>setTags(e.target.value)} placeholder="#Auth, #Security" className="field"/>
+            </div>
+            <div>
+              <label style={lbl}>Image URL</label>
+              <input type="text" value={image} onChange={e=>setImage(e.target.value)} placeholder="https://â€¦" className="field"/>
+            </div>
+          </div>
+          <div style={{display:'flex',justifyContent:'flex-end',gap:10}}>
+            <button type="button" onClick={onClose} style={{padding:'8px 16px',borderRadius:10,fontSize:12,fontWeight:700,background:'rgba(255,255,255,0.05)',color:'#94a3b8',border:'1px solid rgba(255,255,255,0.08)',cursor:'pointer'}}>
+              Cancel
+            </button>
+            <button type="submit" style={{padding:'8px 18px',borderRadius:10,fontSize:12,fontWeight:700,background:'linear-gradient(135deg,#db2777,#7c3aed)',color:'#fff',border:'none',cursor:'pointer',display:'flex',alignItems:'center',gap:6,boxShadow:'0 4px 16px rgba(219,39,119,0.35)'}}>
+              {IC.plus({...SZ.sm,color:'#fff'})} Index Artifact
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+
+/* â”€â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+function Header({onAdd, onSearch}){
+  return (
+    <header style={{
+      position:'sticky',top:0,zIndex:40,
+      background:'rgba(3,0,20,0.9)',backdropFilter:'blur(30px)',
+      borderBottom:'1px solid rgba(255,255,255,0.07)',
+    }}>
+      <div style={{maxWidth:1320,margin:'0 auto',padding:'0 20px',height:64,display:'flex',alignItems:'center',justifyContent:'space-between',gap:12}}>
+        {/* Logo */}
+        <div style={{display:'flex',alignItems:'center',gap:12,flexShrink:0}}>
+          <div style={{width:40,height:40,borderRadius:14,background:'linear-gradient(135deg,#ec4899,#7c3aed,#6366f1)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 4px 18px rgba(236,72,153,0.45)',flexShrink:0}}>
+            {IC.zap({...SZ.md,color:'#fff'})}
+          </div>
+          <div>
+            <div className="grad-text" style={{fontWeight:800,fontSize:18,lineHeight:1.2}}>ContextPulse</div>
+            <div style={{fontSize:9,fontWeight:900,textTransform:'uppercase',letterSpacing:'0.1em',padding:'1px 7px',borderRadius:20,background:'rgba(236,72,153,0.12)',color:'#f9a8d4',border:'1px solid rgba(236,72,153,0.28)',display:'inline-block',marginTop:1}}>
+              Lumina OS v5
+            </div>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div style={{display:'flex',alignItems:'center',gap:8}}>
+          <button onClick={onSearch} style={{
+            display:'flex',alignItems:'center',gap:8,
+            padding:'7px 14px',borderRadius:12,fontSize:12,fontWeight:600,
+            color:'#cbd5e1',background:'rgba(15,10,40,0.8)',
+            border:'1px solid rgba(255,255,255,0.1)',cursor:'pointer',
+          }}>
+            {IC.search({...SZ.sm,color:'#f472b6'})}
+            <span style={{display:'none',minWidth:36}}>Search</span>
+            <kbd style={{fontSize:10,fontFamily:'monospace',padding:'1px 6px',borderRadius:5,background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.12)',color:'#f472b6'}}>âŒ˜K</kbd>
+          </button>
+          <button onClick={onAdd} style={{
+            display:'flex',alignItems:'center',gap:6,
+            padding:'7px 16px',borderRadius:12,fontSize:12,fontWeight:700,
+            color:'#fff',background:'linear-gradient(135deg,#db2777,#7c3aed)',
+            border:'none',cursor:'pointer',boxShadow:'0 4px 16px rgba(219,39,119,0.35)',
+          }}>
+            {IC.sparkle({...SZ.sm,color:'#fff'})}
+            <span>Add Context</span>
+          </button>
+          <div style={{width:1,height:24,background:'rgba(255,255,255,0.1)',flexShrink:0}}/>
+          <div style={{position:'relative',flexShrink:0}}>
+            <img
+              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces"
+              style={{width:36,height:36,borderRadius:10,objectFit:'cover',border:'2px solid rgba(236,72,153,0.55)',display:'block'}}
+              alt="avatar"
+            />
+            <span style={{position:'absolute',bottom:0,right:0,width:10,height:10,borderRadius:'50%',background:'#34d399',border:'2px solid #030014'}}/>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+/* â”€â”€â”€ Sidebar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+const TABS = [
+  {id:'all',      label:'All Streams',       icon:IC.grid,  activeGrad:'linear-gradient(135deg,rgba(219,39,119,0.22),rgba(124,58,237,0.22))', activeBdr:'rgba(236,72,153,0.45)'},
+  {id:'coders',   label:'Coders Workspace',  icon:IC.code,  activeGrad:'linear-gradient(135deg,rgba(8,145,178,0.22),rgba(37,99,235,0.22))',   activeBdr:'rgba(6,182,212,0.45)'},
+  {id:'creators', label:'Creators Vault',    icon:IC.video, activeGrad:'linear-gradient(135deg,rgba(225,29,72,0.22),rgba(219,39,119,0.22))',   activeBdr:'rgba(244,63,94,0.45)'},
+  {id:'leaders',  label:'Executive Suite',   icon:IC.brief, activeGrad:'linear-gradient(135deg,rgba(217,119,6,0.22),rgba(234,88,12,0.22))',    activeBdr:'rgba(245,158,11,0.45)'},
+];
+
+function Sidebar({items, active, setActive}){
+  return (
+    <aside className="sidebar-aside" style={{display:'flex',flexDirection:'column',gap:16}}>
+      {/* Workspace nav */}
+      <div className="glass" style={{borderRadius:22,padding:14}}>
+        <div style={{display:'flex',alignItems:'center',gap:6,padding:'0 4px',marginBottom:10}}>
+          {IC.layers({...SZ.sm,color:'#f472b6'})}
+          <span style={{fontSize:10,fontWeight:900,textTransform:'uppercase',letterSpacing:'0.08em',color:'#f472b6'}}>Workspaces</span>
+        </div>
+        <nav style={{display:'flex',flexDirection:'column',gap:4}}>
+          {TABS.map(tab=>{
+            const on = active === tab.id;
+            const cnt = tab.id==='all' ? items.length : items.filter(i=>i.category===tab.id).length;
+            return (
+              <button key={tab.id} onClick={()=>setActive(tab.id)} style={{
+                width:'100%',display:'flex',alignItems:'center',justifyContent:'space-between',
+                padding:'9px 12px',borderRadius:13,
+                background: on ? tab.activeGrad : 'transparent',
+                border: on ? '1px solid '+tab.activeBdr : '1px solid transparent',
+                color: on ? '#fff' : '#94a3b8',
+                cursor:'pointer',transition:'all 0.15s',fontFamily:'inherit',
+              }}
+              onMouseEnter={e=>{ if(!on){ e.currentTarget.style.background='rgba(255,255,255,0.04)'; e.currentTarget.style.color='#e2e8f0'; }}}
+              onMouseLeave={e=>{ if(!on){ e.currentTarget.style.background='transparent'; e.currentTarget.style.color='#94a3b8'; }}}>
+                <div style={{display:'flex',alignItems:'center',gap:9}}>
+                  {tab.icon({...SZ.md,color:'currentColor'})}
+                  <span style={{fontSize:13,fontWeight:600}}>{tab.label}</span>
+                </div>
+                <span style={{fontSize:11,fontFamily:'monospace',fontWeight:700,padding:'1px 7px',borderRadius:20,background:'rgba(255,255,255,0.07)',color:'#e2e8f0',flexShrink:0}}>
+                  {cnt}
+                </span>
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+
+      {/* Neural Sync widget */}
+      <div style={{borderRadius:22,padding:16,background:'linear-gradient(135deg,rgba(49,8,99,0.5),rgba(3,0,20,0.75),rgba(80,7,36,0.4))',border:'1px solid rgba(236,72,153,0.16)'}}>
+        <div style={{display:'flex',alignItems:'center',gap:7,marginBottom:8}}>
+          {IC.cpu({...SZ.sm,color:'#f472b6'})}
+          <span style={{fontSize:10,fontWeight:900,textTransform:'uppercase',letterSpacing:'0.08em',background:'linear-gradient(to right,#f9a8d4,#d8b4fe)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>
+            Neural Sync Active
+          </span>
+        </div>
+        <p style={{fontSize:11,color:'#475569',lineHeight:1.6,marginBottom:10}}>
+          Live indexing across GitHub, Drive, Notion and Slack.
+        </p>
+        <div style={{width:'100%',height:5,borderRadius:3,background:'rgba(15,10,40,0.8)',overflow:'hidden'}}>
+          <div style={{height:'100%',width:'100%',borderRadius:3,background:'linear-gradient(to right,#ec4899,#a855f7,#22d3ee)',animation:'pulse 2s ease infinite'}}/>
+        </div>
+        <div style={{display:'flex',justifyContent:'space-between',marginTop:7,fontSize:10,fontFamily:'monospace',fontWeight:600,color:'#475569'}}>
+          <span>Latency: 6ms</span>
+          <span style={{color:'#34d399',display:'flex',alignItems:'center',gap:4}}>
+            <span style={{width:5,height:5,borderRadius:'50%',background:'#34d399',display:'inline-block',animation:'pulse 1s ease infinite'}}/>
+            256-bit Encrypted
+          </span>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+
+/* â”€â”€â”€ ArtifactCard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+const CAT_META = {
+  coders:   {icon:IC.code,  bg:'rgba(6,182,212,0.1)',  bdr:'rgba(6,182,212,0.32)',  color:'#67e8f9'},
+  creators: {icon:IC.video, bg:'rgba(244,63,94,0.1)',  bdr:'rgba(244,63,94,0.32)',  color:'#fda4af'},
+  leaders:  {icon:IC.brief, bg:'rgba(245,158,11,0.1)', bdr:'rgba(245,158,11,0.32)', color:'#fcd34d'},
+};
+
+function ArtifactCard({item, onFav, onDelete, onCopy, onDownload, onExpand}){
+  const m = CAT_META[item.category] || CAT_META.coders;
+  const [hov, setHov] = useState(false);
+
+  return (
+    <div className="glass-card" style={{padding:20,display:'flex',flexDirection:'column',gap:12,position:'relative'}}
+      onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}>
+
+      {/* Category badge + action buttons */}
+      <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:8}}>
+        <div style={{display:'flex',alignItems:'center',gap:5,padding:'4px 10px',borderRadius:9,background:m.bg,border:'1px solid '+m.bdr,fontSize:10,fontWeight:800,textTransform:'uppercase',letterSpacing:'0.06em',color:m.color,flexShrink:0}}>
+          {m.icon({...SZ.xs,color:'currentColor'})}
+          <span>{item.category} Â· {item.source}</span>
+        </div>
+        <div style={{display:'flex',gap:5,flexShrink:0}}>
+          <button onClick={()=>onFav(item.id)} title="Favourite" style={{
+            padding:6,borderRadius:9,cursor:'pointer',display:'flex',
+            background: item.favorite ? 'rgba(245,158,11,0.18)' : 'rgba(255,255,255,0.05)',
+            border: item.favorite ? '1px solid rgba(245,158,11,0.5)' : '1px solid rgba(255,255,255,0.08)',
+            color: item.favorite ? '#fcd34d' : '#64748b',
+            transition:'all 0.15s',
+          }}>
+            {IC.star({...SZ.sm,color:'currentColor'}, item.favorite)}
+          </button>
+          <button onClick={()=>onDelete(item.id)} title="Delete" style={{
+            padding:6,borderRadius:9,cursor:'pointer',display:'flex',
+            background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',
+            color:'#ef4444',opacity: hov ? 1 : 0,transition:'opacity 0.2s',
+          }}>
+            {IC.trash({...SZ.sm,color:'currentColor'})}
+          </button>
+        </div>
+      </div>
+
+      {/* Title + description */}
+      <div>
+        <h4 style={{fontWeight:800,fontSize:15,color:'#f1f5f9',marginBottom:5,lineHeight:1.3}}>
+          {item.title}
+        </h4>
+        <p className="clamp2" style={{fontSize:12,color:'#64748b',lineHeight:1.65}}>
+          {item.description}
+        </p>
+      </div>
+
+      {/* Image */}
+      {item.image && (
+        <div style={{borderRadius:13,overflow:'hidden',height:118,border:'1px solid rgba(255,255,255,0.07)',position:'relative',flexShrink:0}}>
+          <img src={item.image} alt={item.title} style={{width:'100%',height:'100%',objectFit:'cover',transition:'transform 0.4s',transform: hov ? 'scale(1.05)' : 'scale(1)'}}/>
+          <div style={{position:'absolute',inset:0,background:'linear-gradient(to top,rgba(3,0,20,0.65),transparent)',pointerEvents:'none'}}/>
+        </div>
+      )}
+
+      {/* Snippet */}
+      {item.snippet && (
+        <div className="mono" style={{background:'rgba(2,6,23,0.92)',borderRadius:11,padding:11,fontSize:11,color:'#f9a8d4',border:'1px solid rgba(255,255,255,0.06)',maxHeight:82,overflowY:'auto',lineHeight:1.65}}>
+          <pre style={{margin:0,whiteSpace:'pre-wrap',wordBreak:'break-all'}}>{item.snippet}</pre>
+        </div>
+      )}
+
+      {/* Tags */}
+      {item.tags && item.tags.length > 0 && (
+        <div style={{display:'flex',flexWrap:'wrap',gap:5}}>
+          {item.tags.map((tag,i)=>(
+            <span key={i} className="tag">{tag}</span>
+          ))}
+        </div>
+      )}
+
+      {/* Footer */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',paddingTop:10,borderTop:'1px solid rgba(255,255,255,0.07)',marginTop:'auto',gap:6,flexWrap:'wrap'}}>
+        <span className="mono" style={{fontSize:11,color:'#475569',flexShrink:0}}>{item.metadata}</span>
+        <div style={{display:'flex',gap:5,flexWrap:'wrap'}}>
+          <button onClick={()=>onDownload(item)} style={{display:'flex',alignItems:'center',gap:4,padding:'5px 9px',borderRadius:9,fontSize:11,fontWeight:700,color:'#67e8f9',background:'rgba(6,182,212,0.1)',border:'1px solid rgba(6,182,212,0.28)',cursor:'pointer'}}>
+            {IC.download({...SZ.xs,color:'currentColor'})} Save
+          </button>
+          <button onClick={()=>onExpand(item)} style={{display:'flex',alignItems:'center',gap:4,padding:'5px 9px',borderRadius:9,fontSize:11,fontWeight:700,color:'#d8b4fe',background:'rgba(124,58,237,0.1)',border:'1px solid rgba(124,58,237,0.28)',cursor:'pointer'}}>
+            {IC.expand({...SZ.xs,color:'currentColor'})} View
+          </button>
+          <button onClick={()=>onCopy(item)} style={{display:'flex',alignItems:'center',gap:5,padding:'5px 13px',borderRadius:9,fontSize:11,fontWeight:700,color:'#fff',background:'linear-gradient(135deg,#db2777,#7c3aed)',border:'none',cursor:'pointer',boxShadow:'0 3px 12px rgba(219,39,119,0.28)'}}>
+            Copy {IC.copy({...SZ.xs,color:'#fff'})}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* â”€â”€â”€ ExpandModal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+function ExpandModal({item, onClose, onCopy, onDownload}){
+  return (
+    <div className="overlay" onClick={onClose}>
+      <div className="glass anim-pop-in" onClick={e=>e.stopPropagation()} style={{
+        width:'100%',maxWidth:700,borderRadius:24,padding:28,
+        border:'1px solid rgba(236,72,153,0.42)',
+        maxHeight:'90vh',overflowY:'auto',
+      }}>
+        {/* Header */}
+        <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:18,gap:12}}>
+          <div>
+            <h2 style={{fontWeight:900,fontSize:20,color:'#fff',marginBottom:4,lineHeight:1.25}}>{item.title}</h2>
+            <span className="mono" style={{fontSize:11,color:'#f472b6'}}>{item.category} Â· {item.source}</span>
+          </div>
+          <button onClick={onClose} style={{padding:7,borderRadius:10,background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.1)',cursor:'pointer',color:'#94a3b8',display:'flex',flexShrink:0}}>
+            {IC.x(SZ.md)}
+          </button>
+        </div>
+
+        {/* Image */}
+        {item.image && (
+          <div style={{borderRadius:16,overflow:'hidden',height:210,marginBottom:18,border:'1px solid rgba(255,255,255,0.09)'}}>
+            <img src={item.image} alt={item.title} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
+          </div>
+        )}
+
+        {/* Description */}
+        <p style={{fontSize:13,color:'#94a3b8',lineHeight:1.75,marginBottom:18}}>{item.description}</p>
+
+        {/* Snippet */}
+        {item.snippet && (
+          <div style={{marginBottom:16}}>
+            <div style={{fontSize:10,fontWeight:800,textTransform:'uppercase',letterSpacing:'0.08em',color:'#f472b6',marginBottom:7}}>Snippet</div>
+            <div className="mono" style={{background:'rgba(2,6,23,0.96)',borderRadius:14,padding:16,fontSize:12,color:'#f9a8d4',border:'1px solid rgba(255,255,255,0.07)',lineHeight:1.75,overflowX:'auto'}}>
+              <pre style={{margin:0,whiteSpace:'pre-wrap',wordBreak:'break-all'}}>{item.snippet}</pre>
+            </div>
+          </div>
+        )}
+
+        {/* Tags */}
+        {item.tags && item.tags.length > 0 && (
+          <div style={{display:'flex',flexWrap:'wrap',gap:6,marginBottom:4}}>
+            {item.tags.map((tag,i)=><span key={i} className="tag">{tag}</span>)}
+          </div>
+        )}
+
+        {/* Actions */}
+        <div style={{display:'flex',gap:10,marginTop:18,paddingTop:16,borderTop:'1px solid rgba(255,255,255,0.07)'}}>
+          <button onClick={()=>onCopy(item)} style={{flex:1,padding:11,borderRadius:12,fontSize:12,fontWeight:700,color:'#fff',background:'linear-gradient(135deg,#db2777,#7c3aed)',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:7}}>
+            {IC.copy({...SZ.sm,color:'#fff'})} Copy Snippet
+          </button>
+          <button onClick={()=>onDownload(item)} style={{flex:1,padding:11,borderRadius:12,fontSize:12,fontWeight:700,color:'#67e8f9',background:'rgba(6,182,212,0.1)',border:'1px solid rgba(6,182,212,0.28)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:7}}>
+            {IC.download({...SZ.sm,color:'currentColor'})} Download
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+/* â”€â”€â”€ ChatBot Brain (fixed & improved) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+function botReply(msg, items){
+  const m = msg.toLowerCase().trim();
+
+  /* Robust keyword matcher â€” checks if ANY of the words appear */
+  const has = (...words) => words.some(w => m.includes(w));
+
+  /* â”€â”€ Greetings â”€â”€ */
+  if(has('hi','hello','hey','sup','yo','howdy','good morning','good evening','good afternoon','whats up','what\'s up'))
+    return "Hey! ðŸ‘‹ I'm your ContextPulse AI.\n\nHere's what I can help with:\n\nðŸ› ï¸  \"tools\"       â€” see all features\nðŸ“‹  \"copy\"        â€” how to copy a snippet\nâ¬‡ï¸  \"save\"        â€” how to download\nðŸ”  \"search\"      â€” how to filter & search\nâ­  \"favourites\"  â€” your starred items\nðŸ“Š  \"stats\"       â€” workspace counts\nðŸ·ï¸  \"tags\"        â€” list all tags\nâž•  \"add\"         â€” create a new artifact\n\nOr just type any artifact title to find it!";
+
+  /* â”€â”€ Tools / Features â”€â”€ */
+  if(has('tools','features','capabilities','what can you do','what does this do','how does this work','all features','feature list'))
+    return "ðŸ› ï¸  ALL TOOLS IN CONTEXTPULSE:\n\nðŸ“‹  COPY â€” Pink button on each card. Copies the code snippet instantly. Works locally and on hosted sites (fallback method included).\n\nâ¬‡ï¸  SAVE â€” Cyan 'Save' button. Downloads the snippet as a .txt file.\n\nðŸ”  VIEW â€” Purple 'View' button. Opens a full-screen detail modal.\n\nâž•  ADD CONTEXT â€” Header top-right. Create an artifact with title, snippet, tags and more.\n\nðŸ”Ž  SEARCH â€” Type in the main search bar or press Ctrl+K / âŒ˜K for Omni Search.\n\nâ­  FAVOURITE â€” Click the â­ star on any card to bookmark it.\n\nðŸ—‘ï¸  DELETE â€” Hover a card â†’ trash icon appears â†’ click to remove.\n\nðŸ’¬  CHAT â€” That's me! Ask anything about the app.";
+
+  /* â”€â”€ Help / Guide â”€â”€ */
+  if(has('help','guide','tutorial','command','how to use','usage'))
+    return "ðŸ’¡ QUICK REFERENCE:\n\nâ€¢ \"tools\"       â†’ all features explained\nâ€¢ \"copy\"        â†’ copy snippet to clipboard\nâ€¢ \"save\"        â†’ download snippet as file\nâ€¢ \"view\"        â†’ open full artifact detail\nâ€¢ \"search\"      â†’ search & filter workspace\nâ€¢ \"add\"         â†’ create new artifact\nâ€¢ \"favourites\"  â†’ your bookmarked items\nâ€¢ \"delete\"      â†’ remove an artifact\nâ€¢ \"tags\"        â†’ list all existing tags\nâ€¢ \"stats\"       â†’ item counts per workspace\n\nOr just type any artifact title to find it!";
+
+  /* â”€â”€ Copy â”€â”€ */
+  if(has('copy','clipboard','how to copy','copying'))
+    return "ðŸ“‹  HOW TO COPY A SNIPPET:\n\n1ï¸âƒ£  Find the artifact card you want\n2ï¸âƒ£  Click the pink gradient 'Copy' button (bottom-right of card)\n3ï¸âƒ£  The snippet is copied to your clipboard âœ…\n\nYou can also copy from inside the 'View' modal.\n\nâœ…  Works on both local file:// and hosted https:// â€” a fallback method (execCommand) runs automatically if the Clipboard API is blocked.";
+
+  /* â”€â”€ Save / Download â”€â”€ */
+  if(has('save','download','export','get file','how to download','how to save'))
+    return "â¬‡ï¸  HOW TO DOWNLOAD A SNIPPET:\n\n1ï¸âƒ£  Find the artifact card\n2ï¸âƒ£  Click the cyan 'Save' button at the bottom of the card\n3ï¸âƒ£  A .txt file downloads to your computer âœ…\n\nYou can also download from inside the 'View' modal.";
+
+  /* â”€â”€ View / Expand â”€â”€ */
+  if(has('view','expand','open','full detail','preview','modal','see full','see more','full screen'))
+    return "ðŸ”  HOW TO VIEW FULL ARTIFACT:\n\n1ï¸âƒ£  Click the purple 'View' button on any card\n2ï¸âƒ£  A full-screen overlay opens with:\n     â€¢ Full title & source\n     â€¢ Complete code snippet\n     â€¢ Description & tags\n     â€¢ Full-size image\n3ï¸âƒ£  Copy or Download directly from this modal âœ…";
+
+  /* â”€â”€ Search â”€â”€ */
+  if(has('search','find','filter','query','look for','how to search','how to find'))
+    return "ðŸ”Ž  HOW TO SEARCH:\n\nâ€¢ Type in the main search bar (center of page) â€” cards filter in real-time\nâ€¢ Press Ctrl+K (Windows) or âŒ˜K (Mac) for Omni Search overlay\nâ€¢ Searches across: title, description, tags, source, and snippet content\nâ€¢ Click the sidebar tabs to filter by workspace\nâ€¢ Click 'Clear' to reset the search âœ…";
+
+  /* â”€â”€ Add / Create â”€â”€ */
+  if(has('add','create','new artifact','index artifact','upload','new context','make new','how to add'))
+    return "âž•  HOW TO ADD A NEW ARTIFACT:\n\n1ï¸âƒ£  Click 'Add Context' (top-right header button)\n2ï¸âƒ£  Fill in the form:\n     â€¢ Title (required)\n     â€¢ Workspace: Coders / Creators / Leaders\n     â€¢ Source (GitHub, Notion, etc.)\n     â€¢ Description\n     â€¢ Code snippet\n     â€¢ Tags (comma-separated, e.g. #Auth, #NodeJS)\n     â€¢ Image URL (optional)\n3ï¸âƒ£  Click 'Index Artifact' to save âœ…\n\nArtifacts are saved in your browser's localStorage automatically.";
+
+  /* â”€â”€ Favourites / Starred â”€â”€ */
+  if(has('favourite','favorites','star','starred','bookmark','bookmarks','liked')){
+    const favs = items.filter(i=>i.favorite);
+    if(favs.length===0)
+      return "â­  You have no starred artifacts yet.\n\nTo favourite one:\n1ï¸âƒ£  Find any artifact card\n2ï¸âƒ£  Click the â­ star icon in the top-right corner of the card\n3ï¸âƒ£  It turns gold and is bookmarked âœ…\n\nClick it again to un-favourite.";
+    return "â­  YOUR STARRED ARTIFACTS ("+favs.length+"):\n\n"+favs.map(i=>"â€¢ "+i.title+" ["+i.category+"]").join('\n')+"\n\nClick â­ on any card to toggle its favourite status.";
+  }
+
+  /* â”€â”€ Delete / Remove â”€â”€ */
+  if(has('delete','remove','trash','clear artifact','how to delete','how to remove'))
+    return "ðŸ—‘ï¸  HOW TO DELETE AN ARTIFACT:\n\n1ï¸âƒ£  Hover your mouse over any artifact card\n2ï¸âƒ£  The ðŸ—‘ï¸ trash icon appears in the top-right corner\n3ï¸âƒ£  Click it â€” the artifact is permanently removed âœ…\n\nâš ï¸  Deletion is instant. Refresh the page if you want to restore defaults (clears localStorage).";
+
+  /* â”€â”€ Tags â”€â”€ */
+  if(has('tag','tags','#') && !has('add','create')){
+    const all = [];
+    items.forEach(i=>i.tags&&i.tags.forEach(t=>{ if(!all.includes(t)) all.push(t); }));
+    return "ðŸ·ï¸  ALL TAGS IN YOUR WORKSPACE:\n\n"+(all.length>0 ? all.join('   ') : 'No tags found yet. Add tags when creating artifacts.');
+  }
+
+  /* â”€â”€ Stats / Workspace counts â”€â”€ */
+  if(has('stat','stats','count','how many','total','workspace','coders','creators','leaders','category')){
+    const c  = items.filter(i=>i.category==='coders').length;
+    const cr = items.filter(i=>i.category==='creators').length;
+    const l  = items.filter(i=>i.category==='leaders').length;
+    const fav= items.filter(i=>i.favorite).length;
+    return "ðŸ“Š  WORKSPACE STATS:\n\nðŸ’»  Coders Workspace   â†’ "+c+" artifact"+(c!==1?'s':'')+
+           "\nðŸŽ¬  Creators Vault     â†’ "+cr+" artifact"+(cr!==1?'s':'')+
+           "\nðŸ’¼  Executive Suite    â†’ "+l+" artifact"+(l!==1?'s':'')+
+           "\n\nðŸ“¦  Total: "+items.length+" artifacts indexed"+
+           "\nâ­  Starred: "+fav+" artifact"+(fav!==1?'s':'');
+  }
+
+  /* â”€â”€ Keyboard shortcuts â”€â”€ */
+  if(has('keyboard','shortcut','hotkey','ctrl','cmd','key'))
+    return "âŒ¨ï¸  KEYBOARD SHORTCUTS:\n\nâ€¢ Ctrl+K / âŒ˜K  â†’ Open Omni Search overlay\nâ€¢ Escape         â†’ Close any open modal or overlay\nâ€¢ Enter          â†’ Submit chat message";
+
+  /* â”€â”€ Search artifact by title â”€â”€ */
+  const found = items.filter(i=>
+    i.title.toLowerCase().includes(m) ||
+    i.tags.some(t=>t.toLowerCase().includes(m)) ||
+    i.source.toLowerCase().includes(m)
+  );
+  if(found.length > 0)
+    return "ðŸ”  Found "+found.length+" artifact"+(found.length>1?'s':'')+' matching "'+msg+'":\n\n'+
+           found.map(i=>"â€¢ "+i.title+"\n  ["+i.category+"] â€” "+i.source+"\n  Tags: "+i.tags.join(', ')).join('\n\n');
+
+  /* â”€â”€ Fallback â”€â”€ */
+  return "ðŸ¤”  I didn't quite catch that.\n\nTry one of these:\nâ€¢ \"tools\"       â†’ all features\nâ€¢ \"copy\"        â†’ copy a snippet\nâ€¢ \"save\"        â†’ download snippet\nâ€¢ \"view\"        â†’ full artifact details\nâ€¢ \"search\"      â†’ find artifacts\nâ€¢ \"add\"         â†’ create new artifact\nâ€¢ \"favourites\"  â†’ your starred items\nâ€¢ \"tags\"        â†’ list all tags\nâ€¢ \"stats\"       â†’ workspace counts\nâ€¢ \"shortcuts\"   â†’ keyboard shortcuts\n\nOr type any artifact title or tag to find it!";
+}
+
+
+/* â”€â”€â”€ ChatPanel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+const CHAT_CHIPS = [
+  {label:'ðŸ› ï¸ tools',   send:'tools'},
+  {label:'ðŸ“‹ copy',    send:'copy'},
+  {label:'â¬‡ï¸ save',    send:'save'},
+  {label:'ðŸ” search',  send:'search'},
+  {label:'â­ starred', send:'favourites'},
+  {label:'ðŸ“Š stats',   send:'stats'},
+];
+
+function ChatPanel({onClose, items}){
+  const [msgs,   setMsgs]   = useState([{from:'ai', text:"Hi! I'm your ContextPulse AI ðŸ¤–\n\nClick a quick button below, or ask me anything:\nðŸ› ï¸  \"tools\"  â€” see all features\nðŸ“‹  \"copy\"   â€” copy a snippet\nðŸ”  \"search\" â€” find artifacts\n\nOr type any artifact title to find it!"}]);
+  const [input,  setInput]  = useState('');
+  const [typing, setTyping] = useState(false);
+  const bottomRef = useRef(null);
+
+  /* Auto-scroll to bottom whenever messages or typing state changes */
+  useEffect(()=>{
+    if(bottomRef.current) bottomRef.current.scrollIntoView({behavior:'smooth'});
+  },[msgs,typing]);
+
+  const sendMsg = useCallback((text)=>{
+    const t = text.trim();
+    if(!t) return;
+    setMsgs(prev=>[...prev, {from:'user', text:t}]);
+    setInput('');
+    setTyping(true);
+    setTimeout(()=>{
+      const reply = botReply(t, items);
+      setMsgs(prev=>[...prev, {from:'ai', text:reply}]);
+      setTyping(false);
+    }, 520);
+  },[items]);
+
+  function onKey(e){
+    if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendMsg(input); }
+  }
+
+  return (
+    <div className="glass anim-slide-up" style={{
+      position:'fixed', bottom:92, left:24, zIndex:89,
+      width:345, maxHeight:510, borderRadius:22,
+      border:'1px solid rgba(236,72,153,0.38)',
+      display:'flex', flexDirection:'column', overflow:'hidden',
+      boxShadow:'0 28px 64px rgba(0,0,0,0.75)',
+    }}>
+
+      {/* Chat Header */}
+      <div style={{padding:'12px 14px',borderBottom:'1px solid rgba(255,255,255,0.08)',display:'flex',alignItems:'center',justifyContent:'space-between',background:'rgba(15,10,40,0.92)',flexShrink:0}}>
+        <div style={{display:'flex',alignItems:'center',gap:9}}>
+          <div style={{width:32,height:32,borderRadius:'50%',background:'linear-gradient(135deg,#ec4899,#7c3aed)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+            {IC.sparkle({...SZ.sm,color:'#fff'})}
+          </div>
+          <div>
+            <div style={{fontSize:12,fontWeight:800,color:'#fff'}}>ContextPulse AI</div>
+            <div style={{fontSize:10,color:'#34d399',display:'flex',alignItems:'center',gap:4}}>
+              <span style={{width:5,height:5,borderRadius:'50%',background:'#34d399',display:'inline-block',animation:'pulse 1.4s ease infinite'}}/>
+              Online Â· Ready
+            </div>
+          </div>
+        </div>
+        <button onClick={onClose} style={{padding:5,borderRadius:8,background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',cursor:'pointer',color:'#64748b',display:'flex'}}>
+          {IC.x({...SZ.sm,color:'currentColor'})}
+        </button>
+      </div>
+
+      {/* Messages */}
+      <div style={{flex:1,overflowY:'auto',padding:12,display:'flex',flexDirection:'column',gap:9}}>
+        {msgs.map((msg,i)=>{
+          const isAI = msg.from === 'ai';
+          return (
+            <div key={i}>
+              <div style={{display:'flex',justifyContent: isAI ? 'flex-start' : 'flex-end'}}>
+                <div style={{
+                  maxWidth:'87%', padding:'9px 12px',
+                  borderRadius: isAI ? '4px 14px 14px 14px' : '14px 4px 14px 14px',
+                  fontSize:12, lineHeight:1.72, whiteSpace:'pre-wrap', wordBreak:'break-word',
+                  background: isAI ? 'rgba(124,58,237,0.18)' : 'linear-gradient(135deg,rgba(219,39,119,0.38),rgba(124,58,237,0.38))',
+                  border: isAI ? '1px solid rgba(124,58,237,0.28)' : '1px solid rgba(236,72,153,0.28)',
+                  color:'#f1f5f9',
+                }}>
+                  {msg.text}
+                </div>
+              </div>
+
+              {/* Quick chip buttons â€” shown only after the FIRST AI message */}
+              {isAI && i===0 && (
+                <div style={{display:'flex',flexWrap:'wrap',gap:5,marginTop:9}}>
+                  {CHAT_CHIPS.map(chip=>(
+                    <button key={chip.send} onClick={()=>sendMsg(chip.send)} style={{
+                      fontSize:10,fontWeight:700,padding:'3px 10px',borderRadius:20,
+                      background:'rgba(124,58,237,0.14)',border:'1px solid rgba(124,58,237,0.38)',
+                      color:'#c4b5fd',cursor:'pointer',fontFamily:'inherit',transition:'all 0.15s',
+                    }}
+                    onMouseEnter={e=>e.currentTarget.style.background='rgba(124,58,237,0.38)'}
+                    onMouseLeave={e=>e.currentTarget.style.background='rgba(124,58,237,0.14)'}>
+                      {chip.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+
+        {/* Typing indicator */}
+        {typing && (
+          <div style={{display:'flex',justifyContent:'flex-start'}}>
+            <div style={{padding:'10px 14px',borderRadius:'4px 14px 14px 14px',background:'rgba(124,58,237,0.18)',border:'1px solid rgba(124,58,237,0.28)',display:'flex',gap:4,alignItems:'center'}}>
+              <span style={{width:6,height:6,borderRadius:'50%',background:'#a78bfa',display:'inline-block',animation:'dot1 1.2s ease 0s infinite'}}/>
+              <span style={{width:6,height:6,borderRadius:'50%',background:'#a78bfa',display:'inline-block',animation:'dot2 1.2s ease 0.2s infinite'}}/>
+              <span style={{width:6,height:6,borderRadius:'50%',background:'#a78bfa',display:'inline-block',animation:'dot3 1.2s ease 0.4s infinite'}}/>
+            </div>
+          </div>
+        )}
+        <div ref={bottomRef}/>
+      </div>
+
+      {/* Input */}
+      <div style={{padding:'10px 12px',borderTop:'1px solid rgba(255,255,255,0.07)',display:'flex',gap:8,background:'rgba(15,10,40,0.92)',flexShrink:0}}>
+        <input
+          type="text" value={input}
+          onChange={e=>setInput(e.target.value)}
+          onKeyDown={onKey}
+          placeholder="Ask anything about this appâ€¦"
+          style={{flex:1,background:'rgba(2,6,23,0.9)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:10,padding:'8px 12px',fontSize:12,color:'#f1f5f9',outline:'none',fontFamily:'inherit',transition:'border-color 0.2s'}}
+          onFocus={e=>e.target.style.borderColor='rgba(236,72,153,0.55)'}
+          onBlur={e=>e.target.style.borderColor='rgba(255,255,255,0.1)'}
+        />
+        <button onClick={()=>sendMsg(input)} style={{padding:'8px 12px',borderRadius:10,background:'linear-gradient(135deg,#db2777,#7c3aed)',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',flexShrink:0}}>
+          {IC.send({...SZ.md,color:'#fff'})}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
+/* â”€â”€â”€ App â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+function App(){
+  /* State */
+  const [items, setItems] = useState(()=>{
+    try{
+      const s = localStorage.getItem('cp_v5');
+      if(s){ const p=JSON.parse(s); if(Array.isArray(p) && p.length>0) return p; }
+    }catch(e){}
+    return SEED;
+  });
+  const [tab,      setTab]      = useState('all');
+  const [query,    setQuery]    = useState('');
+  const [omni,     setOmni]     = useState(false);
+  const [addOpen,  setAddOpen]  = useState(false);
+  const [toast,    setToast]    = useState(null);
+  const [expanded, setExpanded] = useState(null);
+  const [chatOpen, setChatOpen] = useState(false);
+
+  /* Persist to localStorage */
+  useEffect(()=>{
+    try{ localStorage.setItem('cp_v5', JSON.stringify(items)); }catch(e){}
+  },[items]);
+
+  /* Global keyboard shortcuts */
+  useEffect(()=>{
+    function kd(e){
+      if((e.metaKey||e.ctrlKey) && e.key.toLowerCase()==='k'){
+        e.preventDefault(); setOmni(p=>!p);
+      }
+      if(e.key==='Escape'){
+        setOmni(false); setAddOpen(false); setExpanded(null);
+      }
+    }
+    window.addEventListener('keydown', kd);
+    return ()=>window.removeEventListener('keydown', kd);
+  },[]);
+
+  /* Toast helper */
+  function showToast(msg){
+    setToast(msg);
+    setTimeout(()=>setToast(null), 3000);
+  }
+
+  /* Handlers */
+  function handleFav(id){
+    setItems(p=>p.map(i=>i.id===id ? {...i,favorite:!i.favorite} : i));
+    showToast('â­ Favourite updated');
+  }
+  function handleDelete(id){
+    setItems(p=>p.filter(i=>i.id!==id));
+    showToast('ðŸ—‘ï¸ Artifact deleted');
+  }
+  function handleAdd(item){
+    setItems(p=>[item,...p]);
+    setAddOpen(false);
+    showToast('âœ¨ Artifact indexed!');
+  }
+  function handleDownload(item){
+    const text = item.snippet || item.title;
+    const blob = new Blob([text],{type:'text/plain'});
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url;
+    a.download = item.title.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('â¬‡ï¸ Snippet downloaded!');
+  }
+  function fallbackCopy(text){
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    try{
+      const ok = document.execCommand('copy');
+      showToast(ok ? 'ðŸ“‹ Copied to clipboard!' : 'âš ï¸ Copy failed â€” try manually');
+    }catch(e){ showToast('âš ï¸ Copy not supported here'); }
+    document.body.removeChild(ta);
+  }
+  function handleCopy(item){
+    const text = item.snippet || item.title;
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text)
+        .then(()=>showToast('ðŸ“‹ Copied to clipboard!'))
+        .catch(()=>fallbackCopy(text));
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  /* OmniSearch result â†’ open expand modal */
+  function handleOmniSelect(item){
+    setExpanded(item);
+  }
+
+  /* Filtered items */
+  const filtered = useMemo(()=>{
+    const q = query.trim().toLowerCase();
+    return items.filter(item=>{
+      const matchTab = tab==='all' || item.category===tab;
+      const matchQ   = !q ||
+        item.title.toLowerCase().includes(q) ||
+        item.description.toLowerCase().includes(q) ||
+        item.source.toLowerCase().includes(q) ||
+        (item.snippet && item.snippet.toLowerCase().includes(q)) ||
+        item.tags.some(t=>t.toLowerCase().includes(q));
+      return matchTab && matchQ;
+    });
+  },[items, tab, query]);
+
+  const feedLabel = tab==='all' ? 'All Workspace Streams' : {
+    coders:'Coders Workspace', creators:'Creators Vault', leaders:'Executive Suite'
+  }[tab];
+
+  return (
+    <div style={{minHeight:'100vh',display:'flex',flexDirection:'column'}}>
+
+      {/* Toast */}
+      {toast && <Toast msg={toast}/>}
+
+      {/* OmniSearch overlay */}
+      {omni && (
+        <OmniSearch
+          items={items} query={query} setQuery={setQuery}
+          onClose={()=>setOmni(false)}
+          onSelect={handleOmniSelect}
+        />
+      )}
+
+      {/* Add artifact modal */}
+      {addOpen && <AddItemModal onClose={()=>setAddOpen(false)} onAdd={handleAdd}/>}
+
+      {/* Expand / detail modal */}
+      {expanded && (
+        <ExpandModal
+          item={expanded}
+          onClose={()=>setExpanded(null)}
+          onCopy={handleCopy}
+          onDownload={handleDownload}
+        />
+      )}
+
+      {/* Header */}
+      <Header onAdd={()=>setAddOpen(true)} onSearch={()=>setOmni(true)}/>
+
+      {/* Main content */}
+      <main style={{flex:1,maxWidth:1320,width:'100%',margin:'0 auto',padding:'28px 20px'}}>
+        <div className="main-grid">
+          {/* Sidebar */}
+          <Sidebar items={items} active={tab} setActive={setTab}/>
+
+          {/* Feed */}
+          <section style={{display:'flex',flexDirection:'column',gap:20,minWidth:0}}>
+
+            {/* Search banner */}
+            <div className="glass" style={{borderRadius:22,padding:26,position:'relative',overflow:'hidden',border:'1px solid rgba(236,72,153,0.22)'}}>
+              <div style={{position:'absolute',right:-50,top:-50,width:220,height:220,borderRadius:'50%',background:'radial-gradient(circle,rgba(236,72,153,0.2),transparent)',filter:'blur(40px)',pointerEvents:'none'}}/>
+              <h2 className="grad-text" style={{fontWeight:900,fontSize:22,marginBottom:5}}>Infinite Context Engine</h2>
+              <p style={{fontSize:13,color:'#64748b',marginBottom:16,fontWeight:500}}>Instant retrieval across your entire digital workspace.</p>
+              <div style={{position:'relative'}}>
+                <span style={{position:'absolute',left:14,top:'50%',transform:'translateY(-50%)',pointerEvents:'none',display:'flex'}}>
+                  {IC.search({...SZ.md,color:'#f472b6'})}
+                </span>
+                <input
+                  type="text"
+                  value={query}
+                  onChange={e=>setQuery(e.target.value)}
+                  placeholder="Search by title, tag, keyword or platform…"
+                  className="field"
+                  style={{paddingLeft:42,fontSize:14,borderRadius:14,padding:'13px 14px 13px 42px'}}
+                />
+                {query && (
+                  <button onClick={()=>setQuery('')} style={{position:'absolute',right:12,top:'50%',transform:'translateY(-50%)',fontSize:11,fontWeight:700,color:'#f472b6',background:'none',border:'none',cursor:'pointer'}}>
+                    Clear
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Feed header */}
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 4px'}}>
+              <div style={{display:'flex',alignItems:'center',gap:8}}>
+                <span style={{width:8,height:8,borderRadius:'50%',background:'linear-gradient(to right,#f472b6,#a78bfa)',display:'inline-block'}}/>
+                <span style={{fontSize:13,fontWeight:800,color:'#e2e8f0'}}>{feedLabel}</span>
+              </div>
+              <span style={{fontSize:11,fontFamily:'monospace',fontWeight:700,padding:'3px 12px',borderRadius:20,background:'rgba(236,72,153,0.08)',border:'1px solid rgba(236,72,153,0.22)',color:'#f472b6'}}>
+                {filtered.length} artifact{filtered.length!==1?'s':''}
+              </span>
+            </div>
+
+            {/* Cards or empty state */}
+            {filtered.length===0 ? (
+              <div className="glass" style={{borderRadius:22,padding:'56px 20px',textAlign:'center',border:'1px dashed rgba(236,72,153,0.2)'}}>
+                <div style={{display:'flex',justifyContent:'center',marginBottom:14}}>
+                  {IC.inbox({width:44,height:44,color:'#ec4899',display:'block'})}
+                </div>
+                <p style={{fontWeight:700,color:'#cbd5e1',fontSize:14,marginBottom:4}}>No artifacts found</p>
+                <p style={{fontSize:12,color:'#475569'}}>Try a different search or add a new artifact.</p>
+              </div>
+            ) : (
+              <div className="cards-grid">
+                {filtered.map(item=>(
+                  <ArtifactCard
+                    key={item.id}
+                    item={item}
+                    onFav={handleFav}
+                    onDelete={handleDelete}
+                    onCopy={handleCopy}
+                    onDownload={handleDownload}
+                    onExpand={setExpanded}
+                  />
+                ))}
+              </div>
+            )}
+
+          </section>
+        </div>
+      </main>
+
+      {/* Chat FAB button */}
+      <button
+        onClick={()=>setChatOpen(p=>!p)}
+        title="Open AI Chat"
+        style={{
+          position:'fixed',bottom:24,left:24,zIndex:90,
+          width:52,height:52,borderRadius:'50%',
+          background: chatOpen
+            ? 'linear-gradient(135deg,#7c3aed,#ec4899)'
+            : 'linear-gradient(135deg,#ec4899,#7c3aed)',
+          border:'none',cursor:'pointer',
+          display:'flex',alignItems:'center',justifyContent:'center',
+          boxShadow:'0 6px 24px rgba(236,72,153,0.55)',
+          transition:'transform 0.2s, box-shadow 0.2s',
+        }}
+        onMouseEnter={e=>{e.currentTarget.style.transform='scale(1.12)';e.currentTarget.style.boxShadow='0 8px 30px rgba(236,72,153,0.7)';}}
+        onMouseLeave={e=>{e.currentTarget.style.transform='scale(1)';e.currentTarget.style.boxShadow='0 6px 24px rgba(236,72,153,0.55)';}}
+      >
+        {chatOpen ? IC.x({...SZ.lg,color:'#fff'}) : IC.chat({...SZ.lg,color:'#fff'})}
+      </button>
+
+      {/* Chat panel */}
+      {chatOpen && <ChatPanel onClose={()=>setChatOpen(false)} items={items}/>}
+
+    </div>
+  );
+}
+
+
+/* ─── Mount ──────────────────────────────────────────────────────────────── */
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
+
+/* ─── Mount ──────────────────────────────────────────────────────────────── */
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>
 </html>
